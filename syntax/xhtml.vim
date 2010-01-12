@@ -1,0 +1,1 @@
+set syntax=xhtml_
