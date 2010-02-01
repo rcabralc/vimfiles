@@ -187,7 +187,7 @@ augroup END
 augroup python
   " This is for the tComment plugin.  Strangely, it doesn't define a python
   " comment string.  This worked until I recently work on a kubuntu 9.04 box...
-  autocmd FileType python call TCommentDefineType('python', '# %s')
+  " autocmd FileType python call TCommentDefineType('python', '# %s')
 
   " Recognize Zope's controller python scripts and validators as python.
   autocmd BufNewFile,BufRead *.cpy,*.vpy set filetype=python
