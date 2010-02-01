@@ -14,8 +14,8 @@ autocmd!
 " permita que arquivos definam configuração
 set modeline
 
-" destaque linha do cursor
-set cursorline
+" destaque linha e coluna do cursor
+set cursorline cursorcolumn
 
 " permita uso do mouse em todos os modos
 " set mouse=a
@@ -66,7 +66,7 @@ syntax on
 " colorscheme blackboard
 " colorscheme desert
 let transparent_background=1
-colorscheme rafael
+colorscheme rcabralc
 
 " Movimentação/navegação
 " ======================
