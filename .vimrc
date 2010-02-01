@@ -14,6 +14,9 @@ autocmd!
 " permita que arquivos definam configuração
 set modeline
 
+" destaque linha do cursor
+set cursorline
+
 " permita uso do mouse em todos os modos
 " set mouse=a
 

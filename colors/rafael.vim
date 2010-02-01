@@ -33,10 +33,10 @@ end
 
 hi Cursor           guifg=Black   guibg=#FFFFFF
 hi Cursor           ctermfg=0     ctermbg=15
-hi CursorLine                     guibg=#0d0d0d
-hi CursorLine                     ctermbg=232
-hi CursorColumn                   guibg=#0d0d0d
-hi CursorColumn                   ctermbg=232
+hi CursorLine                     guibg=#141414 gui=none
+hi CursorLine                     ctermbg=233   cterm=none
+hi CursorColumn                   guibg=#141414
+hi CursorColumn                   ctermbg=233
 hi DiffAdd          guifg=#E6E1DC guibg=#144212
 hi DiffAdd          ctermfg=230   ctermbg=22
 hi DiffDelete       guifg=#E6E1DC guibg=#660000
