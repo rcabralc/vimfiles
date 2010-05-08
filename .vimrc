@@ -48,7 +48,7 @@ set hidden
 " ======
 
 " configuração de cores para fundo escuro
-set bg=dark
+" set bg=dark
 
 " Set the number of colors to 256.  This requires a capable terminal.
 set t_Co=256
@@ -66,7 +66,8 @@ syntax on
 " colorscheme blackboard
 " colorscheme desert
 let transparent_background=1
-colorscheme rcabralc
+" colorscheme rcabralc
+colorscheme jellybeans
 
 " Movimentação/navegação
 " ======================
@@ -92,7 +93,7 @@ endfunction
 map <Leader>D :bw<CR>
 
 " <F3> opens/closes the NERDTree window
-nmap <F3> :NERDTreeToggle<CR><C-W>=
+" nmap <F3> :NERDTreeToggle<CR><C-W>=
 
 " <C-F> finds the current buffer in the tree.
 nmap <C-F> :call FindInNERDTree()<CR>
