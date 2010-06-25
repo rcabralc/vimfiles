@@ -297,15 +297,15 @@ if version >= 700
   call s:X("TabLineSel","000000","f0f0f0","italic,bold","","")
 
   " Auto-completion
-  call s:X("Pmenu","ffffff","000000","","","")
-  call s:X("PmenuSel","101010","eeeeee","","","")
+  call s:X("Pmenu","ffffff","151515","","","")
+  call s:X("PmenuSel","303030","eeeeee","","","")
 endif
 
 call s:X("Visual","","404040","","","")
 call s:X("Cursor","","b0d0f0","","","")
 
 " call s:X("Normal","e8e8d3","151515","","White","")
-hi Normal guifg=#e8e8d3 guibg=#151515 ctermfg=White ctermbg=NONE
+hi Normal guifg=#e8e8d3 guibg=#000000 ctermfg=White ctermbg=NONE
 call s:X("LineNr","605958","151515","none","Black","")
 call s:X("Comment","888888","","italic","Grey","")
 call s:X("Todo","808080","","bold","","")
@@ -333,7 +333,7 @@ call s:X("Function","fad07a","","","Yellow","")
 call s:X("Statement","8197bf","","","DarkBlue","")
 call s:X("PreProc","8fbfdc","","","LightBlue","")
 
-hi link Operator Normal
+hi link Operator Structure
 
 call s:X("Type","ffb964","","","Yellow","")
 call s:X("NonText","808080","151515","","","")
