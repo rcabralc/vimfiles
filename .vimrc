@@ -82,15 +82,15 @@ nnoremap B :buffer<Space>
 " E prompts for a new file (in a new buffer)
 nnoremap E :edit<Space>
 
-" <Leader>D kills a buffer and close the window, <Leader>d kills a buffer but
-" preserve the window.
+" <Leader>D kills a buffer ignoring changes and closes the window, <Leader>d
+" kills a buffer when there's no changes and preserves the window.
 map <Leader>d :call KillBuffer()<CR>
 function! KillBuffer()
   let num = bufnr('%')
-  bn
+  bp
   execute "bw " . num
 endfunction
-map <Leader>D :bw<CR>
+map <Leader>D :bw!<CR>
 
 " <F3> opens/closes the NERDTree window
 " nmap <F3> :NERDTreeToggle<CR><C-W>=
