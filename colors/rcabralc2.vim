@@ -31,7 +31,7 @@ let g:colors_name = "rcabralc2"
 
 hi Cursor                    guibg=#FFFFFF
 hi CursorLine                guibg=#333435
-hi LineNr                    guifg=#888888 guibg=#DEDEDE
+hi LineNr                    guifg=#888888 guibg=#444444
 hi Normal                    guifg=#E6E1DC guibg=#2B2B2B
 hi Search                    guibg=#5A647E
 hi StatusLine 	             guifg=#FFFFFF guibg=#202020 gui=bold
