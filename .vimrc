@@ -165,6 +165,9 @@ set comments+=fb:*
 set comments+=b:\"
 set comments+=n::
 
+" Ragtag plugin global mappings.
+inoremap <M-o> <Esc>o
+let g:ragtag_global_maps = 1
 
 " Tipos de arquivos específicos
 " =============================
