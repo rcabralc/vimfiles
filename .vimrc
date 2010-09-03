@@ -29,8 +29,8 @@ set history=50
 " always show the status line
 set laststatus=2
 
-" fugitive indication.
-set statusline=%{fugitive#statusline()}
+" fugitive indication
+set statusline=%<%f\ %h%m%r%{fugitive#statusline()}%=%-14.(%l,%c%V%)\ %P
 
 " have command-line completion <Tab> (for filenames, help topics, option names)
 " first list the available options and complete the longest common part, then
