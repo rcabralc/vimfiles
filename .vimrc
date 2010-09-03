@@ -29,6 +29,9 @@ set history=50
 " always show the status line
 set laststatus=2
 
+" fugitive indication.
+set statusline=%{fugitive#statusline()}
+
 " have command-line completion <Tab> (for filenames, help topics, option names)
 " first list the available options and complete the longest common part, then
 " have further <Tab>s cycle through the possibilities:
@@ -71,6 +74,9 @@ colorscheme jellybeans
 
 " Movimentação/navegação
 " ======================
+
+map <A-j> 5j
+map <A-k> 5k
 
 " Navigate between buffers (only normal mode)
 nnoremap <C-N> :bn!<CR>
