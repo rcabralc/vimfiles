@@ -86,7 +86,8 @@ nnoremap <C-P> :bp!<CR>
 nnoremap B :buffer<Space>
 
 " E prompts for a new file (in a new buffer)
-nnoremap E :edit<Space>
+" nnoremap E :edit<Space>
+nmap E <Leader>lf
 
 " <Leader>D kills a buffer ignoring changes and closes the window, <Leader>d
 " kills a buffer when there's no changes and preserves the window.
@@ -97,12 +98,6 @@ function! KillBuffer()
   execute "bw " . num
 endfunction
 map <Leader>D :bw!<CR>
-
-" <F3> opens/closes the NERDTree window
-" nmap <F3> :NERDTreeToggle<CR><C-W>=
-
-" <C-F> finds the current buffer in the tree.
-nmap <C-F> :call FindInNERDTree()<CR>
 
 " Window
 " ------
