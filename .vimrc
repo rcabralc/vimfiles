@@ -85,9 +85,8 @@ nnoremap <C-P> :bp!<CR>
 " B prompts for opening a buffer
 nnoremap B :buffer<Space>
 
-" E prompts for a new file (in a new buffer)
-" nnoremap E :edit<Space>
-nmap E <Leader>lf
+" E prompts for a new/edit file (in a new buffer)
+nnoremap E :edit<Space>
 
 " <Leader>D kills a buffer ignoring changes and closes the window, <Leader>d
 " kills a buffer when there's no changes and preserves the window.
