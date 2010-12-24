@@ -283,3 +283,11 @@ set incsearch
 let g:selBufAlwaysShowDetails=1
 let g:selBufAlwaysShowHidden=1
 let g:selBufAlwaysShowPaths=2
+
+" More
+" ====
+
+" Calculator using python
+" -----------------------
+command! -nargs=+ Calc :py print <args>
+py from math import *
