@@ -169,10 +169,14 @@ set comments+=n::
 inoremap <M-o> <Esc>o
 let g:ragtag_global_maps = 1
 
+" Activate pathogen
+call pathogen#runtime_append_all_bundles()
+
 " Tipos de arquivos específicos
 " =============================
 
 " detecte os tipos de arquivo
+filetype off
 filetype plugin indent on
 
 " geral
