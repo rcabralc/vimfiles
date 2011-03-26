@@ -72,11 +72,17 @@ let transparent_background=1
 " colorscheme rcabralc
 colorscheme jellybeans
 
+" Ruby-Debugger
+" =============
+
+map <Leader>D :Rdebugger<Space>
+map <Leader>P :RdbCommand<Space>p<Space>
+map <Leader>L :RdbLog<CR>
+map <Leader>S :RdbStop<CR>
+
+
 " Movimentação/navegação
 " ======================
-
-map <A-j> 5j
-map <A-k> 5k
 
 " Navigate between buffers (only normal mode)
 nnoremap <C-N> :bn!<CR>
@@ -90,13 +96,13 @@ nnoremap E :edit<Space>
 
 " <Leader>D kills a buffer ignoring changes and closes the window, <Leader>d
 " kills a buffer when there's no changes and preserves the window.
-map <Leader>d :call KillBuffer()<CR>
+map <Leader>k :call KillBuffer()<CR>
 function! KillBuffer()
   let num = bufnr('%')
   bp
   execute "bw " . num
 endfunction
-map <Leader>D :bw!<CR>
+map <Leader>K :bw!<CR>
 
 " Window
 " ------
@@ -107,9 +113,10 @@ nnoremap <C-j> <C-W><C-j>
 nnoremap <C-k> <C-W><C-k>
 nnoremap <C-l> <C-W><C-l>
 
-" Mappings for breaking lines on every white space
-nnoremap <Leader>b f<Space>xi<CR><ESC>_
-nnoremap <Leader>B F<Space>xi<CR><ESC>_
+" Mappings for breaking lines on every white space or cursor
+nnoremap <Leader>j f<Space>xi<CR><ESC>_
+nnoremap <Leader>J F<Space>xi<CR><ESC>_
+nnoremap <A-j> i<CR><ESC>_
 
 " Mappings for breaking lines at 72 chars
 nmap <Leader>w 073l\B
@@ -240,6 +247,9 @@ augroup END
 
 augroup eruby
   autocmd FileType eruby set et ts=2 sw=2 sts=2 tw=79
+  " Change identation keys.  The automatic indent when <Return> is used in any
+  " place of the line is really crappy.
+  autocmd FileType eruby setlocal indentkeys=o,O,<Return>,<>>,{,},0),0],o,O,!^F,=end,=else,=elsif,=rescue,=ensure,=when,=end,=else,=cat,=fina,=END,0\
 augroup END
 
 augroup xmllike
