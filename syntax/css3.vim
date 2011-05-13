@@ -47,7 +47,7 @@ syn match cssUIProp contained "\<outline-\(width\|style\|offset\|color\)\>" cont
 syn match cssUIProp contained "\<nav-\(index\|up\|right\|down\|left\)\>" containedin=ALL
 syn keyword cssUIProp contained resize outline
 " Other modules
-syn keyword cssCommonAttr contained columns containedin=ALL
+syn keyword cssCommonAttr contained columns
 syn match cssCommonAttr contained "\<column-\(width\|span\|rule\|gap\|fill\|count\)\>" containedin=ALL
 syn match cssCommonAttr contained "\<column-rule-\(color\|width\|style\)\>" containedin=ALL
 syn match cssCommonAttr contained "\<column-break-\(after\|before\)\>" containedin=ALL
