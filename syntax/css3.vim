@@ -49,7 +49,7 @@ syn keyword cssColorProp contained opacity containedin=ALL
 
 syn match cssTextAttr contained "\<text-shadow\|text-overflow\|word-wrap\>" containedin=ALL
 
-syn match cssColorProp contained "\<background\(-\(origin\|clip\|size\)\)\=" containedin=ALL
+syn match cssColorProp contained "\<background\(-\(origin\|clip\|size\)\)\>" containedin=ALL
 
 "syn keyword cssColorProp contained hsl hsla rgb rgba
 syn match cssColor contained "\<rgb\s*(\s*\d\+\(\.\d*\)\=%\=\s*,\s*\d\+\(\.\d*\)\=%\=\s*,\s*\d\+\(\.\d*\)\=%\=\s*)"
