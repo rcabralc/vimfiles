@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:	CSS 3
 " Maintainer: lepture <sopheryoung@gmail.com>
-" Last Change:	Mar 3, 2010
+" Last Change:	May 13, 2011
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
@@ -20,6 +20,16 @@ if version < 600
 else
   runtime! syntax/css.vim
   unlet b:current_syntax
+endif
+
+" @media fixes
+syn match cssMediaConstraint contained "\(and\|or\)\s\+(\(min\|max\)-\(width\|height\)\s*:\s*\d\+\(\.\d*\)\=\(%\|mm\|cm\|in\|pt\|pc\|em\|ex\|px\))" nextgroup=cssMediaConstraint,cssMediaComma,cssMediaBlock skipwhite skipnl
+syn match cssMediaType contained "\(only\s\+\)\=\(screen\|print\|aural\|braile\|embosed\|handheld\|projection\|ty\|tv\|all\)" nextgroup=cssMediaConstraint,cssMediaComma,cssMediaBlock skipwhite skipnl
+
+if version < 508
+  hi link cssMediaConstraint Special
+else
+  hi def link cssMediaConstraint Special
 endif
 
 " HTML 5 tags
