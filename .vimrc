@@ -94,13 +94,21 @@ nnoremap B :buffer<Space>
 " E prompts for a new/edit file (in a new buffer)
 nnoremap E :edit<Space>
 
-" <Leader>D kills a buffer ignoring changes and closes the window, <Leader>d
+" <Leader>K kills a buffer ignoring changes and closes the window, <Leader>k
 " kills a buffer when there's no changes and preserves the window.
 map <Leader>k :call KillBuffer()<CR>
 function! KillBuffer()
-  let num = bufnr('%')
-  bp
-  execute "bw " . num
+    let del_buf_nr = bufnr("%")
+    let new_buf_nr = bufnr("#")
+    if ((new_buf_nr != -1) && (new_buf_nr != del_buf_nr) && buflisted(new_buf_nr))
+        execute "b " . new_buf_nr
+    else
+        bnext
+    endif
+    if (bufnr("%") == del_buf_nr)
+        new
+    endif
+    execute "bw " . del_buf_nr
 endfunction
 map <Leader>K :bw!<CR>
 
