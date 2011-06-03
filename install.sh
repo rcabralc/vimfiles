@@ -1,6 +1,8 @@
 #!/bin/sh
-mkdir bundle
+rm -rf bundle/
+rm -rf vim-pathogen/
 git clone http://github.com/tpope/vim-pathogen.git/
+mkdir bundle
 cd bundle
 git clone http://github.com/tpope/vim-abolish.git/
 git clone http://github.com/tpope/vim-fugitive.git/
