@@ -323,3 +323,13 @@ let g:selBufAlwaysShowPaths=2
 " -----------------------
 command! -nargs=+ Calc :py print <args>
 py from math import *
+
+" Syntastic configuration
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+let g:syntastic_auto_loc_list=1
+let g:syntastic_enable_signs=1
+
+" Disable syntastic for python, as I use pyflakes.
+let g:syntastic_disabled_filetypes = ['python']
