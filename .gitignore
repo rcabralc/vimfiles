@@ -1,5 +1,3 @@
 *.swp
 *.pyc
 .netrwhist
-bundle/
-vim-pathogen/
