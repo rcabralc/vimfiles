@@ -247,7 +247,7 @@ augroup rest
   " format list pattern
   autocmd FileType rst,gitcommit set flp=^\\s*\\(\\d\\+\\\|[a-z]\\)[\\].)]\\s*
 
-  " Syntax highlightning for doctest
+  " Syntax highlighting for doctest
   autocmd FileType rst set syntax=doctest
 augroup END
 
@@ -333,3 +333,7 @@ let g:syntastic_enable_signs=1
 
 " Disable syntastic for python, as I use pyflakes.
 let g:syntastic_disabled_filetypes = ['python']
+
+" Hilite trailing spaces as errors
+autocmd Syntax * syntax match TrailingSpace "\s\+$" containedin=ALL
+highlight link TrailingSpace Error
