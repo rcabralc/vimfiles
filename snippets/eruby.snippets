@@ -13,7 +13,6 @@ snippet lbh
 			<%= lb.headers(${1:Class}, ${2:fields}) %>
 		<% end %>
 	<% end %>
-	${3}
 
 snippet lbb
 	<% lb.body do %>
@@ -25,7 +24,6 @@ snippet lbb
 			<% end %>
 		<% end %>
 	<% end %>
-	${4}
 
 snippet lbf
 	<% lb.foot do %>
@@ -34,14 +32,12 @@ snippet lbf
 		<% end %>
 	<% end %>
 
-
 snippet pdf
 	<%= report_format_buttons %>
 
 	<% if report_mode == :pdf %>
 	  <%= pdf_report %>
 	<% else %>
-	${1}
 
 snippet form
 	<% form_for(
