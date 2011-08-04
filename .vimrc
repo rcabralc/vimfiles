@@ -294,6 +294,10 @@ augroup c
   autocmd FileType c set fo+=ro
 augroup END
 
+augroup snippet
+  autocmd FileType snippet set noexpandtab sw=2 ts=2
+augroup END
+
 
 " Procura e substituição
 " ======================
