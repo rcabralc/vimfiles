@@ -320,6 +320,15 @@ let g:selBufAlwaysShowDetails=1
 let g:selBufAlwaysShowHidden=1
 let g:selBufAlwaysShowPaths=2
 
+" Session management
+" ==================
+
+" When quitting, save the session.
+autocmd! VimLeavePre * mksession!
+
+" Load a session in the current directory.
+map <Leader>l :so Session.vim<CR>
+
 " More
 " ====
 
@@ -341,3 +350,6 @@ let g:syntastic_disabled_filetypes = ['python']
 " Hilite trailing spaces as errors
 autocmd Syntax * syntax match TrailingSpace "\s\+$" containedin=ALL
 highlight link TrailingSpace Error
+
+" Save the session and prompt for loading another.
+nmap <F2> :wa<Bar>exe "mksession! " . v:this_session<CR>:so ~/vim-sessions/
