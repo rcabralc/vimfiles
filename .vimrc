@@ -137,7 +137,7 @@ nnoremap <Leader>J F<Space>xi<CR><ESC>_
 nnoremap <A-j> i<CR><ESC>_
 
 " Mappings for breaking lines at 72 chars
-nmap <Leader>w 073l\B
+nmap <Leader>w 073l<A-j>
 
 " For Emacs-style editing on the command-line:
 " start of line
