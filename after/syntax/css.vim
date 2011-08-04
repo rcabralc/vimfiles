@@ -25,7 +25,9 @@ function! s:SetMatcher(clr,pat)
    redir END
    if s:currentmatch !~ a:pat.'\/'
       exe 'syn match '.group.' /'.a:pat.'\>/ contained'
-      exe 'syn cluster cssColors add='.group
+      " Use @cssValues instead of @cssColors, due to new css.vim syntax file.
+      " exe 'syn cluster cssColors add='.group
+      exe 'syn cluster cssValues add='.group
       if has('gui_running')
         exe 'hi '.group.' guifg='.s:FGforBG(a:clr)
         exe 'hi '.group.' guibg='.a:clr
@@ -107,7 +109,9 @@ endfunction
 function! s:SetNamedColor(clr,name)
    let group = 'cssColor'.substitute(a:clr,'^#','','')
    exe 'syn keyword '.group.' '.a:name.' contained'
-   exe 'syn cluster cssColors add='.group
+   " Use @cssValues instead of @cssColors, due to new css.vim syntax file.
+   " exe 'syn cluster cssColors add='.group
+   exe 'syn cluster cssValues add='.group
    if has('gui_running')
      exe 'hi '.group.' guifg='.s:FGforBG(a:clr)
      exe 'hi '.group.' guibg='.a:clr
@@ -141,16 +145,19 @@ function! s:PreviewCSSColorInLine(where)
 endfunction
 
 if has("gui_running") || &t_Co==256
+   " Commented out because of new css.vim syntax file, which hasn't
+   " cssDefinition.
+   "
    " HACK modify cssDefinition to add @cssColors to its contains
-   redir => s:olddef
-      silent!  syn list cssDefinition
-   redir END
-   if s:olddef != ''
-      let s:b = strridx(s:olddef,'matchgroup')
-      if s:b != -1
-         exe 'syn region cssDefinition '.strpart(s:olddef,s:b).',@cssColors'
-      endif
-   endif
+   " redir => s:olddef
+   "    silent!  syn list cssDefinition
+   " redir END
+   " if s:olddef != ''
+   "    let s:b = strridx(s:olddef,'matchgroup')
+   "    if s:b != -1
+   "       exe 'syn region cssDefinition '.strpart(s:olddef,s:b).',@cssColors'
+   "    endif
+   " endif
 
    " w3c Colors
    let i = s:SetNamedColor('#800000', 'maroon')
@@ -314,5 +321,5 @@ if has("gui_running") || &t_Co==256
 
    autocmd CursorHold * silent call s:PreviewCSSColorInLine('.')
    autocmd CursorHoldI * silent call s:PreviewCSSColorInLine('.')
-   set ut=100
+   " set ut=100
 endif		" has("gui_running")

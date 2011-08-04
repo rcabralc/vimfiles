@@ -252,7 +252,7 @@ augroup rest
 augroup END
 
 augroup css
-  autocmd FileType css set syntax=css3 smartindent autoindent tw=79 ts=2 sts=2 sw=2 et
+  autocmd FileType css set smartindent autoindent tw=79 ts=2 sts=2 sw=2 et
 augroup END
 
 augroup js
