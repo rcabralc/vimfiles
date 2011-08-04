@@ -271,11 +271,11 @@ augroup eruby
 augroup END
 
 augroup xmllike
-  autocmd FileType xhtml,html,xml set nosmartindent
+  autocmd FileType svg,xhtml,html,xml set nosmartindent
   " Change identation keys.  The automatic indent when <Return> is used in any
   " place of the line is really crappy.
-  autocmd FileType xhtml,html,xml setlocal indentkeys=o,O,<>>,{,}
-  autocmd FileType xhtml,html,xml set fo+=tl tw=79 ts=2 sw=2 sts=2 et
+  autocmd FileType svg,xhtml,html,xml setlocal indentkeys=o,O,<>>,{,}
+  autocmd FileType svg,xhtml,html,xml set fo+=tl tw=79 ts=2 sw=2 sts=2 et
 augroup END
 
 augroup text
