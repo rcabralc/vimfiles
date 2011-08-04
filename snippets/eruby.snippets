@@ -41,7 +41,7 @@ snippet pdf
 
 snippet form
 	<% form_for(
-		${1},
+		${1:resource},
 		:html => {:class => 'form-grid'}
 	) do |f| %>
 		<fieldset>
