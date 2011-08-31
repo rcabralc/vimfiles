@@ -162,6 +162,11 @@ cnoremap <Esc><C-B>	<S-Left>
 " forward one word
 cnoremap <Esc><C-F>	<S-Right>
 
+" Redraw screen, useful for when using small fonts which left some artifacts on
+" the screen after subsequent edits.
+map <A-r> :redraw!<Return>
+
+
 " Formatação de texto
 " ===================
 
