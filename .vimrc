@@ -72,6 +72,9 @@ let transparent_background=1
 " colorscheme rcabralc
 colorscheme jellybeans
 
+" Mark text width column.
+set colorcolumn=+1
+
 " Ruby-Debugger
 " =============
 
