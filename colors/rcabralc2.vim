@@ -31,13 +31,14 @@ let g:colors_name = "rcabralc2"
 
 hi Cursor                    guibg=#FFFFFF
 hi CursorLine                guibg=#333435
-hi LineNr                    guifg=#888888 guibg=#444444
-hi Normal                    guifg=#E6E1DC guibg=#2B2B2B
+hi LineNr                    guifg=#888888 guibg=#333333
+hi Normal                    guifg=#E6E1DC guibg=#181818
 hi Search                    guibg=#5A647E
-hi StatusLine 	             guifg=#FFFFFF guibg=#202020 gui=bold
-hi StatusLineNC              guifg=#888888 guibg=#202020 gui=NONE
-hi VertSplit                 guifg=#202020 guibg=#202020 gui=NONE
+hi StatusLine 	             guifg=#FFFFFF guibg=#101010 gui=bold
+hi StatusLineNC              guifg=#888888 guibg=#101010 gui=NONE
+hi VertSplit                 guifg=#202020 guibg=#101010 gui=NONE
 hi Visual                    guibg=#5A647E
+hi ColorColumn                             guibg=#101010
 
 " Folds
 " -----
@@ -179,4 +180,3 @@ hi link htmlEndTag           xmlEndTag
 hi xmlTag                    guifg=#E8BF6A
 hi xmlTagName                guifg=#E8BF6A
 hi xmlEndTag                 guifg=#E8BF6A
-
