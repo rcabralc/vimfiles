@@ -70,7 +70,11 @@ syntax on
 " colorscheme desert
 let transparent_background=1
 " colorscheme rcabralc
-colorscheme jellybeans
+if has('gui_running')
+  colorscheme rcabralc2
+else
+  colorscheme jellybeans
+endif
 
 " Mark text width column.
 set colorcolumn=+1
