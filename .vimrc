@@ -232,7 +232,7 @@ augroup python
   autocmd BufNewFile,BufRead *.cpy,*.vpy set filetype=python
 
   " Default python identation, as recommended by PEP8.
-  autocmd FileType python set et ts=4 sw=4 sts=4
+  autocmd FileType python set tw=79 et ts=4 sw=4 sts=4
 
   " Remove whitespace at the end of lines.
   autocmd BufWritePre *.py,*.cpy,*.vpy normal m`:%s/\s\*$//e ``
