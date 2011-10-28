@@ -29,20 +29,20 @@ snippet gstheme
 
 snippet gsthemestylesheet
 	<stylesheet
-		title=""
-		authenticated="${1:False}"
-		cacheable="${2:True}"
-		compression="${3:safe}"
-		conditionalcomment=""
-		cookable="${4:True}"
-		enabled="${5:on}"
-		expression="${6:request/HTTP_X_THEME_ENABLED | nothing}"
-		id="++theme++${7:packagename}/${8:path}"
-		media=""
-		rel="${9:stylesheet}"
-		rendering="${10:link}"
-		applyPrefix="${11:True}"
-		/>
+			title=""
+			authenticated="${1:False}"
+			cacheable="${2:True}"
+			compression="${3:safe}"
+			conditionalcomment=""
+			cookable="${4:True}"
+			enabled="${5:on}"
+			expression="${6:request/HTTP_X_THEME_ENABLED | nothing}"
+			id="++theme++${7:packagename}/${8:path}"
+			media=""
+			rel="${9:stylesheet}"
+			rendering="${10:link}"
+			applyPrefix="${11:True}"
+			/>
 	${12}
 
 # ZCML snippets
@@ -64,7 +64,7 @@ snippet fivens
 	xmlns:five="http://namespaces.zope.org/five"
 	${1}
 
-snippet genericsetupns
+snippet gsns
 	xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
 	${1}
 
