@@ -31,24 +31,26 @@ let g:colors_name = "rcabralc2"
 
 hi Cursor                    guibg=#FFFFFF
 hi CursorLine                guibg=#333435
-hi LineNr                    guifg=#888888 guibg=#333333
-hi Normal                    guifg=#E6E1DC guibg=#181818
-hi Search                    guibg=#5A647E
-hi StatusLine 	             guifg=#FFFFFF guibg=#101010 gui=bold
-hi StatusLineNC              guifg=#888888 guibg=#101010 gui=NONE
-hi VertSplit                 guifg=#202020 guibg=#101010 gui=NONE
-hi Visual                    guibg=#5A647E
-hi ColorColumn                             guibg=#101010
+hi LineNr                    guifg=#AAAAAA guibg=#303030
+hi Normal                    guifg=#E6E1DC guibg=#101010
+hi Search                                  guibg=#5A647E
+hi StatusLine 	             guifg=#FFFFFF guibg=#100808 gui=bold
+hi StatusLineNC              guifg=#888888 guibg=#100808 gui=NONE
+hi VertSplit                 guifg=#402020 guibg=#100808 gui=NONE
+hi Visual                                  guibg=#5A647E
+hi ColorColumn                             guibg=#080808
 
 " Folds
 " -----
+
 " line used for closed folds
-hi Folded                    guifg=#F6F3E8 guibg=#444444 gui=NONE
+hi Folded                    guifg=#BCBCBC guibg=#202020 gui=NONE
 
 " Misc
 " ----
+
 " directory names and other special names in listings
-hi Directory                 guifg=#A5C261 gui=NONE
+hi Directory                 guifg=#A5C261               gui=NONE
 hi MatchParen                guifg=#FFFFFF guibg=DarkCyan
 hi Question                  guifg=Green
 hi Title                     guifg=#FFFFFF
@@ -57,15 +59,18 @@ hi WarningMsg                guifg=#FE0000
 
 " Popup Menu
 " ----------
-" normal item in popup
-hi Pmenu                     guifg=#F6F3E8 guibg=#444444 gui=NONE
-" selected item in popup
-hi PmenuSel                  guifg=#000000 guibg=#A5C261 gui=NONE
-" scrollbar in popup
-hi PMenuSbar                 guibg=#5A647E gui=NONE
-" thumb of the scrollbar in the popup
-hi PMenuThumb                guibg=#AAAAAA gui=NONE
 
+" normal item in popup
+hi Pmenu                     guifg=#A05050 guibg=#100808 gui=NONE
+" selected item in popup
+hi PmenuSel                  guifg=#FFFFFF guibg=#202020 gui=NONE
+" scrollbar in popup
+hi PMenuSbar                               guibg=#5A647E gui=NONE
+" thumb of the scrollbar in the popup
+hi PMenuThumb                              guibg=#AAAAAA gui=NONE
+
+" Common language elements
+" ------------------------
 
 " a boolean constant: TRUE, false
 hi Boolean                   guifg=#6D9CBE
@@ -75,7 +80,6 @@ hi Character                 guifg=#6D9CBE
 
 "rubyComment
 hi Comment                   guifg=#888888 gui=italic
-hi Todo                      guifg=#BC9458 guibg=NONE gui=italic
 
 "rubyPseudoVariable
 "nil, self, symbols, etc
@@ -167,15 +171,24 @@ hi Todo                      guifg=#BC9458 guibg=NONE gui=italic
 " text that stands out, HTML links
 hi Underlined                guifg=fg                 gui=underline
 
-"rubyConstant
+" rubyConstant
 hi Type                      guifg=#DA4939 gui=NONE
 
 hi DiffAdd                   guifg=#E6E1DC guibg=#144212
 hi DiffDelete                guifg=#E6E1DC guibg=#660000
 
-hi link htmlTag              xmlTag
-hi link htmlTagName          xmlTagName
-hi link htmlEndTag           xmlEndTag
+" Special elements that are used only to better grouping other related
+" highlighting groups.
+hi RegularExpression         guifg=#EE30A9
+
+" Special elements for other languages
+" ------------------------------------
+
+hi link htmlEndTag             xmlEndTag
+hi link htmlTag                xmlTag
+hi link htmlTagName            xmlTagName
+hi link javaScriptRegexpString RegularExpression
+hi link rubyRegexp             RegularExpression
 
 hi xmlTag                    guifg=#E8BF6A
 hi xmlTagName                guifg=#E8BF6A
