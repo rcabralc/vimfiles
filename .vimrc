@@ -363,5 +363,24 @@ let g:syntastic_disabled_filetypes = ['python']
 autocmd Syntax * syntax match TrailingSpace "\s\+$" containedin=ALL
 highlight link TrailingSpace Error
 
+" Hilite excess in long lines as errors
+function! MatchOverLength()
+    if &colorcolumn =~ "^+"
+        " Sum &tw value with &cc value.
+        let column = eval(&textwidth.&colorcolumn)
+    else
+        if &colorcolumn != ''
+            let column = &colorcolumn
+        else
+            let column = &textwidth
+        endif
+    endif
+    execute "match OverLength /.\\%>".column."v/"
+endfunction
+highlight link OverLength Error
+autocmd Syntax,WinEnter,WinLeave * call MatchOverLength()
+
+let g:already_bored_with_overlength = 1
+
 " Save the session and prompt for loading another.
 nmap <F2> :wa<Bar>exe "mksession! " . v:this_session<CR>:so ~/vim-sessions/
