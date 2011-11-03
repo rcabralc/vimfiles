@@ -2,6 +2,9 @@
 " Configuração padrão
 " ===================
 
+" Activate pathogen
+call pathogen#infect()
+
 " Interface
 " =========
 
@@ -205,9 +208,6 @@ set comments+=n::
 " Ragtag plugin global mappings.
 inoremap <M-o> <Esc>o
 let g:ragtag_global_maps = 1
-
-" Activate pathogen
-call pathogen#runtime_append_all_bundles()
 
 " Tipos de arquivos específicos
 " =============================
