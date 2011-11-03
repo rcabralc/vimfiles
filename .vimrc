@@ -312,13 +312,6 @@ set incsearch
 " General settings
 " ================
 
-" Settings for the selectbuf plugin
-" ---------------------------------
-
-let g:selBufAlwaysShowDetails=1
-let g:selBufAlwaysShowHidden=1
-let g:selBufAlwaysShowPaths=2
-
 " Session management
 " ==================
 
