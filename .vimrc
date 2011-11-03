@@ -191,20 +191,6 @@ set smarttab
 " Text width at 79 chars allows me to easily split windows vertically.
 set textwidth=79
 
-" get rid of the default style of C comments, and define a style with two stars
-" at the start of `middle' rows which (looks nicer and) avoids asterisks used
-" for bullet lists being treated like C comments; then define a bullet list
-" style for single stars (like already is for hyphens):
-set comments-=s1:/*,mb:*,ex:*/
-set comments+=s:/*,mb:**,ex:*/
-set comments+=fb:*
-
-" treat lines starting with a quote mark as comments (for `Vim' files, such as
-" this very one!), and colons as well so that reformatting usenet messages from
-" `Tin' users works OK:
-set comments+=b:\"
-set comments+=n::
-
 " Ragtag plugin global mappings.
 inoremap <M-o> <Esc>o
 let g:ragtag_global_maps = 1
