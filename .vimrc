@@ -172,9 +172,8 @@ cnoremap <Esc>b <S-Left>
 cnoremap <Esc>f <S-Right>
 
 " Redraw screen, useful for when using small fonts which left some artifacts on
-" the screen after subsequent edits.
-map <A-r> :redraw!<Return>
-
+" the screen after subsequent edits.  Also reset the highlight of OverLength.
+map <A-r> :redraw! <Bar> call MatchOverLength()<Return>
 
 
 " Text formatting
