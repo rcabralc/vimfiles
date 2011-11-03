@@ -30,6 +30,8 @@ hi StatusLine 	             guifg=#FFFFFF guibg=#201010 gui=bold
 hi StatusLineNC              guifg=#888888 guibg=#201010 gui=NONE
 hi VertSplit                 guifg=#402020 guibg=#201010 gui=NONE
 hi Visual                                  guibg=#5A647E
+hi TabLine                   guifg=#C06060 guibg=#402020
+hi TabLineFill                                           gui=NONE
 
 " Folds
 " -----
