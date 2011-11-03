@@ -333,7 +333,7 @@ map <Leader>l :so Session.vim<CR>
 " Calculator using python
 " -----------------------
 command! -nargs=+ Calc :py print <args>
-py from math import *
+py import math
 
 " Syntastic configuration
 set statusline+=%#warningmsg#
