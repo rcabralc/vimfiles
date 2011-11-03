@@ -45,6 +45,9 @@ set history=50
 " always show the status line
 set laststatus=2
 
+" Lazy redraw
+set lazyredraw
+
 " fugitive indication
 set statusline=%<%f\ %h%m%r%{fugitive#statusline()}%=%-14.(%l,%c%V%)\ %P
 
