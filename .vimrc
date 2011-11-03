@@ -175,6 +175,9 @@ cnoremap <Esc>f <S-Right>
 " the screen after subsequent edits.  Also reset the highlight of OverLength.
 map <A-r> :redraw! <Bar> call MatchOverLength()<Return>
 
+" Open URL under cursor.
+nnoremap <Leader>o :silent !xdg-open <C-R>=escape("<C-R><C-F>", "#?&;\|%")<CR><CR>
+
 
 " Text formatting
 " ===============
