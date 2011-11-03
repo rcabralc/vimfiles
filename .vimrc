@@ -20,6 +20,9 @@ set modeline
 " Highlight cursor line
 set cursorline
 
+" Turn on command line completion wild style
+set wildmenu
+
 " permita uso do mouse em todos os modos
 " set mouse=a
 
