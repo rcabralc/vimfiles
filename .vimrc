@@ -20,6 +20,9 @@ set modeline
 " Highlight cursor line
 set cursorline
 
+" Highlight cursor column
+set cursorcolumn
+
 " Turn on command line completion wild style
 set wildmenu
 
