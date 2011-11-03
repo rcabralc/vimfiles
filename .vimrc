@@ -74,10 +74,9 @@ syntax on
 " colorscheme quagmire
 " colorscheme blackboard
 " colorscheme desert
-let transparent_background=1
-" colorscheme rcabralc
 if has('gui_running')
-  colorscheme rcabralc2
+  let g:indent_guides_auto_colors = 0
+  colorscheme rcabralc
 else
   colorscheme jellybeans
 endif
