@@ -26,6 +26,12 @@ set cursorcolumn
 " Turn on command line completion wild style
 set wildmenu
 
+" Leave the cursor where it was
+set nostartofline
+
+" Keep some lines around for scope
+set scrolloff=10
+
 " permita uso do mouse em todos os modos
 " set mouse=a
 
