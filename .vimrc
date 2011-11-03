@@ -137,9 +137,6 @@ function! KillBuffer()
 endfunction
 map <Leader>K :bw!<CR>
 
-" Window
-" ------
-
 " navigate between windows without pressing C-W
 nnoremap <C-h> <C-W><C-h>
 nnoremap <C-j> <C-W><C-j>
@@ -156,31 +153,32 @@ nmap <Leader>w 073l<A-j>
 
 " For Emacs-style editing on the command-line:
 " start of line
-cnoremap <C-A>		<Home>
+cnoremap <C-A> <Home>
 " back one character
-cnoremap <C-B>		<Left>
+cnoremap <C-B> <Left>
 " delete character under cursor
-cnoremap <C-D>		<Del>
+cnoremap <C-D> <Del>
 " end of line
-cnoremap <C-E>		<End>
+cnoremap <C-E> <End>
 " forward one character
-cnoremap <C-F>		<Right>
+cnoremap <C-F> <Right>
 " recall newer command-line
-cnoremap <C-N>		<Down>
+cnoremap <C-N> <Down>
 " recall previous (older) command-line
-cnoremap <C-P>		<Up>
+cnoremap <C-P> <Up>
 " back one word
-cnoremap <Esc><C-B>	<S-Left>
+cnoremap <Esc>b <S-Left>
 " forward one word
-cnoremap <Esc><C-F>	<S-Right>
+cnoremap <Esc>f <S-Right>
 
 " Redraw screen, useful for when using small fonts which left some artifacts on
 " the screen after subsequent edits.
 map <A-r> :redraw!<Return>
 
 
-" Formatação de texto
-" ===================
+
+" Text formatting
+" ===============
 
 " Make the Q key format the entire paragraph.  This makes the Ex mode go away,
 " but I don't use that, and I can enter in Ex mode (in a way more like typing
