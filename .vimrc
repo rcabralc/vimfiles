@@ -101,17 +101,22 @@ map <Leader><C-s> :Rspec<Space>
 map <Leader><C-l> :Rlib<Space>
 
 
-" Movimentação/navegação
-" ======================
+" Mappings
+" ========
 
 " Navigate between buffers (only normal mode)
 nnoremap <C-N> :bn!<CR>
 nnoremap <C-P> :bp!<CR>
 
-" B prompts for opening a buffer
-nnoremap B :buffer<Space>
+" Navigate between tabs (overrides the default from, to match settings of
+" Pentadactyl).
+map <A-h> gT
+map <A-j> gt
 
-" E prompts for a new/edit file (in a new buffer)
+" <C-\> prompts for opening a buffer
+nnoremap <C-\> :buffer<Space>
+
+" E prompts for a new/edit file (in the current window)
 nnoremap E :edit<Space>
 
 " <Leader>K kills a buffer ignoring changes and closes the window, <Leader>k
