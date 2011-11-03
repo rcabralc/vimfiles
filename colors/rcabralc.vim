@@ -1,12 +1,12 @@
 " Vim color scheme
 "
-" Name:        rcabralc2.vim
-" Maintainer:  Rafael Cabral Coutinho <rcabralc@gmail.com> 
+" Name:        rcabralc.vim
+" Maintainer:  Rafael Cabral Coutinho <rcabralc@gmail.com>
 " License:     public domain
 "
 " A color scheme made on top of railscasts:
-" 
-" - http://railscasts.com/about 
+"
+" - http://railscasts.com/about
 " - http://www.vim.org/scripts/script.php?script_id=2536
 
 set background=dark
@@ -19,17 +19,17 @@ let g:colors_name = "rcabralc"
 " Window elements
 " ---------------
 
-hi Cursor                    guibg=#FFFFFF
-hi CursorLine                guibg=#301818
-hi CursorColumn              guibg=#201010
-hi LineNr                    guifg=#AAAAAA guibg=#303030
 hi Normal                    guifg=#E6E1DC guibg=#100808
+hi Cursor                                  guibg=#FFFFFF
+hi CursorLine                              guibg=#301818
+hi CursorColumn                            guibg=#402020
+hi ColorColumn                             guibg=#0C0606
+hi LineNr                    guifg=#804040 guibg=#201010
 hi Search                                  guibg=#5A647E
-hi StatusLine 	             guifg=#FFFFFF guibg=#100808 gui=bold
-hi StatusLineNC              guifg=#888888 guibg=#100808 gui=NONE
-hi VertSplit                 guifg=#402020 guibg=#100808 gui=NONE
+hi StatusLine 	             guifg=#FFFFFF guibg=#201010 gui=bold
+hi StatusLineNC              guifg=#888888 guibg=#201010 gui=NONE
+hi VertSplit                 guifg=#402020 guibg=#201010 gui=NONE
 hi Visual                                  guibg=#5A647E
-hi ColorColumn                             guibg=#080404
 
 " Folds
 " -----
