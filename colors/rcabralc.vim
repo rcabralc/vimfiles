@@ -26,11 +26,11 @@ hi ColorColumn                             guibg=#0C0606
 hi LineNr                    guifg=#804040 guibg=#201010
 hi Search                                  guibg=#5A647E
 hi StatusLine 	             guifg=#FFFFFF guibg=#201010 gui=bold
-hi StatusLineNC              guifg=#888888 guibg=#201010 gui=NONE
+hi StatusLineNC              guifg=#F07878 guibg=#201010 gui=NONE
 hi VertSplit                 guifg=#402020 guibg=#201010 gui=NONE
 hi Visual                                  guibg=#5A647E
-hi TabLine                   guifg=#C06060 guibg=#402020
-hi TabLineFill                                           gui=NONE
+hi TabLine                   guifg=#F07878 guibg=#402020
+hi TabLineFill                             guibg=#402020 gui=NONE
 
 " Folds
 " -----
@@ -53,9 +53,9 @@ hi WarningMsg                guifg=#FE0000
 " ----------
 
 " normal item in popup
-hi Pmenu                     guifg=#A05050 guibg=#100808 gui=NONE
+hi Pmenu                     guifg=#A05050 guibg=#180C0C gui=NONE
 " selected item in popup
-hi PmenuSel                  guifg=#FFFFFF guibg=#202020 gui=NONE
+hi PmenuSel                  guifg=#FFFFFF guibg=#201010 gui=NONE
 " scrollbar in popup
 hi PMenuSbar                               guibg=#5A647E gui=NONE
 " thumb of the scrollbar in the popup
