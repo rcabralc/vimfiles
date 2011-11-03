@@ -2,6 +2,7 @@ set guioptions-=m
 set guioptions-=r
 set guioptions-=L
 set guioptions-=T
+set guioptions-=e
 set guifont=Ubuntu\ Mono\ 8,Inconsolata\ Medium\ 9,Consolas\ 8,DejaVu\ Sans\ Mono\ 8
 set visualbell t_vb="
 set number
