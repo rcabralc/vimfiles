@@ -210,24 +210,9 @@ filetype plugin indent on
 " geral
 augroup general
   autocmd BufNewFile,BufRead *.txt set filetype=human
-
-  " Treat Zope3's zcml files as xml, because actually they're it.
-  autocmd BufNewFile,BufRead *.zcml set ft=xml
-
-  " Treat Zope's template files as xhtml, because the TAL implementation is
-  " compatible with this.
-  autocmd BufNewFile,BufRead *.pt,*.cpt set filetype=xhtml
-
-  " Treat Plone's CSS files (actually DTML methods) as CSS files, as well KSS
-  " files.
-  autocmd BufNewFile,BufRead *.css.dtml,*.kss set filetype=css
 augroup END
 
 augroup python
-  " This is for the tComment plugin.  Strangely, it doesn't define a python
-  " comment string.  This worked until I recently work on a kubuntu 9.04 box...
-  " autocmd FileType python call TCommentDefineType('python', '# %s')
-
   " Recognize Zope's controller python scripts and validators as python.
   autocmd BufNewFile,BufRead *.cpy,*.vpy set filetype=python
 
@@ -255,6 +240,10 @@ augroup rest
 augroup END
 
 augroup css
+  " Treat CMF's CSS files (actually DTML methods) as CSS files, as well KSS
+  " files.
+  autocmd BufNewFile,BufRead *.css.dtml,*.kss set filetype=css
+
   autocmd FileType css set smartindent autoindent tw=79 ts=2 sts=2 sw=2 et
 augroup END
 
@@ -273,8 +262,15 @@ augroup eruby
   autocmd FileType eruby setlocal indentkeys=o,O,<Return>,<>>,{,},0),0],o,O,!^F,=end,=else,=elsif,=rescue,=ensure,=when,=end,=else,=cat,=fina,=END,0\
 augroup END
 
-augroup xmllike
-  autocmd FileType svg,xhtml,html,xml set nosmartindent
+augroup sgml
+  " Treat Zope3's zcml files as xml, because actually they're it.
+  autocmd BufNewFile,BufRead *.zcml set ft=xml
+
+  " Treat Zope's template files as xhtml, because the TAL implementation is
+  " compatible with this.
+  autocmd BufNewFile,BufRead *.pt,*.cpt set filetype=xhtml
+
+  " autocmd FileType svg,xhtml,html,xml set nosmartindent
   " Change identation keys.  The automatic indent when <Return> is used in any
   " place of the line is really crappy.
   autocmd FileType svg,xhtml,html,xml setlocal indentkeys=o,O,<>>,{,}
