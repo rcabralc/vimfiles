@@ -20,8 +20,8 @@ let g:colors_name = "rcabralc"
 " ---------------
 
 hi Cursor                    guibg=#FFFFFF
-hi CursorLine                guibg=#402020
-hi CursorColumn              guibg=#080404
+hi CursorLine                guibg=#301818
+hi CursorColumn              guibg=#201010
 hi LineNr                    guifg=#AAAAAA guibg=#303030
 hi Normal                    guifg=#E6E1DC guibg=#100808
 hi Search                                  guibg=#5A647E
@@ -191,5 +191,5 @@ hi xmlEndTag                 guifg=#E8BF6A
 "
 " - http://www.vim.org/scripts/script.php?script_id=3361
 
-hi IndentGuidesOdd           guibg=#080404
-hi IndentGuidesEven          guibg=#040202
+hi IndentGuidesOdd           guibg=#100808
+hi IndentGuidesEven          guibg=#180C0C
