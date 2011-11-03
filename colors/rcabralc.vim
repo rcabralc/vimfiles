@@ -6,8 +6,7 @@
 "
 " A color scheme made on top of railscasts:
 "
-" - http://railscasts.com/about
-" - http://www.vim.org/scripts/script.php?script_id=2536
+" - http://www.vim.org/scripts/script.php?script_id=1995
 
 set background=dark
 hi clear
