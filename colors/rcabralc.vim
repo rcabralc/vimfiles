@@ -26,9 +26,9 @@ hi ColorColumn                             guibg=#0C0606
 hi LineNr                    guifg=#804040 guibg=#201010
 hi Search                                  guibg=#5A647E
 hi StatusLine 	             guifg=#FFFFFF guibg=#201010 gui=bold
-hi StatusLineNC              guifg=#F07878 guibg=#201010 gui=NONE
+hi StatusLineNC              guifg=#703838 guibg=#201010 gui=NONE
 hi VertSplit                 guifg=#402020 guibg=#201010 gui=NONE
-hi Visual                                  guibg=#5A647E
+hi Visual                                  guibg=#302424
 hi TabLine                   guifg=#F07878 guibg=#402020
 hi TabLineFill                             guibg=#402020 gui=NONE
 
@@ -71,7 +71,7 @@ hi Boolean                   guifg=#6D9CBE
 hi Character                 guifg=#6D9CBE
 
 "rubyComment
-hi Comment                   guifg=#888888 gui=italic
+hi Comment                   guifg=#786464 gui=italic
 
 "rubyPseudoVariable
 "nil, self, symbols, etc
