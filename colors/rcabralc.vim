@@ -20,15 +20,15 @@ let g:colors_name = "rcabralc"
 
 hi Normal                    guifg=#E6E1DC guibg=#100808
 hi Cursor                                  guibg=#FFFFFF
-hi CursorLine                              guibg=#301818
-hi CursorColumn                            guibg=#402020
+hi CursorLine                              guibg=#1E1212
+hi CursorColumn                            guibg=#1E0E0E
 hi ColorColumn                             guibg=#0C0606
-hi LineNr                    guifg=#804040 guibg=#201010
 hi Search                                  guibg=#5A647E
 hi StatusLine 	             guifg=#FFFFFF guibg=#201010 gui=bold
 hi StatusLineNC              guifg=#703838 guibg=#201010 gui=NONE
-hi VertSplit                 guifg=#402020 guibg=#201010 gui=NONE
-hi Visual                                  guibg=#302424
+hi LineNr                    guifg=#806060 guibg=#281A1A
+hi VertSplit                 guifg=#603030 guibg=#281A1A gui=NONE
+hi Visual                                  guibg=#2C1C24
 hi TabLine                   guifg=#F07878 guibg=#402020
 hi TabLineFill                             guibg=#402020 gui=NONE
 
@@ -71,7 +71,7 @@ hi Boolean                   guifg=#6D9CBE
 hi Character                 guifg=#6D9CBE
 
 "rubyComment
-hi Comment                   guifg=#786464 gui=italic
+hi Comment                   guifg=#7C6464 gui=italic
 
 "rubyPseudoVariable
 "nil, self, symbols, etc
@@ -192,5 +192,5 @@ hi xmlEndTag                 guifg=#E8BF6A
 "
 " - http://www.vim.org/scripts/script.php?script_id=3361
 
-hi IndentGuidesOdd           guibg=#100808
-hi IndentGuidesEven          guibg=#180C0C
+hi clear IndentGuidesOdd
+hi IndentGuidesEven          guibg=#160B0B
