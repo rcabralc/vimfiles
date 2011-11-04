@@ -355,8 +355,8 @@ let g:syntastic_enable_signs=1
 let g:syntastic_disabled_filetypes = ['python']
 
 " Hilite trailing spaces as errors
-autocmd Syntax * syntax match TrailingSpace "\s\+$" containedin=ALL
 highlight link TrailingSpace Error
+autocmd Syntax * call matchadd('TrailingSpace', '\s\+$', 100)
 
 " Hilite excess in long lines as errors
 function! MatchOverLength()
