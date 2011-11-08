@@ -24,8 +24,8 @@ hi CursorLine                              guibg=#1E1212
 hi CursorColumn                            guibg=#1E0E0E
 hi ColorColumn                             guibg=#180606
 hi Search                                  guibg=#5A647E
-hi StatusLine 	             guifg=#FFFFFF guibg=#201010 gui=bold
-hi StatusLineNC              guifg=#703838 guibg=#201010 gui=NONE
+hi StatusLine 	             guifg=#FFFFFF guibg=#301010 gui=bold
+hi StatusLineNC              guifg=#703838 guibg=#200C0C gui=NONE
 hi LineNr                    guifg=#806060 guibg=#301A1A
 hi VertSplit                 guifg=#603030 guibg=#281A1A gui=NONE
 hi Visual                                  guibg=#501010
@@ -194,4 +194,4 @@ hi xmlEndTag                 guifg=#E8BF6A
 " - http://www.vim.org/scripts/script.php?script_id=3361
 
 hi clear IndentGuidesOdd
-hi IndentGuidesEven          guibg=#160808
+hi IndentGuidesEven          guibg=#1A0808
