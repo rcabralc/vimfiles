@@ -354,11 +354,11 @@ let g:syntastic_enable_signs=1
 " Disable syntastic for python, as I use pyflakes.
 let g:syntastic_disabled_filetypes = ['python']
 
-" Hilite trailing spaces as errors
-highlight link TrailingSpace Error
+" Hilite trailing spaces as spelling errors
+highlight link TrailingSpace SpellBad
 autocmd Syntax * call matchadd('TrailingSpace', '\s\+$', 100)
 
-" Hilite excess in long lines as errors
+" Hilite excess in long lines as spelling errors
 function! MatchOverLength()
     if &colorcolumn =~ "^+"
         " Sum &tw value with &cc value.
@@ -372,7 +372,7 @@ function! MatchOverLength()
     endif
     execute "match OverLength /.\\%>".column."v/"
 endfunction
-highlight link OverLength Error
+highlight link OverLength SpellBad
 autocmd Syntax,WinEnter,WinLeave * call MatchOverLength()
 
 let g:already_bored_with_overlength = 1
