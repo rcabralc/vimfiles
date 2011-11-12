@@ -18,19 +18,19 @@ let g:colors_name = "rcabralc"
 " Window elements
 " ---------------
 
-hi Normal                    guifg=#E6E1DC guibg=#120000
+hi Normal                    guifg=#E6E1DC guibg=#130000
 hi Cursor                                  guibg=#FFFFFF
-hi CursorLine                              guibg=#1E1212
-hi CursorColumn                            guibg=#1E0E0E
-hi ColorColumn                             guibg=#180606
+hi CursorLine                              guibg=#1A0808
+hi CursorColumn                            guibg=#1A0808
+hi ColorColumn                             guibg=#240C0C
 hi Search                                  guibg=#5A647E
-hi StatusLine 	             guifg=#FFFFFF guibg=#301010 gui=bold
-hi StatusLineNC              guifg=#703838 guibg=#200C0C gui=NONE
-hi LineNr                    guifg=#806060 guibg=#301A1A
-hi VertSplit                 guifg=#603030 guibg=#281A1A gui=NONE
+hi StatusLine 	             guifg=#FFFFFF guibg=#381010 gui=bold
+hi StatusLineNC              guifg=#A05F5F guibg=#401818 gui=NONE
+hi LineNr                    guifg=#806060 guibg=#301616
+hi VertSplit                 guifg=#603030 guibg=#281616 gui=NONE
 hi Visual                                  guibg=#501010
-hi TabLine                   guifg=#F07878 guibg=#402020
-hi TabLineFill                             guibg=#402020 gui=NONE
+hi TabLine                   guifg=#F07878 guibg=#502020
+hi TabLineFill                             guibg=#502020 gui=NONE
 hi NonText                   guifg=#800000 guibg=Black
 
 " Folds
@@ -194,4 +194,4 @@ hi xmlEndTag                 guifg=#E8BF6A
 " - http://www.vim.org/scripts/script.php?script_id=3361
 
 hi clear IndentGuidesOdd
-hi IndentGuidesEven          guibg=#1A0808
+hi IndentGuidesEven          guibg=#220B0B
