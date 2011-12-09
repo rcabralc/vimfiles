@@ -66,10 +66,10 @@ hi PMenuThumb                              guibg=#AAAAAA gui=NONE
 " ------------------------
 
 " a boolean constant: TRUE, false
-hi Boolean                   guifg=#6D9CBE
+hi Boolean                   guifg=#519F50
 
 " a character constant: 'c', '\n'
-hi Character                 guifg=#6D9CBE
+hi Character                 guifg=#EE30A9
 
 "rubyComment
 hi Comment                   guifg=#7C6464 gui=italic
