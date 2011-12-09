@@ -293,7 +293,7 @@ augroup text
 augroup END
 
 augroup vim
-  autocmd FileType vim set tw=79
+  autocmd FileType vim set tw=79 sw=4 ts=4 sts=4 et
 augroup END
 
 augroup clike
@@ -355,23 +355,38 @@ highlight link TrailingSpace SpellBad
 autocmd Syntax * call matchadd('TrailingSpace', '\s\+$', 100)
 
 " Hilite excess in long lines as spelling errors
-function! MatchOverLength()
+function! s:MatchOverLength()
+    let tw = &textwidth ? &textwidth : 80
     if &colorcolumn =~ "^+"
         " Sum &tw value with &cc value.
-        let column = eval(&textwidth.&colorcolumn)
+        let column = eval(tw.&colorcolumn)
     else
         if &colorcolumn != ''
             let column = &colorcolumn
         else
-            let column = &textwidth
+            let column = tw
         endif
     endif
     execute "match OverLength /.\\%>".column."v/"
 endfunction
 highlight link OverLength SpellBad
-autocmd Syntax,WinEnter,WinLeave * call MatchOverLength()
+autocmd Syntax,WinEnter,WinLeave * call <sid>MatchOverLength()
 
 let g:already_bored_with_overlength = 1
 
 " Save the session and prompt for loading another.
 nmap <F2> :wa<Bar>exe "mksession! " . v:this_session<CR>:so ~/vim-sessions/
+
+function! s:ToggleRelativeNumber()
+    if &relativenumber
+        set number
+        autocmd! RelativeNumberAutoCommands
+    else
+        set relativenumber
+        augroup RelativeNumberAutoCommands
+            autocmd CursorMoved <buffer> call <sid>ToggleRelativeNumber()
+        augroup END
+    endif
+endfunction
+
+nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
