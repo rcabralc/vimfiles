@@ -97,25 +97,6 @@ endif
 " Mark text width column.
 set colorcolumn=+1
 
-" Ruby-Debugger
-" =============
-
-map <Leader>D :Rdebugger<Space>
-map <Leader>P :RdbCommand<Space>p<Space>
-map <Leader>L :RdbLog<CR>
-map <Leader>S :RdbStop<CR>
-
-" Rails
-" =====
-
-map <Leader><C-m> :Rmodel<Space>
-map <Leader><C-v> :Rview<Space>
-map <Leader><C-o> :Rcontroller<Space>
-map <Leader><C-h> :Rhelper<Space>
-map <Leader><C-s> :Rspec<Space>
-map <Leader><C-l> :Rlib<Space>
-
-
 " Mappings
 " ========
 
@@ -322,7 +303,10 @@ set incsearch
 autocmd! VimLeavePre * mksession!
 
 " Load a session in the current directory.
-map <Leader>l :so Session.vim<CR>
+map <F3> :so Session.vim<CR>
+
+" Save the session and prompt for loading another.
+nmap <F2> :wa<Bar>exe "mksession! " . v:this_session<CR>:so ~/vim-sessions/
 
 " More
 " ====
@@ -365,9 +349,6 @@ highlight link OverLength SpellBad
 autocmd Syntax,WinEnter,WinLeave * call <sid>MatchOverLength()
 
 let g:already_bored_with_overlength = 1
-
-" Save the session and prompt for loading another.
-nmap <F2> :wa<Bar>exe "mksession! " . v:this_session<CR>:so ~/vim-sessions/
 
 function! s:ToggleRelativeNumber()
     if &relativenumber
