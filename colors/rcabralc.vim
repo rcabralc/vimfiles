@@ -28,7 +28,7 @@ hi StatusLine 	             guifg=#FFFFFF guibg=#381010 gui=bold
 hi StatusLineNC              guifg=#A05F5F guibg=#401818 gui=NONE
 hi LineNr                    guifg=#806060 guibg=#301616
 hi VertSplit                 guifg=#603030 guibg=#281616 gui=NONE
-hi Visual                                  guibg=#501010
+hi Visual                                  guibg=#342428
 hi TabLine                   guifg=#F07878 guibg=#502020
 hi TabLineFill                             guibg=#502020 gui=NONE
 hi NonText                   guifg=#800000 guibg=Black
