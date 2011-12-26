@@ -120,19 +120,11 @@ map <Leader><C-l> :Rlib<Space>
 " ========
 
 " Navigate between buffers (only normal mode)
-nnoremap <C-N> :bn!<CR>
-nnoremap <C-P> :bp!<CR>
+nnoremap <A-S-l> :bn!<CR>
+nnoremap <A-S-h> :bp!<CR>
 
-" Navigate between tabs (overrides the default from, to match settings of
-" Pentadactyl).
-map <A-h> gT
-map <A-j> gt
-
-" <C-\> prompts for opening a buffer
+" <C-\> prompts for displaying an open file in the current buffer
 nnoremap <C-\> :buffer<Space>
-
-" E prompts for a new/edit file (in the current window)
-nnoremap E :edit<Space>
 
 " <Leader>K kills a buffer ignoring changes and closes the window, <Leader>k
 " kills a buffer when there's no changes and preserves the window.
