@@ -5,6 +5,7 @@
 
 " Activate pathogen
 call pathogen#infect()
+call pathogen#helptags()
 
 " Interface
 " =========
