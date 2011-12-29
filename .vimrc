@@ -96,6 +96,8 @@ set colorcolumn=+1
 " ========
 
 " Navigate between buffers (only normal mode)
+map <A-h> :bp<Return>
+map <A-l> :bn<Return>
 nnoremap <A-S-l> :bn!<CR>
 nnoremap <A-S-h> :bp!<CR>
 
