@@ -73,3 +73,6 @@
 [submodule "bundle/python.vim--Vasiliev"]
 	path = bundle/python.vim--Vasiliev
 	url = git://github.com/vim-scripts/python.vim--Vasiliev.git
+[submodule "bundle/vim-css-color"]
+	path = bundle/vim-css-color
+	url = git://github.com/skammer/vim-css-color.git
