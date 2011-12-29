@@ -34,12 +34,6 @@ set nostartofline
 " Keep some lines around for scope
 set scrolloff=10
 
-" permita uso do mouse em todos os modos
-" set mouse=a
-
-" exiba os números de linha
-" set number
-
 " tenha cinquenta linhas de histórico
 set history=50
 
@@ -184,6 +178,10 @@ set textwidth=79
 inoremap <M-o> <Esc>o
 let g:ragtag_global_maps = 1
 
+" Python highlighing options.
+let python_highlight_all = 1
+let python_slow_sync = 1
+
 " Tipos de arquivos específicos
 " =============================
 
@@ -205,9 +203,6 @@ augroup python
 
   " Remove whitespace at the end of lines.
   autocmd BufWritePre *.py,*.cpy,*.vpy normal m`:%s/\s\*$//e ``
-
-  " pylint
-  autocmd FileType python compiler pylint
 augroup END
 
 augroup rest

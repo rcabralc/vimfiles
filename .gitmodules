@@ -61,3 +61,12 @@
 [submodule "bundle/vim-git"]
 	path = bundle/vim-git
 	url = git://github.com/tpope/vim-git.git
+[submodule "bundle/taskpaper.vim"]
+	path = bundle/taskpaper.vim
+	url = git://github.com/davidoc/taskpaper.vim.git
+[submodule "bundle/vim-javascript"]
+	path = bundle/vim-javascript
+	url = git://github.com/pangloss/vim-javascript.git
+[submodule "bundle/vim-python-ftplugin"]
+	path = bundle/vim-python-ftplugin
+	url = git://github.com/tarmack/vim-python-ftplugin.git
