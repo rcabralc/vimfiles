@@ -193,15 +193,15 @@ filetype plugin indent on
 
 " geral
 augroup general
-  autocmd BufNewFile,BufRead *.txt set filetype=human
+  autocmd BufNewFile,BufRead *.txt setfiletype human
 augroup END
 
 augroup python
   " Recognize Zope's controller python scripts and validators as python.
-  autocmd BufNewFile,BufRead *.cpy,*.vpy set filetype=python
+  autocmd BufNewFile,BufRead *.cpy,*.vpy setlocal filetype=python
 
   " Default python identation, as recommended by PEP8.
-  autocmd FileType python set tw=79 et ts=4 sw=4 sts=4
+  autocmd FileType python setlocal tw=79 et ts=4 sw=4 sts=4
 
   " Remove whitespace at the end of lines.
   autocmd BufWritePre *.py,*.cpy,*.vpy normal m`:%s/\s\*$//e ``
@@ -211,34 +211,34 @@ augroup rest
   " formatação de commits do git segue mesmo padrão do rest
 
   " Some options for rest/gitcommit.
-  autocmd FileType rst,gitcommit set ai fo=tcroqn tw=78 et sw=2 ts=2 sts=2
+  autocmd FileType rst,gitcommit setlocal ai fo=tcroqn tw=78 et sw=2 ts=2 sts=2
 
   " format list pattern
-  autocmd FileType rst,gitcommit set flp=^\\s*\\(\\d\\+\\\|[a-z]\\)[\\].)]\\s*
+  autocmd FileType rst,gitcommit setlocal flp=^\s*\(\d\+\\|[a-z]\)[\].)]\s*
 
   " Syntax highlighting for doctest
-  autocmd FileType rst set syntax=doctest
+  autocmd FileType rst setlocal syntax=doctest
 augroup END
 
 augroup css
   " Treat CMF's CSS files (actually DTML methods) as CSS files, as well KSS
   " files.
-  autocmd BufNewFile,BufRead *.css.dtml,*.kss set filetype=css
+  autocmd BufNewFile,BufRead *.css.dtml,*.kss setlocal filetype=css
 
-  autocmd FileType css set smartindent autoindent tw=79 ts=2 sts=2 sw=2 et
+  autocmd FileType css setlocal smartindent autoindent tw=79 ts=2 sts=2 sw=2 et
 augroup END
 
 augroup js
-  autocmd FileType javascript set smartindent autoindent tw=79 ts=2 sts=2 sw=2 et
+  autocmd FileType javascript setlocal smartindent autoindent tw=79 ts=2 sts=2 sw=2 et
 augroup END
 
 augroup ruby
   autocmd Syntax ruby hi link rubyPseudoVariable Special
-  autocmd FileType ruby set et ts=2 sw=2 sts=2 tw=79
+  autocmd FileType ruby setlocal et ts=2 sw=2 sts=2 tw=79
 augroup END
 
 augroup eruby
-  autocmd FileType eruby set et ts=2 sw=2 sts=2 tw=79
+  autocmd FileType eruby setlocal et ts=2 sw=2 sts=2 tw=79
   " Change identation keys.  The automatic indent when <Return> is used in any
   " place of the line is really crappy.
   autocmd FileType eruby setlocal indentkeys=o,O,<Return>,<>>,{,},0),0],o,O,!^F,=end,=else,=elsif,=rescue,=ensure,=when,=end,=else,=cat,=fina,=END,0\
@@ -246,37 +246,37 @@ augroup END
 
 augroup sgml
   " Treat Zope3's zcml files as xml, because actually they're it.
-  autocmd BufNewFile,BufRead *.zcml set ft=xml
+  autocmd BufNewFile,BufRead *.zcml setlocal ft=xml
 
   " Treat Zope's template files as xhtml, because the TAL implementation is
   " compatible with this.
-  autocmd BufNewFile,BufRead *.pt,*.cpt set filetype=xhtml
+  autocmd BufNewFile,BufRead *.pt,*.cpt setlocal filetype=xhtml
 
   " autocmd FileType svg,xhtml,html,xml set nosmartindent
   " Change identation keys.  The automatic indent when <Return> is used in any
   " place of the line is really crappy.
   autocmd FileType svg,xhtml,html,xml setlocal indentkeys=o,O,<>>,{,}
-  autocmd FileType svg,xhtml,html,xml set fo+=tl tw=79 ts=2 sw=2 sts=2 et
+  autocmd FileType svg,xhtml,html,xml setlocal fo+=tl tw=79 ts=2 sw=2 sts=2 et
 augroup END
 
 augroup text
-  autocmd FileType mail,human set fo+=t tw=72
+  autocmd FileType mail,human setlocal fo+=t tw=72
 augroup END
 
 augroup vim
-  autocmd FileType vim set tw=79 sw=4 ts=4 sts=4 et
+  autocmd FileType vim setlocal tw=79 sw=4 ts=4 sts=4 et
 augroup END
 
 augroup clike
-  autocmd FileType c,cpp,slang set cindent
+  autocmd FileType c,cpp,slang setlocal cindent
 augroup END
 
 augroup c
-  autocmd FileType c set fo+=ro
+  autocmd FileType c setlocal fo+=ro
 augroup END
 
 augroup snippet
-  autocmd FileType snippet set noexpandtab sw=2 ts=2
+  autocmd FileType snippet setlocal noexpandtab sw=2 ts=2
 augroup END
 
 
@@ -322,7 +322,7 @@ let g:syntastic_auto_loc_list=1
 let g:syntastic_enable_signs=1
 
 " Disable syntastic for python, as I use pyflakes.
-let g:syntastic_disabled_filetypes = ['python']
+let g:syntastic_disabled_filetypes = ['python', 'cpp']
 
 " Hilite trailing spaces as spelling errors
 highlight link TrailingSpace SpellBad
@@ -361,3 +361,9 @@ function! s:ToggleRelativeNumber()
 endfunction
 
 nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
+
+" CtrlP configuration
+" -------------------
+
+let g:ctrlp_regexp_search = 1
+let g:ctrlp_follow_symlinks = 1
