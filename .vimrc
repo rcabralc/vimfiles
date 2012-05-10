@@ -136,6 +136,9 @@ nnoremap <A-j> i<CR><ESC>_
 " Mappings for breaking lines at 72 chars
 nmap <Leader>w 073l<A-j>
 
+" Search in current git tree.
+nmap <C-S> :Ggrep  <bar> copen<CR>
+
 " For Emacs-style editing on the command-line:
 " start of line
 cnoremap <C-A> <Home>
