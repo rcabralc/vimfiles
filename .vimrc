@@ -228,7 +228,7 @@ augroup css
   " files.
   autocmd BufNewFile,BufRead *.css.dtml,*.kss setlocal filetype=css
 
-  autocmd FileType css setlocal smartindent autoindent tw=79 ts=2 sts=2 sw=2 et
+  autocmd FileType css,scss,sass setlocal smartindent autoindent tw=79 ts=2 sts=2 sw=2 et
 augroup END
 
 augroup js
