@@ -1,6 +1,5 @@
 snippet xml
 	<?xml version="1.0" encoding="UTF-8"?>
-
 # GenericSetup snippets
 
 snippet gscssreg
@@ -8,25 +7,21 @@ snippet gscssreg
 	<object name="portal_css">
 		${1}
 	</object>
-
 snippet gsdeps
 	<dependencies>
 		<dependency>profile-${1}:${2:default}</dependency>
 	</dependencies>
-
 snippet gsmeta
 	<?xml version="1.0" encoding="UTF-8"?>
 	<metadata>
 		<version>${1:1000}</version>
 	</metadata>
-
 snippet gstheme
 	<?xml version="1.0" encoding="UTF-8"?>
 	<theme>
 		<name>${1}</name>
 		<enabled>True</enabled>
 	</theme>
-
 snippet gsthemestylesheet
 	<stylesheet
 			title=""
@@ -44,7 +39,6 @@ snippet gsthemestylesheet
 			applyPrefix="${11:True}"
 			/>
 	${12}
-
 # ZCML snippets
 
 snippet configure
@@ -55,43 +49,33 @@ snippet configure
 			>
 		${2}
 	</configure>
-
 snippet browserns
 	xmlns:browser="http://namespaces.zope.org/browser"
 	${1}
-
 snippet fivens
 	xmlns:five="http://namespaces.zope.org/five"
 	${1}
-
 snippet gsns
 	xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
 	${1}
-
 snippet grok
 	<grok:grok package="." />
 	${1}
-
 snippet grokns
 	xmlns:grok="http://namespaces.zope.org/grok"
 	${1}
-
 snippet i18nns
 	xmlns:i18n="http://namespaces.zope.org/i18n"
 	${1}
-
 snippet plonens
 	xmlns:plone="http://namespaces.plone.org/plone"
 	${1}
-
 snippet plonestatic
 	<plone:static directory="static" type="theme" />
 	${1}
-
 snippet registerPackage
 	<five:registerPackage package="." initialize=".initialize" />
 	${1}
-
 snippet registerProfile
 	<genericsetup:registerProfile
 			name="${1:default}"
@@ -101,4 +85,3 @@ snippet registerProfile
 			provides="Products.GenericSetup.interfaces.EXTENSION"
 			/>
 	${4}
-
