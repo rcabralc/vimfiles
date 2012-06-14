@@ -187,6 +187,12 @@ let g:ragtag_global_maps = 1
 let python_highlight_all = 1
 let python_slow_sync = 1
 
+" Python filetype options.
+let g:python_syntax_fold = 0
+let g:python_fold_strings = 0
+let g:python_auto_complete_modules = 0
+let g:python_auto_complete_variables = 0
+
 " Tipos de arquivos específicos
 " =============================
 
