@@ -376,3 +376,4 @@ nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
 
 let g:ctrlp_regexp_search = 1
 let g:ctrlp_follow_symlinks = 1
+let g:ctrlp_max_files = 0
