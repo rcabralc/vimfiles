@@ -374,6 +374,13 @@ nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
 " CtrlP configuration
 " -------------------
 
-let g:ctrlp_regexp_search = 1
+let g:ctrlp_regexp = 1
 let g:ctrlp_follow_symlinks = 1
 let g:ctrlp_max_files = 0
+let g:ctrlp_open_new_file = 'r'
+let g:ctrlp_lazy_update = 1
+let g:ctrlp_default_input = 1
+let g:ctrlp_custom_ignore = {
+    'file': '\.swp$\|\.pyc$\|\.pyo$\|\.mo$',
+    'dir': '\.egg-info$\|\.git$\|\.hg$\|\.svn$',
+}
