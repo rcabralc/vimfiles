@@ -67,6 +67,15 @@ snippet grokns
 snippet i18nns
 	xmlns:i18n="http://namespaces.zope.org/i18n"
 	${1}
+snippet plonebehavior
+	<plone:behavior
+			title="${1}"
+			description="${2}"
+			provides="${3}"
+			marker="${4}"
+			factory="${5:plone.behavior.AnnotationStorage}"
+			/>
+	${6}
 snippet plonens
 	xmlns:plone="http://namespaces.plone.org/plone"
 	${1}
