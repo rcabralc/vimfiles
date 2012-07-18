@@ -374,13 +374,97 @@ nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
 " CtrlP configuration
 " -------------------
 
-let g:ctrlp_regexp = 1
 let g:ctrlp_follow_symlinks = 1
 let g:ctrlp_max_files = 0
 let g:ctrlp_open_new_file = 'r'
-let g:ctrlp_lazy_update = 1
+" let g:ctrlp_lazy_update = 1
 let g:ctrlp_default_input = 1
-let g:ctrlp_custom_ignore = {
-    'file': '\.swp$\|\.pyc$\|\.pyo$\|\.mo$',
-    'dir': '\.egg-info$\|\.git$\|\.hg$\|\.svn$',
-}
+let g:ctrlp_user_command = "find -L %s -type f | egrep -v '\.(git|hg|svn|egg-info)/.*' | egrep -v '\.(pyc|pyo|swp)$'"
+let g:ctrlp_working_path_mode = 2
+
+function! g:filterCtrlPList(items, pat, limit, mmode, ispath, crfile, isregex)
+python << EOPython
+import os.path
+import re
+import vim
+import functools
+
+items   = vim.eval('a:items')
+pat     = vim.eval('a:pat')
+limit   = int(vim.eval('a:limit'))
+mmode   = vim.eval('a:mmode')
+ispath  = int(vim.eval('a:ispath'))
+crfile  = vim.eval('a:crfile')
+isregex = int(vim.eval('a:isregex'))
+
+sep = os.path.sep
+
+def similarity(s, pat_pairs):
+    # A simple way to do string comparison, using the algorithm described in
+    # http://www.catalysoft.com/articles/StrikeAMatch.html, from Simon White.
+    # Slightly modified to improve performance, but may not yield the same
+    # results as the mentioned algorithm.
+    s_pairs = [s[i:i + 2] for i in xrange(len(s) - 1)]
+
+    if s_pairs and not pat_pairs:
+        return 0.0
+
+    union_len = len(s_pairs) + len(pat_pairs)
+
+    if not union_len:
+        return 1.0
+
+    def fn(count, pair):
+        if pair in s_pairs:
+            count += 1
+            # Here is the key modification: instead of removing only one
+            # element from the list of pairs, remove also all preceding
+            # elements.
+            # s_pairs.remove(pair)
+            index = s_pairs.index(pair)
+            del s_pairs[:index + 1]
+        return count
+
+    intersection_len = functools.reduce(fn, pat_pairs, 0)
+    return 2.0 * intersection_len / union_len
+
+def rank_and_filter(items, pat):
+    if isregex:
+        match = re.compile(pat or '.*').search
+        rank  = lambda i, ti: len(i.split(sep))
+    else:
+        pat_pairs = tuple(pat[i:i + 2] for i in xrange(len(pat) - 1))
+        def match(item):
+            item_chars = item
+            for char in pat:
+                index = item_chars.find(char)
+                if index == -1:
+                    return False
+                item_chars = item_chars[index + 1:]
+            return True
+        def rank(item, transformed_item):
+            return 1.0 - similarity(transformed_item, pat_pairs)
+
+    transform = {
+        'full-line':      lambda i: i,
+        'filename-only':  os.path.basename,
+        'first-non-tab':  lambda i: i.split('\t')[0],
+        'until-last-tab': lambda i: '\t'.join(i.split('\t')[:-1]).strip('\t') if '\t' in i else i
+    }[mmode]
+
+    def reject(item):
+        return ispath == 1 and item == crfile
+
+    for item in items:
+        transformed = transform(item)
+        if not reject(item) and match(transformed):
+            yield (rank(item, transformed), item)
+
+items = list(i[1] for i in sorted(rank_and_filter(items, pat)))
+del items[limit:]
+
+vim.command('return %r' % items)
+EOPython
+endfunction
+
+let g:ctrlp_match_func = { 'match': 'g:filterCtrlPList' }
