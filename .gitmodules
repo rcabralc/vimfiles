@@ -58,3 +58,9 @@
 [submodule "bundle/vim-css-color"]
 	path = bundle/vim-css-color
 	url = git://github.com/skammer/vim-css-color.git
+[submodule "bundle/handlebars"]
+	path = bundle/handlebars
+	url = git://github.com/nono/vim-handlebars.git
+[submodule "bundle/scss-syntax.vim"]
+	path = bundle/scss-syntax.vim
+	url = git://github.com/cakebaker/scss-syntax.vim.git
