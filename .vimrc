@@ -13,6 +13,9 @@ call pathogen#helptags()
 " Nocompatible mode
 set nocompatible
 
+" Ensure backspace behavior is not alien.
+set backspace=indent,eol,start
+
 " limpe qualquer autocommand existente
 autocmd!
 
