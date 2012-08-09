@@ -431,42 +431,48 @@ def similarity(s, pat_pairs):
     intersection_len = functools.reduce(fn, pat_pairs, 0)
     return 2.0 * intersection_len / union_len
 
-def rank_and_filter(items, pat):
+def rank_fn(pat):
     if isregex:
-        match = re.compile(pat or '.*').search
-        rank  = lambda i, ti: len(i.split(sep))
-    else:
-        pat_pairs = tuple(pat[i:i + 2] for i in xrange(len(pat) - 1))
-        def match(item):
-            item_chars = item
-            for char in pat:
-                index = item_chars.find(char)
-                if index == -1:
-                    return False
-                item_chars = item_chars[index + 1:]
-            return True
-        def rank(item, transformed_item):
-            return 1.0 - similarity(transformed_item, pat_pairs)
+        return lambda (i, ti): len(i.split(sep))
+    pat_pairs = tuple(pat[i:i + 2] for i in xrange(len(pat) - 1))
+    return lambda (i, ti): 1.0 - similarity(ti, pat_pairs)
 
-    transform = {
+def match_fn(pat):
+    if isregex:
+        return re.compile(pat or '.*').search
+    def fuzzy_match(transformed_item):
+        index = 0
+        for char in pat:
+            index = transformed_item.find(char, index)
+            if index == -1:
+                return False
+            index += 1
+        return True
+    return fuzzy_match
+
+def transform_fn(mmode):
+    return {
         'full-line':      lambda i: i,
         'filename-only':  os.path.basename,
         'first-non-tab':  lambda i: i.split('\t')[0],
         'until-last-tab': lambda i: '\t'.join(i.split('\t')[:-1]).strip('\t') if '\t' in i else i
     }[mmode]
 
-    def reject(item):
-        return ispath == 1 and item == crfile
+if ispath == 1 and crfile:
+    try:
+        items.remove(crfile)
+    except ValueError:
+        pass
 
-    for item in items:
-        transformed = transform(item)
-        if not reject(item) and match(transformed):
-            yield (rank(item, transformed), item)
+match = match_fn(pat)
+rank = rank_fn(pat)
+transform = transform_fn(mmode)
 
-items = list(i[1] for i in sorted(rank_and_filter(items, pat)))
-del items[limit:]
+transformed = ((i, transform(i)) for i in items)
+filtered    = ((i, ti) for i, ti in transformed if match(ti))
+final       = [i for i, ti in sorted(filtered, key=rank)[:limit]]
 
-vim.command('return %r' % items)
+vim.command('return %r' % final)
 EOPython
 endfunction
 
