@@ -380,10 +380,9 @@ nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
 let g:ctrlp_follow_symlinks = 1
 let g:ctrlp_max_files = 0
 let g:ctrlp_open_new_file = 'r'
-" let g:ctrlp_lazy_update = 1
 let g:ctrlp_default_input = 1
 let g:ctrlp_user_command = "find -L %s -type f | egrep -v '\.(git|hg|svn|egg-info)/.*' | egrep -v '\.(pyc|pyo|swp)$'"
-let g:ctrlp_working_path_mode = 2
+let g:ctrlp_working_path_mode = 'rc'
 
 function! g:filterCtrlPList(items, pat, limit, mmode, ispath, crfile, isregex)
 python << EOPython
