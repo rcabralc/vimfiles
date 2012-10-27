@@ -1,84 +1,108 @@
-from collections import namedtuple
-
 import os.path
 import re
 import functools
 
+CHARSET = 'utf-8'
 
-def filterCtrlpList(items, pat, limit, mmode, ispath, crfile, isregex):
-    sep = os.path.sep
+class Item(object):
+    def __init__(self, transformed, string):
+        self.encoded     = string
+        self.original    = string.decode(CHARSET)
+        self.transformed = transformed.decode(CHARSET)
 
-    def similarity(s, pat_pairs):
+
+class Processor(object):
+    def filter(self, items, excluded=[]):
+        items = list(i for i in items
+                     if self.match(i) and i.original not in excluded)
+        items.sort(key=self.sort_key)
+        return items
+
+
+class RegexProcessor(Processor):
+    def __init__(self, pattern):
+        self.pattern = re.compile(pattern or u'.*')
+        self._sep    = os.path.sep
+
+    def match(self, item):
+        return self.pattern.match(item.transformed)
+
+    def sort_key(self, item):
+        return len(item.original.split(self._sep))
+
+
+class FuzzyProcessor(Processor):
+    def __init__(self, pattern):
+        pattern      = pattern.lower()
+        self.pattern = pattern
+        self.pairs   = self._make_pairs(pattern)
+
+    def match(self, item):
+        index = 0
+        string = item.transformed.lower()
+        for char in self.pattern:
+            index = string.find(char, index)
+            if index == -1:
+                return False
+            index += 1
+        return True
+
+    def sort_key(self, item):
+        return 1.0 - self._similarity_with_pattern(item)
+
+    def _similarity_with_pattern(self, item):
         # A simple way to do string comparison, using the algorithm described
         # in http://www.catalysoft.com/articles/StrikeAMatch.html, from Simon
         # White.  Slightly modified to improve performance, but may not yield
         # the same results as the mentioned algorithm.
-        s_pairs = [s[i:i + 2] for i in range(len(s) - 1)]
+        pairs = self._make_pairs(item.transformed.lower())
 
-        if s_pairs and not pat_pairs:
+        if pairs and not self.pairs:
             return 0.0
 
-        union_len = len(s_pairs) + len(pat_pairs)
+        union_len = len(pairs) + len(self.pairs)
 
         if not union_len:
             return 1.0
 
         def fn(count, pair):
-            if pair in s_pairs:
+            if pair in pairs:
                 count += 1
                 # Here is the key modification: instead of removing only one
                 # element from the list of pairs, remove also all preceding
                 # elements.
-                # s_pairs.remove(pair)
-                index = s_pairs.index(pair)
-                del s_pairs[:index + 1]
+                # pairs.remove(pair)
+                index = pairs.index(pair)
+                del pairs[:index + 1]
             return count
 
-        intersection_len = functools.reduce(fn, pat_pairs, 0)
+        intersection_len = functools.reduce(fn, self.pairs, 0)
         return 2.0 * intersection_len / union_len
 
-    def rank_fn(pat):
-        if isregex:
-            return lambda result: len(result.item.split(sep))
-        pat_pairs = tuple(pat[i:i + 2] for i in range(len(pat) - 1))
-        return lambda result: 1.0 - similarity(result.transformed_item,
-                                               pat_pairs)
+    def _make_pairs(self, string):
+        return [string[i:i + 2] for i in range(len(string) - 1)]
 
-    def match_fn(pat):
-        if isregex:
-            return re.compile(pat or '.*').search
-        def fuzzy_match(transformed_item):
-            index = 0
-            for char in pat:
-                index = transformed_item.find(char, index)
-                if index == -1:
-                    return False
-                index += 1
-            return True
-        return fuzzy_match
 
-    def transform_fn(mmode):
-        return {
-            'full-line':      lambda i: i,
-            'filename-only':  os.path.basename,
-            'first-non-tab':  lambda i: i.split('\t')[0],
-            'until-last-tab': lambda i: '\t'.join(i.split('\t')[:-1]).strip('\t') if '\t' in i else i
-        }[mmode]
+def filterCtrlpList(items, pat, limit, mmode, ispath, crfile, isregex):
+    if isregex:
+        factory = RegexProcessor
+    else:
+        factory = FuzzyProcessor
 
+    processor = factory(pat.decode(CHARSET))
+
+    excluded = []
     if ispath == 1 and crfile:
-        try:
-            items.remove(crfile)
-        except ValueError:
-            pass
+        excluded = [crfile.decode(CHARSET)]
 
-    match = match_fn(pat)
-    rank = rank_fn(pat)
-    transform = transform_fn(mmode)
+    transformation = {
+        'full-line':      lambda i: i,
+        'filename-only':  os.path.basename,
+        'first-non-tab':  lambda i: i.split('\t')[0],
+        'until-last-tab': lambda i: '\t'.join(i.split('\t')[:-1]).strip('\t') if '\t' in i else i
+    }[mmode]
 
-    filtered_result = namedtuple('filteredresult', 'item transformed_item')
-
-    transformed = ((i, transform(i)) for i in items)
-    filtered    = (filtered_result(i, ti) for i, ti in transformed if match(ti))
-    final       = [i for i, ti in sorted(filtered, key=rank)[:limit]]
-
-    return final
+    return [item.encoded for item in processor.filter(
+        (Item(i, transformation(i)) for i in items),
+        excluded
+    )]
