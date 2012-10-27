@@ -189,7 +189,7 @@ set textwidth=79
 inoremap <M-o> <Esc>o
 let g:ragtag_global_maps = 1
 
-" Python highlighing options.
+" Python highlighting options.
 let python_highlight_all = 1
 let python_slow_sync = 1
 
@@ -199,11 +199,15 @@ let g:python_fold_strings = 0
 let g:python_auto_complete_modules = 0
 let g:python_auto_complete_variables = 0
 
+" Ruby highlighting options
+let g:ruby_operators = 1
+let g:ruby_space_errors = 1
+let g:ruby_no_trail_space_error = 1 " As we already have support for this for all filetypes
+
 " Tipos de arquivos específicos
 " =============================
 
 " detecte os tipos de arquivo
-filetype off
 filetype plugin indent on
 
 " geral
