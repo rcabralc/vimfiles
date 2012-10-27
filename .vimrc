@@ -64,6 +64,9 @@ set wrap
 " permita que buffers sejam trocados sem perder as alterações
 set hidden
 
+" Wrap search around the end of the file
+set wrapscan
+
 " Colors
 " ======
 
