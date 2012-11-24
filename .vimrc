@@ -67,6 +67,11 @@ set hidden
 " Wrap search around the end of the file
 set wrapscan
 
+" Use symbols in Powerline (requires capable font, both in terminal and in
+" GUI).
+let g:Powerline_symbols = 'fancy'
+
+
 " Colors
 " ======
 
@@ -91,12 +96,15 @@ syntax on
 if has('gui_running')
   let g:indent_guides_auto_colors = 0
   colorscheme rcabralc
+  " Powerline colorscheme
+  let g:Powerline_colorscheme = 'default'
 else
   colorscheme jellybeans
 endif
 
 " Mark text width column.
 set colorcolumn=+1
+
 
 " Mappings
 " ========
@@ -203,6 +211,7 @@ let g:python_auto_complete_variables = 0
 let g:ruby_operators = 1
 let g:ruby_space_errors = 1
 let g:ruby_no_trail_space_error = 1 " As we already have support for this for all filetypes
+
 
 " Tipos de arquivos específicos
 " =============================
@@ -385,6 +394,7 @@ function! s:ToggleRelativeNumber()
 endfunction
 
 nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
+
 
 " CtrlP configuration
 " -------------------
