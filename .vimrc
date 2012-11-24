@@ -235,17 +235,22 @@ augroup python
   autocmd BufWritePre *.py,*.cpy,*.vpy normal m`:%s/\s\*$//e ``
 augroup END
 
-augroup rest
-  " formatação de commits do git segue mesmo padrão do rest
-
+augroup text
   " Some options for rest/gitcommit.
-  autocmd FileType rst,gitcommit setlocal ai fo=tcroqn tw=78 et sw=2 ts=2 sts=2
+  autocmd FileType rst setlocal ai fo=tcroqn tw=78 et sw=2 ts=2 sts=2
 
-  " format list pattern
-  autocmd FileType rst,gitcommit setlocal flp=^\s*\(\d\+\\|[a-z]\)[\].)]\s*
+  " " Git commits wrapped in 72 columns, so we can have four columns at left for
+  " " indentation (as git log does) and four columns at right (for symmetry) and
+  " " still have all the message fit in a 80-columns terminal.
+  autocmd FileType gitcommit setlocal ai et sw=2 ts=2 sts=2
 
   " Syntax highlighting for doctest
   autocmd FileType rst setlocal syntax=doctest
+
+  autocmd FileType mail,human setlocal fo+=t tw=72
+
+  " format list pattern
+  autocmd FileType mail,human,rst,gitcommit setlocal flp=^\s*\(\d\+\\|[a-z]\)[\].)]\s*
 augroup END
 
 augroup css
@@ -258,6 +263,7 @@ augroup END
 
 augroup js
   autocmd FileType javascript setlocal smartindent autoindent tw=79 ts=2 sts=2 sw=2 et
+  autocmd FileType coffee     setlocal smartindent autoindent tw=79 ts=4 sts=4 sw=4 et
 augroup END
 
 augroup ruby
@@ -285,10 +291,6 @@ augroup sgml
   " place of the line is really crappy.
   autocmd FileType svg,xhtml,html,xml setlocal indentkeys=o,O,<>>,{,}
   autocmd FileType svg,xhtml,html,xml setlocal fo+=tl tw=79 ts=2 sw=2 sts=2 et
-augroup END
-
-augroup text
-  autocmd FileType mail,human setlocal fo+=t tw=72
 augroup END
 
 augroup vim
