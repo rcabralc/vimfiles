@@ -1,6 +1,7 @@
 import os.path
-import re
 import functools
+import re
+import vim_bridge
 
 CHARSET = 'utf-8'
 
@@ -83,7 +84,11 @@ class FuzzyProcessor(Processor):
         return [string[i:i + 2] for i in range(len(string) - 1)]
 
 
-def filterCtrlpList(items, pat, limit, mmode, ispath, crfile, isregex):
+@vim_bridge.bridged
+def filter_ctrlp_list(items, pat, limit, mmode, ispath, crfile, isregex):
+    ispath = int(ispath)
+    isregex = int(isregex)
+
     if isregex:
         factory = RegexProcessor
     else:

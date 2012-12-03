@@ -99,7 +99,8 @@ if has('gui_running')
   " Powerline colorscheme
   let g:Powerline_colorscheme = 'default'
 else
-  colorscheme jellybeans
+  let g:molokai_original = 1
+  colorscheme molokai
 endif
 
 " Mark text width column.
@@ -262,6 +263,7 @@ augroup css
 augroup END
 
 augroup js
+  autocmd!
   autocmd FileType javascript setlocal smartindent autoindent tw=79 ts=2 sts=2 sw=2 et
   autocmd FileType coffee     setlocal smartindent autoindent tw=79 ts=4 sts=4 sw=4 et
 augroup END
@@ -408,56 +410,26 @@ let g:ctrlp_default_input = 1
 let g:ctrlp_user_command = "find -L %s -type f | egrep -v '\.(git|hg|svn|egg-info)/.*' | egrep -v '\.(pyc|pyo|swp)$'"
 let g:ctrlp_working_path_mode = 'rc'
 
-function! g:filterCtrlPList(items, pat, limit, mmode, ispath, crfile, isregex)
 if has('python3')
-
 python3 << EOPython
 import vim, sys
 sys.path.append('/home/rcabralc/.vim/')
+# import vim_bridge
 import ctrlp
-
-items   = vim.eval('a:items')
-pat     = vim.eval('a:pat')
-limit   = int(vim.eval('a:limit'))
-mmode   = vim.eval('a:mmode')
-ispath  = int(vim.eval('a:ispath'))
-crfile  = vim.eval('a:crfile')
-isregex = int(vim.eval('a:isregex'))
-vim.command('return %r' %
-            ctrlp.filterCtrlpList(items,
-                                  pat,
-                                  limit,
-                                  mmode,
-                                  ispath,
-                                  crfile,
-                                  isregex))
+# @vim_bridge.bridged
+# def filter_ctrlp_list(*args):
+#     return ctrlp.filter_ctrlp_list(*args)
 EOPython
-
 elseif has('python')
-
 python << EOPython
 import vim, sys
 sys.path.append('/home/rcabralc/.vim/')
+# import vim_bridge
 import ctrlp
-
-items   = vim.eval('a:items')
-pat     = vim.eval('a:pat')
-limit   = int(vim.eval('a:limit'))
-mmode   = vim.eval('a:mmode')
-ispath  = int(vim.eval('a:ispath'))
-crfile  = vim.eval('a:crfile')
-isregex = int(vim.eval('a:isregex'))
-vim.command('return %r' %
-            ctrlp.filterCtrlpList(items,
-                                  pat,
-                                  limit,
-                                  mmode,
-                                  ispath,
-                                  crfile,
-                                  isregex))
+# @vim_bridge.bridged
+# def filter_ctrlp_list(*args):
+#     return ctrlp.filter_ctrlp_list(*args)
 EOPython
-
 endif
-endfunction
 
-let g:ctrlp_match_func = { 'match': 'g:filterCtrlPList' }
+let g:ctrlp_match_func = { 'match': 'FilterCtrlpList' }
