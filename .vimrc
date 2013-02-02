@@ -13,6 +13,9 @@ call pathogen#helptags()
 " Nocompatible mode
 set nocompatible
 
+" Smart indent is crap.
+set nosmartindent
+
 " Ensure backspace behavior is not alien.
 set backspace=indent,eol,start
 
@@ -84,15 +87,6 @@ set t_Co=256
 " sintaxe colorida
 syntax on
 
-" default color scheme
-" colorscheme neverness
-" colorscheme vividchalk
-" colorscheme railscasts
-" colorscheme zmrok
-" colorscheme textmate16
-" colorscheme quagmire
-" colorscheme blackboard
-" colorscheme desert
 if has('gui_running')
   let g:indent_guides_auto_colors = 0
   colorscheme rcabralc
@@ -227,7 +221,7 @@ augroup END
 
 augroup python
   " Recognize Zope's controller python scripts and validators as python.
-  autocmd BufNewFile,BufRead *.cpy,*.vpy setlocal filetype=python
+  autocmd BufNewFile,BufRead *.cpy,*.vpy setfiletype python
 
   " Default python identation, as recommended by PEP8.
   autocmd FileType python setlocal tw=79 et ts=4 sw=4 sts=4
@@ -257,15 +251,18 @@ augroup END
 augroup css
   " Treat CMF's CSS files (actually DTML methods) as CSS files, as well KSS
   " files.
-  autocmd BufNewFile,BufRead *.css.dtml,*.kss setlocal filetype=css
+  autocmd BufNewFile,BufRead *.css.dtml,*.kss setfiletype css
+  autocmd BufRead,BufNewFile *.scss set filetype=scss
 
-  autocmd FileType css,scss,sass setlocal smartindent autoindent tw=79 ts=2 sts=2 sw=2 et
+  autocmd FileType css,scss,sass setlocal autoindent tw=79 ts=2 sts=2 sw=2 et
 augroup END
 
 augroup js
-  autocmd!
-  autocmd FileType javascript setlocal smartindent autoindent tw=79 ts=2 sts=2 sw=2 et
-  autocmd FileType coffee     setlocal smartindent autoindent tw=79 ts=4 sts=4 sw=4 et
+  autocmd FileType javascript setlocal autoindent tw=79 ts=2 sts=2 sw=2 et
+augroup END
+
+augroup coffee
+  autocmd FileType coffee setlocal autoindent tw=79 ts=4 sts=4 sw=4 et
 augroup END
 
 augroup ruby
@@ -282,13 +279,10 @@ augroup END
 
 augroup sgml
   " Treat Zope3's zcml files as xml, because actually they're it.
-  autocmd BufNewFile,BufRead *.zcml setlocal ft=xml
+  autocmd BufNewFile,BufRead *.zcml setfiletype xml
 
-  " Treat Zope's template files as xhtml, because the TAL implementation is
-  " compatible with this.
-  autocmd BufNewFile,BufRead *.pt,*.cpt setlocal filetype=xhtml
+  autocmd BufNewFile,BufRead *.pt,*.cpt setfiletype xml
 
-  " autocmd FileType svg,xhtml,html,xml set nosmartindent
   " Change identation keys.  The automatic indent when <Return> is used in any
   " place of the line is really crappy.
   autocmd FileType svg,xhtml,html,xml setlocal indentkeys=o,O,<>>,{,}
@@ -359,7 +353,9 @@ let g:syntastic_auto_loc_list=1
 let g:syntastic_enable_signs=1
 
 " Disable syntastic for python, as I use pyflakes.
-let g:syntastic_disabled_filetypes = ['python', 'cpp']
+let g:syntastic_mode_map = { 'mode': 'active',
+                           \ 'active_filetypes': [],
+                           \ 'passive_filetypes': ['python', 'cpp'] }
 
 " Hilite trailing spaces as spelling errors
 highlight link TrailingSpace SpellBad
@@ -403,32 +399,22 @@ nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
 " CtrlP configuration
 " -------------------
 
-let g:ctrlp_follow_symlinks = 1
-let g:ctrlp_max_files = 0
 let g:ctrlp_open_new_file = 'r'
 let g:ctrlp_default_input = 1
 let g:ctrlp_user_command = "find -L %s -type f | egrep -v '\.(git|hg|svn|egg-info)/.*' | egrep -v '\.(pyc|pyo|swp)$'"
-let g:ctrlp_working_path_mode = 'rc'
+" let g:ctrlp_working_path_mode = 'rc'
 
 if has('python3')
 python3 << EOPython
 import vim, sys
 sys.path.append('/home/rcabralc/.vim/')
-# import vim_bridge
 import ctrlp
-# @vim_bridge.bridged
-# def filter_ctrlp_list(*args):
-#     return ctrlp.filter_ctrlp_list(*args)
 EOPython
 elseif has('python')
 python << EOPython
 import vim, sys
 sys.path.append('/home/rcabralc/.vim/')
-# import vim_bridge
 import ctrlp
-# @vim_bridge.bridged
-# def filter_ctrlp_list(*args):
-#     return ctrlp.filter_ctrlp_list(*args)
 EOPython
 endif
 
