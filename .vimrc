@@ -10,6 +10,8 @@ call pathogen#helptags()
 " Interface
 " =========
 
+set number
+
 " Nocompatible mode
 set nocompatible
 
@@ -70,6 +72,9 @@ set hidden
 " Wrap search around the end of the file
 set wrapscan
 
+" Add powerline runtime path
+set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
+
 " Use symbols in Powerline (requires capable font, both in terminal and in
 " GUI).
 let g:Powerline_symbols = 'fancy'
@@ -88,8 +93,10 @@ set t_Co=256
 syntax on
 
 if has('gui_running')
-  let g:indent_guides_auto_colors = 0
-  colorscheme rcabralc
+  let g:molokai_original = 1
+  colorscheme molokai
+  " let g:indent_guides_auto_colors = 0
+  " colorscheme rcabralc
   " Powerline colorscheme
   let g:Powerline_colorscheme = 'default'
 else
@@ -279,9 +286,9 @@ augroup END
 
 augroup sgml
   " Treat Zope3's zcml files as xml, because actually they're it.
-  autocmd BufNewFile,BufRead *.zcml setfiletype xml
+  autocmd BufNewFile,BufRead *.zcml set ft=xml
 
-  autocmd BufNewFile,BufRead *.pt,*.cpt setfiletype xml
+  autocmd BufNewFile,BufRead *.pt,*.cpt set ft=xml
 
   " Change identation keys.  The automatic indent when <Return> is used in any
   " place of the line is really crappy.
@@ -394,6 +401,13 @@ function! s:ToggleRelativeNumber()
 endfunction
 
 nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
+
+
+" Quickfixsigns: no icons.
+let g:quickfixsigns_icons = {}
+
+" Khuno: ignore multiple spaces before operators.
+let g:khuno_ignore = "E221"
 
 
 " CtrlP configuration
