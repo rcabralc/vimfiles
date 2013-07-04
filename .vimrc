@@ -93,14 +93,14 @@ set t_Co=256
 syntax on
 
 if has('gui_running')
-  let g:molokai_original = 1
+  let g:molokai_original = 0
   colorscheme molokai
   " let g:indent_guides_auto_colors = 0
   " colorscheme rcabralc
   " Powerline colorscheme
   let g:Powerline_colorscheme = 'default'
 else
-  let g:molokai_original = 1
+  let g:molokai_original = 0
   colorscheme molokai
 endif
 
@@ -122,20 +122,21 @@ nnoremap <C-\> :buffer<Space>
 
 " <Leader>K kills a buffer ignoring changes and closes the window, <Leader>k
 " kills a buffer when there's no changes and preserves the window.
-map <Leader>k :call KillBuffer()<CR>
-function! KillBuffer()
-    let del_buf_nr = bufnr("%")
-    let new_buf_nr = bufnr("#")
-    if ((new_buf_nr != -1) && (new_buf_nr != del_buf_nr) && buflisted(new_buf_nr))
-        execute "b " . new_buf_nr
-    else
-        bnext
-    endif
-    if (bufnr("%") == del_buf_nr)
-        new
-    endif
-    execute "bw " . del_buf_nr
-endfunction
+" map <Leader>k :call KillBuffer()<CR>
+" function! KillBuffer()
+"     let del_buf_nr = bufnr("%")
+"     let new_buf_nr = bufnr("#")
+"     if ((new_buf_nr != -1) && (new_buf_nr != del_buf_nr) && buflisted(new_buf_nr))
+"         execute "b " . new_buf_nr
+"     else
+"         bnext
+"     endif
+"     if (bufnr("%") == del_buf_nr)
+"         new
+"     endif
+"     execute "bw " . del_buf_nr
+" endfunction
+map <Leader>k :bw<CR>
 map <Leader>K :bw!<CR>
 
 " navigate between windows without pressing C-W
@@ -273,16 +274,14 @@ augroup coffee
 augroup END
 
 augroup ruby
-  autocmd Syntax ruby hi link rubyPseudoVariable Special
   autocmd FileType ruby setlocal et ts=2 sw=2 sts=2 tw=79
-augroup END
-
-augroup eruby
   autocmd FileType eruby setlocal et ts=2 sw=2 sts=2 tw=79
   " Change identation keys.  The automatic indent when <Return> is used in any
   " place of the line is really crappy.
   autocmd FileType eruby setlocal indentkeys=o,O,<Return>,<>>,{,},0),0],o,O,!^F,=end,=else,=elsif,=rescue,=ensure,=when,=end,=else,=cat,=fina,=END,0\
 augroup END
+
+autocmd FileType yaml setlocal et ts=2 sw=2 sts=2 tw=79
 
 augroup sgml
   " Treat Zope3's zcml files as xml, because actually they're it.
@@ -358,11 +357,7 @@ set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 let g:syntastic_auto_loc_list=1
 let g:syntastic_enable_signs=1
-
-" Disable syntastic for python, as I use pyflakes.
-let g:syntastic_mode_map = { 'mode': 'active',
-                           \ 'active_filetypes': [],
-                           \ 'passive_filetypes': ['python', 'cpp'] }
+let g:syntastic_python_checkers = ['flake8']
 
 " Hilite trailing spaces as spelling errors
 highlight link TrailingSpace SpellBad
