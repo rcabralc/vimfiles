@@ -43,7 +43,7 @@ class RegexProcessor(Processor):
         return self.pattern.search(item.transformed)
 
     def sort_key(self, item):
-        return len(item.original.split(self._sep))
+        return len(item.value.split(self._sep))
 
 
 class FuzzyProcessor(Processor):
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     results = filter_ctrlp_list(
         input_lines,
         pattern,
-        args.limit,
+        None,# args.limit,
         match_mode,
         is_path,
         current_file,
