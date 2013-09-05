@@ -92,16 +92,18 @@ set t_Co=256
 " sintaxe colorida
 syntax on
 
+let g:Powerline_colorscheme = 'default'
 if has('gui_running')
-  let g:molokai_original = 0
+  let g:molokai_original = 1
   colorscheme molokai
   " let g:indent_guides_auto_colors = 0
   " colorscheme rcabralc
   " Powerline colorscheme
-  let g:Powerline_colorscheme = 'default'
 else
   let g:molokai_original = 0
+  let g:rehash256 = 1
   colorscheme molokai
+  set background=dark
 endif
 
 " Mark text width column.
