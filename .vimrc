@@ -403,9 +403,6 @@ nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
 " Quickfixsigns: no icons.
 let g:quickfixsigns_icons = {}
 
-" Khuno: ignore multiple spaces before operators.
-let g:khuno_ignore = "E221"
-
 
 " CtrlP configuration
 " -------------------
