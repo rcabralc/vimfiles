@@ -332,7 +332,7 @@ set incsearch
 " ==================
 
 " When quitting, save the session.
-autocmd! VimLeavePre * mksession!
+" autocmd! VimLeavePre * mksession!
 
 " Load a session in the current directory.
 map <F3> :so Session.vim<CR>
