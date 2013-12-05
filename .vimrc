@@ -3,17 +3,55 @@
 " Configuração padrão
 " ===================
 
-" Activate pathogen
-call pathogen#infect()
-call pathogen#helptags()
+set nocompatible " Be iMproved
+" Plugins
+" =======
+
+if has('vim_starting')
+    set runtimepath+=~/.vim/bundle/neobundle.vim/
+endif
+
+" Activate NeoBundle
+call neobundle#rc(expand('~/.vim/bundle/'))
+
+" Let NeoBundle manage NeoBundle
+NeoBundleFetch 'Shougo/neobundle.vim'
+
+" After install, turn shell ~/.vim/bundle/vimproc, (n,g)make -f your_machines_makefile
+NeoBundle 'Shougo/vimproc'
+
+NeoBundle 'vim-scripts/VST'
+NeoBundle 'kien/ctrlp.vim'
+NeoBundle 'editorconfig/editorconfig-vim'
+NeoBundle 'nono/vim-handlebars'
+NeoBundle 'othree/html5.vim'
+NeoBundle 'tomasr/molokai'
+NeoBundle 'Lokaltog/powerline', 'develop'
+NeoBundle 'tomtom/quickfixsigns_vim'
+NeoBundle 'cakebaker/scss-syntax.vim'
+NeoBundle 'msanders/snipmate.vim'
+NeoBundle 'scrooloose/syntastic'
+NeoBundle 'tomtom/tcomment_vim'
+NeoBundle 'kchmck/vim-coffee-script'
+NeoBundle 'hail2u/vim-css3-syntax'
+NeoBundle 'tpope/vim-endwise'
+NeoBundle 'tpope/vim-fugitive'
+NeoBundle 'tpope/vim-git'
+NeoBundle 'nathanaelkane/vim-indent-guides'
+NeoBundle 'jelera/vim-javascript-syntax'
+NeoBundle 'tsaleh/vim-matchit'
+NeoBundle 'tpope/vim-rails'
+NeoBundle 'tpope/vim-rake'
+NeoBundle 'nvie/vim-rst-tables'
+NeoBundle 'vim-ruby/vim-ruby'
+
+NeoBundleCheck
+
 
 " Interface
 " =========
 
 set number
-
-" Nocompatible mode
-set nocompatible
 
 " Smart indent is crap.
 set nosmartindent
@@ -73,7 +111,10 @@ set hidden
 set wrapscan
 
 " Add powerline runtime path
-set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
+set rtp+=~/.vim/bundle/powerline_develop/powerline/bindings/vim
+
+" detecte os tipos de arquivo
+filetype plugin indent on
 
 " Use symbols in Powerline (requires capable font, both in terminal and in
 " GUI).
@@ -220,9 +261,6 @@ let g:ruby_no_trail_space_error = 1 " As we already have support for this for al
 
 " Tipos de arquivos específicos
 " =============================
-
-" detecte os tipos de arquivo
-filetype plugin indent on
 
 " geral
 augroup general
