@@ -137,9 +137,9 @@ let g:Powerline_colorscheme = 'default'
 if has('gui_running')
   let g:molokai_original = 1
   colorscheme molokai
+
   " let g:indent_guides_auto_colors = 0
   " colorscheme rcabralc
-  " Powerline colorscheme
 else
   let g:molokai_original = 0
   let g:rehash256 = 1
