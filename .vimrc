@@ -141,10 +141,9 @@ if has('gui_running')
   " let g:indent_guides_auto_colors = 0
   " colorscheme rcabralc
 else
-  let g:molokai_original = 0
+  let g:molokai_original = 1
   let g:rehash256 = 1
   colorscheme molokai
-  set background=dark
 endif
 
 " Mark text width column.
