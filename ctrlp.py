@@ -4,7 +4,8 @@ import re
 import sys
 
 try:
-    import vim, vim_bridge
+    import vim
+    import vim_bridge
     HAS_VIM_BRIDGE = True
 except ImportError:
     HAS_VIM_BRIDGE = False
@@ -24,11 +25,19 @@ class Item(object):
         self.value = value
         self.transformed = transformed
         self.transformed_lower = transformed.lower()
+        self._levels = None
+
+    @property
+    def levels(self):
+        if self._levels is not None:
+            return self._levels
+        self._levels = len(self.value.split('/'))
+        return self._levels
 
 
 class Processor(object):
     def filter(self, items):
-        filtered = list(i for i in items if self.match(i))
+        filtered = list(i for i in items if i.value and self.match(i))
         filtered.sort(key=self.sort_key)
         return filtered[:self.limit]
 
@@ -55,6 +64,7 @@ class FuzzyProcessor(Processor):
             self.match = lambda item: True
             self.sort_key = lambda item: item.value
         self.limit = limit
+        # self._re_search = re.compile(".*%s.*" % '.*'.join(pattern)).search
 
     def match(self, item):
         string = item.transformed_lower
@@ -65,6 +75,7 @@ class FuzzyProcessor(Processor):
                 return False
 
         return True
+        # return self._re_search(item.transformed_lower)
 
     def sort_key(self, item):
         # A simple way to do string comparison, using the algorithm described
@@ -79,14 +90,14 @@ class FuzzyProcessor(Processor):
         for pair in self.pairs:
             # Here is the key modification: instead of removing only one
             # element from the list of pairs, remove (ignore) also all
-            # preceding elements.  This allows use to use the string
-            # directly.
+            # preceding elements.  This allows to use the string directly.
             found = string.find(pair, start)
             if found != -1:
                 start = found + 1
                 intersection_len += 1
 
-        return 1.0 - (2.0 * intersection_len / union_len)
+        return (1.0 - (2.0 * intersection_len / union_len), item.levels,
+                item.transformed_lower)
 
     def _make_pairs(self, string):
         return (string[i:i + 2] for i in range(len(string) - 1))
@@ -179,7 +190,7 @@ if __name__ == '__main__':
     results = filter_ctrlp_list(
         input_lines,
         pattern,
-        None,# args.limit,
+        None,  # args.limit,
         match_mode,
         is_path,
         current_file,
@@ -188,10 +199,9 @@ if __name__ == '__main__':
 
     if PY3:
         sys.stdout.write('\n'.join(item.decode(CHARSET) for item in results))
-        sys.stdout.write('\n')
     else:
         sys.stdout.write('\n'.join(results))
-        sys.stdout.write('\n')
+    sys.stdout.write('\n')
 
     sys.stdout.flush()
 
