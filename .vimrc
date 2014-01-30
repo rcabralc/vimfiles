@@ -53,6 +53,8 @@ NeoBundleCheck
 
 set number
 
+set autoindent
+
 " Smart indent is crap.
 set nosmartindent
 
@@ -80,7 +82,6 @@ set nostartofline
 " Keep some lines around for scope
 set scrolloff=10
 
-" tenha cinquenta linhas de histórico
 set history=50
 
 " always show the status line
@@ -113,7 +114,24 @@ set wrapscan
 " Add powerline runtime path
 set rtp+=~/.vim/bundle/powerline_develop/powerline/bindings/vim
 
-" detecte os tipos de arquivo
+" Mostly troublesome.
+set nrformats-=octal
+
+set shiftround
+
+" Don't wait forever on key codes.
+set ttimeout
+set ttimeoutlen=50
+
+set ignorecase
+set smartcase
+set incsearch
+
+" Briefly jump to matching paren or bracket.  This is not milliseconds, but the
+" docs don't say what it is.
+set showmatch
+set matchtime=3
+
 filetype plugin indent on
 
 " Use symbols in Powerline (requires capable font, both in terminal and in
@@ -349,17 +367,6 @@ augroup END
 augroup snippet
   autocmd FileType snippet setlocal noexpandtab sw=2 ts=2
 augroup END
-
-
-" Procura e substituição
-" ======================
-
-" case-insensitive, a menos que haja maiúsculas
-set ignorecase
-set smartcase
-
-" incremental
-set incsearch
 
 
 " General settings
