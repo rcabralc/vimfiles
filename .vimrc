@@ -295,17 +295,14 @@ augroup END
 
 augroup text
   " Some options for rest/gitcommit.
-  autocmd FileType rst setlocal ai fo=tcroqn tw=78 et sw=2 ts=2 sts=2
-
+  autocmd FileType markdown,rst,human,mail,gitcommit setlocal ai fo=tcroqn tw=78 et sw=2 ts=2 sts=2
+  autocmd FileType mail,human,gitcommit setlocal tw=72
   " " Git commits wrapped in 72 columns, so we can have four columns at left for
   " " indentation (as git log does) and four columns at right (for symmetry) and
   " " still have all the message fit in a 80-columns terminal.
-  autocmd FileType gitcommit setlocal ai et sw=2 ts=2 sts=2
 
   " Syntax highlighting for doctest
   autocmd FileType rst setlocal syntax=doctest
-
-  autocmd FileType mail,human setlocal fo+=t tw=72
 
   " format list pattern
   autocmd FileType mail,human,rst,gitcommit setlocal flp=^\s*\(\d\+\\|[a-z]\)[\].)]\s*
