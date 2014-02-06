@@ -406,19 +406,25 @@ autocmd Syntax * call matchadd('TrailingSpace', '\s\+$', 100)
 
 " Hilite excess in long lines as spelling errors
 function! s:MatchOverLength()
-    let tw = &textwidth ? &textwidth : 80
+    if !&textwidth
+        execute "match OverLength //"
+        return
+    endif
+
     if &colorcolumn =~ "^+"
         " Sum &tw value with &cc value.
-        let column = eval(tw.&colorcolumn)
+        let column = eval(&textwidth.&colorcolumn)
     else
         if &colorcolumn != ''
             let column = &colorcolumn
         else
-            let column = tw
+            let column = &textwidth
         endif
     endif
+
     execute "match OverLength /.\\%>".column."v/"
 endfunction
+
 highlight link OverLength SpellBad
 autocmd Syntax,WinEnter,WinLeave * call <sid>MatchOverLength()
 
