@@ -445,10 +445,6 @@ endfunction
 nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
 
 
-" Quickfixsigns: no icons.
-let g:quickfixsigns_icons = {}
-
-
 " CtrlP configuration
 " -------------------
 
