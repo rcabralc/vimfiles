@@ -26,8 +26,8 @@ NeoBundle 'editorconfig/editorconfig-vim'
 NeoBundle 'nono/vim-handlebars'
 NeoBundle 'othree/html5.vim'
 NeoBundle 'tomasr/molokai'
-NeoBundle 'Lokaltog/powerline', 'develop'
-NeoBundle 'tomtom/quickfixsigns_vim'
+NeoBundle 'bling/vim-airline'
+NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'cakebaker/scss-syntax.vim'
 NeoBundle 'msanders/snipmate.vim'
 NeoBundle 'scrooloose/syntastic'
@@ -44,6 +44,7 @@ NeoBundle 'tpope/vim-rails'
 NeoBundle 'tpope/vim-rake'
 NeoBundle 'nvie/vim-rst-tables'
 NeoBundle 'vim-ruby/vim-ruby'
+NeoBundle 'Valloric/YouCompleteMe'
 
 NeoBundleCheck
 
@@ -111,9 +112,6 @@ set hidden
 " Wrap search around the end of the file
 set wrapscan
 
-" Add powerline runtime path
-set rtp+=~/.vim/bundle/powerline_develop/powerline/bindings/vim
-
 " Mostly troublesome.
 set nrformats-=octal
 
@@ -129,14 +127,14 @@ set incsearch
 
 " Briefly jump to matching paren or bracket.  This is not milliseconds, but the
 " docs don't say what it is.
-set showmatch
-set matchtime=3
+" set showmatch
+" set matchtime=3
 
 filetype plugin indent on
 
-" Use symbols in Powerline (requires capable font, both in terminal and in
+" Use symbols in Airline (requires capable font, both in terminal and in
 " GUI).
-let g:Powerline_symbols = 'fancy'
+let g:airline_powerline_fonts = 1
 
 
 " Colors
@@ -151,7 +149,7 @@ set t_Co=256
 " sintaxe colorida
 syntax on
 
-let g:Powerline_colorscheme = 'default'
+let g:airline_theme = 'dark'
 if has('gui_running')
   let g:molokai_original = 1
   colorscheme molokai
