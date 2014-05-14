@@ -450,12 +450,69 @@ nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
 
 let g:ctrlp_open_new_file = 'r'
 let g:ctrlp_default_input = 1
-let g:ctrlp_follow_symlinks = 1
-let g:ctrlp_custom_ignore = {
-    \ 'dir':  '\v\.(git|hg|svn|egg-info)$',
-    \ 'file': '\v\.(pyc|pyo|swp|so|mo)$',
+let g:ctrlp_user_command = {
+    \ 'types': {
+        \ 1: ['.git', 'cd %s && git ls-files -co --exclude-standard | uniq'],
+        \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
+        \ },
+    \ 'fallback': 'find %s -type f'
     \ }
+let g:ctrlp_show_hidden = 1
 let g:ctrlp_max_files = 0
+let g:ctrlp_extensions = ['line']
 
+if has('python3')
+python3 << EOPython
+import vim, sys
+sys.path.append('/home/rcabralc/.vim/')
+import ctrlp
+EOPython
+elseif has('python')
+python << EOPython
+import vim, sys
+sys.path.append('/home/rcabralc/.vim/')
+import ctrlp
+EOPython
+endif
 
+let g:ctrlp_match_func = { 'match': 'Customctrlpmatch' }
+
+fu! Customctrlpmatch(lines, input, limit, mmode, ispath, crfile, regexp)
+    let matchlist = FilterCtrlpList(a:lines, a:input, a:limit, a:mmode, a:ispath, a:crfile, a:regexp)
+
+    call s:highlight(matchlist)
+
+    cal map(matchlist, 'v:val["match"]')
+    return matchlist
+endfu
+
+" The function below as stolen from
+" https://github.com/JazzCore/ctrlp-cmatcher/blob/master/autoload/matcher.vim
+" Copyright 2010-2012 Wincent Colaiuta. All rights reserved.
+fu! s:escapechars(chars)
+  if exists('+ssl') && !&ssl
+    cal map(a:chars, 'escape(v:val, ''\'')')
+  en
+  for each in ['^', '$', '.']
+    cal map(a:chars, 'escape(v:val, each)')
+  endfo
+
+  return a:chars
+endfu
+
+fu! s:highlight(matchlist)
+    call clearmatches()
+
+    for i in range(len(a:matchlist))
+        for j in range(len(a:matchlist[i]["highlight"]))
+            let highlight = a:matchlist[i]["highlight"][j]
+
+            let beginning = s:escapechars(highlight['beginning'])
+            let middle = '\zs'.s:escapechars(highlight['middle']).'\ze'
+            let ending = s:escapechars(highlight['ending'])
+
+            call matchadd('CtrlPMatch', '\c'.beginning.middle.ending)
+        endfor
+    endfor
+endf
 
