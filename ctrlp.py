@@ -147,9 +147,9 @@ class FuzzyMatch(object):
 
     @property
     def _start_indices(self):
-        max_index = len(self.string) + 1 - len(self.pattern)
+        max_index = len(self.string) - len(self.pattern)
         if max_index >= 0:
-            string = self.string[:max_index]
+            string = self.string[:max_index + 1]
         else:
             string = u''
         lengths = [len(s) for s in string.split(self._pattern_head)]
