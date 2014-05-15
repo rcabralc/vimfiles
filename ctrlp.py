@@ -121,16 +121,24 @@ class FuzzyMatch(object):
     def _compute(self):
         if not self.pattern:
             self._chunks = Chunks(self.string, [])
-            self.rank = len(self.string)
+            self.rank = self.inf
             return
 
         min_length = self.inf
         self._chunks = None
 
-        for chunks in self._possible_chunks:
-            if len(chunks) < min_length:
-                self._chunks = chunks
-                min_length = len(chunks)
+        # Often the pattern is a substring in the string.
+        start = self.string.find(self.pattern)
+        if ~start:
+            min_length = len(self.pattern)
+            end = start + min_length
+            self._chunks = Chunks(self.string[start:end],
+                                  tuple(range(start, end)))
+        else:
+            for chunks in self._possible_chunks:
+                if len(chunks) < min_length:
+                    self._chunks = chunks
+                    min_length = len(chunks)
 
         if self._chunks:
             self.rank = float(min_length)*len(self.string) / len(self.pattern)
@@ -163,19 +171,13 @@ class FuzzyMatch(object):
         find = self.string.find
         indices = [start]
 
-        # Often the pattern is a substring in the string.
-        index = find(self._pattern_tail, current)
-        if ~index:
-            end = index + len(self._pattern_tail)
-            return Chunks(self.string[start:end],
-                          (start,) + tuple(range(index, end)))
-
         for char in self._pattern_tail:
             found = find(char, current)
             if not ~found:
                 return Chunks.empty()
             indices.append(found)
             current = found + 1
+
         return Chunks(self.string[start:current], indices)
 
     @property
