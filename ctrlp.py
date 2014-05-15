@@ -103,12 +103,11 @@ class Chunks(object):
 class FuzzyMatch(object):
     inf = float('+INF')
 
-    def __init__(self, pattern, item):
-        self.pattern = pattern
+    def __init__(self, head, tail, item):
         self.item = item
         self.string = item.transformed_lower
-        self._pattern_head = pattern[0:1]
-        self._pattern_tail = pattern[1:]
+        self._pattern_head = head
+        self._pattern_tail = tail
 
         self._compute()
 
@@ -119,7 +118,7 @@ class FuzzyMatch(object):
         return bool(self._chunks)
 
     def _compute(self):
-        if not self.pattern:
+        if not self._pattern_head:
             self._chunks = Chunks(self.string, [])
             self.rank = self.inf
             return
@@ -128,9 +127,9 @@ class FuzzyMatch(object):
         self._chunks = None
 
         # Often the pattern is a substring in the string.
-        start = self.string.find(self.pattern)
+        start = self.string.find(self._pattern_head + self._pattern_tail)
         if ~start:
-            min_length = len(self.pattern)
+            min_length = len(self._pattern_head) + len(self._pattern_tail)
             end = start + min_length
             self._chunks = Chunks(self.string[start:end],
                                   tuple(range(start, end)))
@@ -141,7 +140,8 @@ class FuzzyMatch(object):
                     min_length = len(chunks)
 
         if self._chunks:
-            self.rank = float(min_length)*len(self.string) / len(self.pattern)
+            pattern_length = len(self._pattern_head) + len(self._pattern_tail)
+            self.rank = float(min_length) * len(self.string) / pattern_length
         else:
             self.rank = self.inf
             self._chunks = Chunks.empty()
@@ -231,11 +231,13 @@ def filter_ctrlp_list(items, pat, limit, mmode, ispath, crfile, isregex):
     isregex = int(isregex)
 
     if isregex:
-        pattern = re.compile(pat or u'.*')
+        pattern = re.compile(u'(?iu)' + pat if pat else u'.*')
         factory = lambda i: RegexMatch(pattern, i)
     else:
         pattern = pat.lower()
-        factory = lambda i: FuzzyMatch(pattern, i)
+        head = pattern[0:1]
+        tail = pattern[1:]
+        factory = lambda i: FuzzyMatch(head, tail, i)
 
     search = Search(factory)
 
