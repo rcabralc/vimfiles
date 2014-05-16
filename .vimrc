@@ -450,6 +450,7 @@ nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
 
 let g:ctrlp_open_new_file = 'r'
 let g:ctrlp_default_input = 1
+
 let g:ctrlp_user_command = {
     \ 'types': {
         \ 1: ['.git', 'cd %s && git ls-files -co --exclude-standard | uniq'],
@@ -457,6 +458,16 @@ let g:ctrlp_user_command = {
         \ },
     \ 'fallback': 'find %s -type f'
     \ }
+
+if executable('ag')
+    set grepprg=ag\ --nogroup\ --nocolor
+    let g:ctrlp_user_command['fallback'] = 'ag %s -i --nocolor --nogroup --hidden '.
+        \ '--ignore .git '.
+        \ '--ignore .hg '.
+        \ '--ignore .DS_Store '.
+        \ '-g ""'
+endif
+
 let g:ctrlp_show_hidden = 1
 let g:ctrlp_max_files = 0
 let g:ctrlp_extensions = ['line']
@@ -482,7 +493,7 @@ fu! Customctrlpmatch(lines, input, limit, mmode, ispath, crfile, regexp)
 
     call s:highlight(matchlist)
 
-    cal map(matchlist, 'v:val["match"]')
+    cal map(matchlist, 'v:val["value"]')
     return matchlist
 endfu
 

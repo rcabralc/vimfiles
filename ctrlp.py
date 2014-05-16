@@ -2,7 +2,6 @@ import argparse
 import os.path
 import re
 import sys
-import traceback
 
 try:
     import vim_bridge
@@ -17,14 +16,19 @@ except NameError:
     PY3 = True
 
 CHARSET = 'utf-8'
-CUTOUT = 100
+
+
+def take(count, iterable):
+    iterable = iter(iterable)
+    while count:
+        yield next(iterable)
+        count = count - 1
 
 
 class Item(object):
     def __init__(self, value, transformed):
         self.value = value
         self.transformed = transformed
-        self.transformed_lower = transformed.lower()
         self._levels = None
 
     @property
@@ -56,6 +60,10 @@ class RegexMatch(object):
         return bool(self._match)
 
     @property
+    def value(self):
+        return self.item.value
+
+    @property
     def highlight(self):
         start, end = self._match.span()
         beginning = self.string[:start]
@@ -73,6 +81,10 @@ class Chunks(object):
     def empty(cls):
         return cls(u'', [])
 
+    @classmethod
+    def full_unhighlighted(cls, string):
+        return cls(string, [])
+
     def __nonzero__(self):
         return self.__bool__()
 
@@ -83,9 +95,10 @@ class Chunks(object):
         return len(self.match)
 
     def __iter__(self):
-        if not self.indices:
-            return
+        return iter(self._merged) if self.indices else iter(())
 
+    @property
+    def _merged(self):
         (head,), tail = self.indices[0:1], self.indices[1:]
         chunks = [[head]]
         (chunk,) = chunks
@@ -100,14 +113,49 @@ class Chunks(object):
             yield chunk[0], chunk[-1] + 1
 
 
+class FuzzyPattern(object):
+    def __init__(self, pattern):
+        pattern_lower = pattern.lower()
+
+        if pattern_lower != pattern:
+            pat = self.pattern = pattern
+            re_prefix = u'(?u)'
+        else:
+            pat = self.pattern = pattern_lower
+            re_prefix = u'(?iu)'
+
+        self.head = self.pattern[0:1]
+        self.re_head = re.compile(re_prefix + re.escape(self.head))
+
+        if len(pat) > 1:
+            self.re = re.compile(
+                re_prefix +
+                u'*'.join(
+                    u'(%(c)s)[^%(c)s]' % {'c': re.escape(c)} for c in pat[:-1]
+                ) +
+                (u'*?(%s)' % re.escape(pat[-1]))
+            )
+        else:
+            self.re = re.compile(re_prefix + (u'(%s)' % re.escape(self.head)))
+
+    def __len__(self):
+        return len(self.pattern)
+
+    def __nonzero__(self):
+        return self.__bool__()
+
+    def __bool__(self):
+        return bool(self.pattern)
+
+
 class FuzzyMatch(object):
     inf = float('+INF')
 
-    def __init__(self, head, tail, item):
+    def __init__(self, pattern, item):
         self.item = item
-        self.string = item.transformed_lower
-        self._pattern_head = head
-        self._pattern_tail = tail
+        self.pattern = pattern
+        self.string = item.transformed
+        self._by_start = {}
 
         self._compute()
 
@@ -118,67 +166,49 @@ class FuzzyMatch(object):
         return bool(self._chunks)
 
     def _compute(self):
-        if not self._pattern_head:
-            self._chunks = Chunks(self.string, [])
+        if not self.pattern:
+            self._chunks = Chunks.full_unhighlighted(self.string)
             self.rank = self.inf
             return
 
         min_length = self.inf
         self._chunks = None
 
-        # Often the pattern is a substring in the string.
-        start = self.string.find(self._pattern_head + self._pattern_tail)
-        if ~start:
-            min_length = len(self._pattern_head) + len(self._pattern_tail)
-            end = start + min_length
-            self._chunks = Chunks(self.string[start:end],
-                                  tuple(range(start, end)))
-        else:
-            for chunks in self._possible_chunks:
-                if len(chunks) < min_length:
-                    self._chunks = chunks
-                    min_length = len(chunks)
+        for chunks in self._possible_chunks:
+            if len(chunks) < min_length:
+                self._chunks = chunks
+                min_length = len(chunks)
 
         if self._chunks:
-            pattern_length = len(self._pattern_head) + len(self._pattern_tail)
-            self.rank = float(min_length) * len(self.string) / pattern_length
+            self.rank = float(min_length)*len(self.string) / len(self.pattern)
         else:
             self.rank = self.inf
             self._chunks = Chunks.empty()
 
     @property
-    def _possible_chunks(self):
-        for start in self._start_indices:
-            chunks = self._chunks_at(start)
-            if chunks:
-                yield chunks
+    def value(self):
+        return self.item.value
 
     @property
-    def _start_indices(self):
-        max_index = len(self.string) - len(self.pattern)
-        if max_index >= 0:
-            string = self.string[:max_index + 1]
-        else:
-            string = u''
-        lengths = [len(s) for s in string.split(self._pattern_head)]
-        previous = 0
-        for l in lengths[:-1]:
-            yield previous + l
-            previous += l + 1
+    def _possible_chunks(self):
+        cutout = len(self.string) - len(self.pattern) + 1
+        for head in self.pattern.re_head.finditer(self.string, 0, cutout):
+            start = head.start()
 
-    def _chunks_at(self, start):
-        current = start + 1
-        find = self.string.find
-        indices = [start]
+            if start in self._by_start:
+                yield self._by_start[start]
+                continue
 
-        for char in self._pattern_tail:
-            found = find(char, current)
-            if not ~found:
-                return Chunks.empty()
-            indices.append(found)
-            current = found + 1
+            match = self.pattern.re.search(self.string, start)
+            if not match:
+                break
 
-        return Chunks(self.string[start:current], indices)
+            groups = range(1, len(match.groups()) + 1)
+            indices = (match.start(group) for group in groups)
+            chunks = Chunks(match.group(0), indices)
+            self._by_start[match.start()] = chunks
+
+            yield chunks
 
     @property
     def highlight(self):
@@ -194,16 +224,34 @@ class FuzzyMatch(object):
 
 
 class Search(object):
-    def __init__(self, factory):
+    def __init__(self, factory, transform, limit):
         self.factory = factory
+        self.transform = transform
+        self.limit = limit
 
     def matches(self, items):
         f = self.factory
-        matches = (f(i) for i in items if i.value)
-        return [item for item in sorted(
+        matches = (f(i) for i in self.transform(items) if i.value)
+        return (SearchResult(match) for match in take(self.limit, sorted(
             (match for match in matches if match),
             key=lambda x: x.rank
-        )]
+        )))
+
+
+class SearchResult(object):
+    def __init__(self, match):
+        self._match = match
+        self.value = match.value.encode(CHARSET)
+
+    def asdict(self):
+        return dict(value=self.value, highlight=self.highlight)
+
+    @property
+    def highlight(self):
+        return [
+            dict((k, v.encode(CHARSET)) for k, v in part.items())
+            for part in self._match.highlight
+        ]
 
 
 def _full_line_transform(items):
@@ -225,7 +273,7 @@ def _until_last_tab_transform(items):
     ) for i in items)
 
 
-def filter_ctrlp_list(items, pat, limit, mmode, ispath, crfile, isregex):
+def filter(items, pat, limit, mmode, ispath, crfile, isregex):
     limit = int(limit)
     ispath = int(ispath)
     isregex = int(isregex)
@@ -234,45 +282,36 @@ def filter_ctrlp_list(items, pat, limit, mmode, ispath, crfile, isregex):
         pattern = re.compile(u'(?iu)' + pat if pat else u'.*')
         factory = lambda i: RegexMatch(pattern, i)
     else:
-        pattern = pat.lower()
-        head = pattern[0:1]
-        tail = pattern[1:]
-        factory = lambda i: FuzzyMatch(head, tail, i)
-
-    search = Search(factory)
+        pattern = FuzzyPattern(pat)
+        factory = lambda i: FuzzyMatch(pattern, i)
 
     if ispath and crfile and crfile in items:
         items.remove(crfile)
 
-    transform = {
-        u'full-line': _full_line_transform,
-        u'filename-only': _filename_only_transform,
-        u'first-non-tab': _first_non_tab_transform,
-        u'until-last-tab': _until_last_tab_transform,
-    }[mmode]
+    transform = dict(
+        fullline=_full_line_transform,
+        filenameonly=_filename_only_transform,
+        firstnontab=_first_non_tab_transform,
+        untillasttab=_until_last_tab_transform,
+    )[mmode.replace('-', '')]
 
-    if not PY3:
-        items = [i.decode(CHARSET) for i in items]
+    return Search(factory, transform, limit).matches(items)
 
+
+def filter_ctrlp_list(items, pat, limit, mmode, ispath, crfile, isregex):
     try:
-        return [
-            dict(
-                match=match.item.value.encode(CHARSET),
-                highlight=[
-                    dict((k, v.encode(CHARSET)) for k, v in part.items())
-                    for part in match.highlight
-                ]
-            )
-            for match in search.matches(transform(items))[:CUTOUT]
-        ]
+        return [result.asdict() for result in
+                filter(items, pat, limit, mmode, ispath, crfile, isregex)]
     except Exception:
         if __name__ == '__main__':
             raise
 
-        return [
-            dict(highlight=[], match=line.encode(CHARSET))
+        import traceback
+        return list(reversed(
+            dict(highlight=[], value=line.encode(CHARSET))
             for line in traceback.format_exception(*sys.exc_info())
-        ]
+        ))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -307,21 +346,21 @@ if __name__ == '__main__':
         current_file = current_file.decode(CHARSET)
         input_lines = (line.decode(CHARSET) for line in input_lines)
 
-    results = filter_ctrlp_list(
+    results = filter(
         input_lines,
         pattern,
-        args.limit,
+        args.limit if args.limit > 0 else 1,
         match_mode,
         is_path,
         current_file,
         is_regex
     )
 
-    sys.stdout.write(u'\n'.join(item['match'].decode(CHARSET)
-                                for item in results))
+    sys.stdout.write(u'\n'.join(result.value.decode(CHARSET)
+                                for result in results))
     sys.stdout.write(u'\n')
-
     sys.stdout.flush()
+
 
 if HAS_VIM_BRIDGE:
     try:
