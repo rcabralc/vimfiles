@@ -22,14 +22,6 @@ class Item(object):
     def __init__(self, value, transformed):
         self.value = value
         self.transformed = transformed
-        self._levels = None
-
-    @property
-    def levels(self):
-        if self._levels is not None:
-            return self._levels
-        self._levels = len(self.value.split(os.path.sep))
-        return self._levels
 
 
 class RegexMatch(object):
