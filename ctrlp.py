@@ -18,13 +18,6 @@ except NameError:
 CHARSET = 'utf-8'
 
 
-def take(count, iterable):
-    iterable = iter(iterable)
-    while count:
-        yield next(iterable)
-        count = count - 1
-
-
 class Item(object):
     def __init__(self, value, transformed):
         self.value = value
@@ -73,17 +66,17 @@ class RegexMatch(object):
 
 
 class Chunks(object):
-    def __init__(self, match, indices):
+    def __init__(self, match):
         self.match = match
-        self.indices = tuple(indices)
+        self._indices = None
 
     @classmethod
     def empty(cls):
-        return cls(u'', [])
+        return cls(None)
 
     @classmethod
-    def full_unhighlighted(cls, string):
-        return cls(string, [])
+    def unhighlighted(cls, string):
+        return UnhighlightedChunk(string)
 
     def __nonzero__(self):
         return self.__bool__()
@@ -91,11 +84,17 @@ class Chunks(object):
     def __bool__(self):
         return bool(self.match)
 
-    def __len__(self):
-        return len(self.match)
-
     def __iter__(self):
-        return iter(self._merged) if self.indices else iter(())
+        return iter(self._merged) if self.match else iter(())
+
+    @property
+    def indices(self):
+        if self._indices is None:
+            match = self.match
+            groups = match.groups()
+            self._indices = list(match.start(i + 1)
+                                 for i, _ in enumerate(groups))
+        return self._indices
 
     @property
     def _merged(self):
@@ -113,6 +112,20 @@ class Chunks(object):
             yield chunk[0], chunk[-1] + 1
 
 
+class UnhighlightedChunk(object):
+    def __init__(self, string):
+        self.length = len(string)
+
+    def __nonzero__(self):
+        return self.__bool__()
+
+    def __bool__(self):
+        return self.length > 0
+
+    def __iter__(self):
+        return iter(())
+
+
 class FuzzyPattern(object):
     def __init__(self, pattern):
         pattern_lower = pattern.lower()
@@ -125,12 +138,11 @@ class FuzzyPattern(object):
             re_prefix = u'(?iu)'
 
         self.head = self.pattern[0:1]
-        self.re_head = re.compile(re_prefix + re.escape(self.head))
 
         if len(pat) > 1:
             self.re = re.compile(
                 re_prefix +
-                u'*'.join(
+                u'*?'.join(
                     u'(%(c)s)[^%(c)s]' % {'c': re.escape(c)} for c in pat[:-1]
                 ) +
                 (u'*?(%s)' % re.escape(pat[-1]))
@@ -155,7 +167,6 @@ class FuzzyMatch(object):
         self.item = item
         self.pattern = pattern
         self.string = item.transformed
-        self._by_start = {}
 
         self._compute()
 
@@ -167,48 +178,53 @@ class FuzzyMatch(object):
 
     def _compute(self):
         if not self.pattern:
-            self._chunks = Chunks.full_unhighlighted(self.string)
+            self._chunks = Chunks.unhighlighted(self.string)
             self.rank = self.inf
             return
 
+        self._chunks = Chunks.empty()
+        self.rank = self.inf
+
         min_length = self.inf
-        self._chunks = None
+        best_match = None
+        pattern_length = len(self.pattern)
 
-        for chunks in self._possible_chunks:
-            if len(chunks) < min_length:
-                self._chunks = chunks
-                min_length = len(chunks)
+        for match_length, match in self._possible_matches:
+            if match_length < min_length:
+                best_match = match
+                min_length = match_length
+            if min_length == pattern_length:
+                break
 
-        if self._chunks:
-            self.rank = float(min_length)*len(self.string) / len(self.pattern)
-        else:
-            self.rank = self.inf
-            self._chunks = Chunks.empty()
+        if best_match:
+            self._chunks = Chunks(match)
+            self.rank = float(min_length) * len(self.string) / pattern_length
 
     @property
     def value(self):
         return self.item.value
 
     @property
-    def _possible_chunks(self):
-        cutout = len(self.string) - len(self.pattern) + 1
-        for head in self.pattern.re_head.finditer(self.string, 0, cutout):
-            start = head.start()
+    def _possible_matches(self):
+        if len(self.pattern) > len(self.string):
+            return
 
-            if start in self._by_start:
-                yield self._by_start[start]
+        leftmost = -1
+        cutout = len(self.string) - len(self.pattern) + 1
+        search = self.pattern.re.search
+        for start, c in enumerate(self.string[0:cutout]):
+            if c != self.pattern.head:
                 continue
 
-            match = self.pattern.re.search(self.string, start)
+            if start <= leftmost:
+                continue
+
+            match = search(self.string, start)
             if not match:
                 break
 
-            groups = range(1, len(match.groups()) + 1)
-            indices = (match.start(group) for group in groups)
-            chunks = Chunks(match.group(0), indices)
-            self._by_start[match.start()] = chunks
-
-            yield chunks
+            leftmost = match.start()
+            yield ((match.end() - leftmost), match)
 
     @property
     def highlight(self):
@@ -232,10 +248,10 @@ class Search(object):
     def matches(self, items):
         f = self.factory
         matches = (f(i) for i in self.transform(items) if i.value)
-        return (SearchResult(match) for match in take(self.limit, sorted(
+        return (SearchResult(match) for match in sorted(
             (match for match in matches if match),
             key=lambda x: x.rank
-        )))
+        )[:self.limit])
 
 
 class SearchResult(object):
