@@ -27,9 +27,10 @@ class Item(object):
 class RegexMatch(object):
     _sep = os.path.sep
 
-    def __init__(self, re_pattern, item):
+    def __init__(self, pattern, re_pattern, item):
         self.item = item
         self.string = item.transformed
+        self.pattern = pattern
         self._match = re_pattern.search(self.string)
 
         if not self._match:
@@ -50,6 +51,9 @@ class RegexMatch(object):
 
     @property
     def highlight(self):
+        if not self.pattern:
+            return []
+
         start, end = self._match.span()
         beginning = self.string[:start]
         middle = self.string[start:end]
@@ -288,7 +292,7 @@ def filter(items, pat, limit, mmode, ispath, crfile, isregex):
 
     if isregex:
         pattern = re.compile(u'(?iu)' + pat if pat else u'.*')
-        factory = lambda i: RegexMatch(pattern, i)
+        factory = lambda i: RegexMatch(pat, pattern, i)
     else:
         pattern = FuzzyPattern(pat)
         factory = lambda i: FuzzyMatch(pattern, i)
