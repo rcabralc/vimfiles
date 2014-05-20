@@ -1,4 +1,8 @@
+from __future__ import division
+from __future__ import unicode_literals
+
 import argparse
+import operator
 import os.path
 import re
 import sys
@@ -25,8 +29,6 @@ class Item(object):
 
 
 class RegexTerm(object):
-    _sep = os.path.sep
-
     def __init__(self, pattern, re_pattern, item):
         self.item = item
         self.string = item.transformed
@@ -37,7 +39,7 @@ class RegexTerm(object):
             self.rank = float('+INF')
         else:
             start, end = self._match.span()
-            self.rank = 1 - float(end - start) / len(self.string)
+            self.rank = 1 - (end - start) / len(self.string)
 
     def __nonzero__(self):
         return self.__bool__()
@@ -55,9 +57,9 @@ class RegexTerm(object):
             return []
 
         start, end = self._match.span()
-        beginning = self.string[:start]
-        middle = self.string[start:end]
-        ending = self.string[end:]
+        beginning = self.value[:start]
+        middle = self.value[start:end]
+        ending = self.value[end:]
         return [dict(beginning=beginning, middle=middle, ending=ending)]
 
 
@@ -120,23 +122,23 @@ class FuzzyPattern(object):
 
         if pattern_lower != pattern:
             pat = self.pattern = pattern
-            re_prefix = u'(?u)'
+            self.ignore_case = False
         else:
             pat = self.pattern = pattern_lower
-            re_prefix = u'(?iu)'
+            self.ignore_case = True
 
         self.head = self.pattern[0:1]
         if self.head:
             regex = re.compile(
-                re_prefix +
-                u''.join(
-                    u'(%(c)s)[^%(c)s]*?' % {'c': re.escape(c)}
+                '(?u)' +
+                ''.join(
+                    '(%(c)s)[^%(c)s]*?' % {'c': re.escape(c)}
                     for c in pat[:-1]
                 ) +
-                (u'(%s)' % re.escape(pat[-1]))
+                ('(%s)' % re.escape(pat[-1]))
             )
         else:
-            regex = re.compile(u'')
+            regex = re.compile('')
 
         self.search = regex.search
 
@@ -156,11 +158,22 @@ class FuzzyTerm(object):
     def __init__(self, pattern, item):
         self.item = item
         self.pattern = pattern
-        self.string = item.transformed
+        if pattern.ignore_case:
+            self.string = item.transformed.lower()
+        else:
+            self.string = item.transformed
         self.string_length = len(self.string)
         self.pattern_length = len(self.pattern)
 
-        self._compute()
+        if self.pattern:
+            if self.pattern_length <= self.string_length:
+                self._compute()
+            else:
+                self._chunks = Chunks(None)
+                self.rank = self.inf
+        else:
+            self._chunks = UnhighlightedChunks(self.string)
+            self.rank = self.inf
 
     def __nonzero__(self):
         return self.__bool__()
@@ -169,29 +182,19 @@ class FuzzyTerm(object):
         return bool(self._chunks)
 
     def _compute(self):
-        if not self.pattern:
-            self._chunks = UnhighlightedChunks(self.string)
-            self.rank = self.inf
-            return
-
-        self.rank = self.inf
         min_length = self.inf
         best_match = None
+        pattern_length = self.pattern_length
 
         for match_length, match in self._possible_matches:
             if match_length < min_length:
                 best_match = match
                 min_length = match_length
-            if min_length == self.pattern_length:
+            if min_length == pattern_length:
                 break
 
-        if best_match:
-            self._chunks = Chunks(match)
-            self.rank = (
-                float(min_length) * self.string_length / self.pattern_length
-            )
-        else:
-            self._chunks = Chunks(None)
+        self._chunks = Chunks(best_match)
+        self.rank = min_length * self.string_length / pattern_length
 
     @property
     def value(self):
@@ -199,25 +202,25 @@ class FuzzyTerm(object):
 
     @property
     def _possible_matches(self):
-        if self.pattern_length > self.string_length:
-            return
-
         cutout = self.string_length - self.pattern_length + 1
         search = self.pattern.search
+        string = self.string
+        find = string.find
+        head = self.pattern.head
 
-        pos = self.string.find(self.pattern.head)
+        pos = find(head)
         if not ~pos:
             return
 
         while pos < cutout:
-            match = search(self.string, pos)
+            match = search(string, pos)
             if not match:
                 return
 
             leftmost = match.start()
             yield ((match.end() - leftmost), match)
 
-            pos = self.string.find(self.pattern.head, leftmost + 1)
+            pos = find(head, leftmost + 1)
             if not ~pos:
                 return
 
@@ -226,9 +229,9 @@ class FuzzyTerm(object):
         matches = []
         for start, end in self._chunks:
             matches.append(dict(
-                beginning=self.string[:start],
-                middle=self.string[start:end],
-                ending=self.string[end:]
+                beginning=self.value[:start],
+                middle=self.value[start:end],
+                ending=self.value[end:]
             ))
 
         return matches
@@ -245,7 +248,7 @@ class Search(object):
         terms = (f(i) for i in self.transform(items) if i.value)
         return (SearchResult(term) for term in sorted(
             (term for term in terms if term),
-            key=lambda x: x.rank
+            key=operator.attrgetter('rank')
         )[:self.limit])
 
 
@@ -274,13 +277,13 @@ def _filename_only_transform(items):
 
 
 def _first_non_tab_transform(items):
-    return (Item(i, i.split(u'\t')[0]) for i in items)
+    return (Item(i, i.split('\t')[0]) for i in items)
 
 
 def _until_last_tab_transform(items):
     return (Item(
         i,
-        u'\t'.join(i.split(u'\t')[:-1]).strip(u'\t') if u'\t' in i else i
+        '\t'.join(i.split('\t')[:-1]).strip('\t') if '\t' in i else i
     ) for i in items)
 
 
@@ -290,7 +293,7 @@ def filter(items, pat, limit, mmode, ispath, crfile, isregex):
     isregex = int(isregex)
 
     if isregex:
-        pattern = re.compile(u'(?iu)' + pat if pat else u'.*')
+        pattern = re.compile('(?iu)' + pat if pat else '.*')
         factory = lambda i: RegexTerm(pat, pattern, i)
     else:
         pattern = FuzzyPattern(pat)
@@ -347,7 +350,7 @@ if __name__ == '__main__':
         current_file = args.ignore_file
         is_path = True
     else:
-        current_file = u''
+        current_file = ''
         is_path = False
 
     input_lines = (line.strip() for line in sys.stdin.readlines())
@@ -367,9 +370,9 @@ if __name__ == '__main__':
         is_regex
     )
 
-    sys.stdout.write(u'\n'.join(result.value.decode(CHARSET)
-                                for result in results))
-    sys.stdout.write(u'\n')
+    sys.stdout.write('\n'.join(result.value.decode(CHARSET)
+                               for result in results))
+    sys.stdout.write('\n')
     sys.stdout.flush()
 
 
