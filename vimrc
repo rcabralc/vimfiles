@@ -17,11 +17,15 @@ call neobundle#rc(expand('~/.vim/bundle/'))
 " Let NeoBundle manage NeoBundle
 NeoBundleFetch 'Shougo/neobundle.vim'
 
-" After install, turn shell ~/.vim/bundle/vimproc, (n,g)make -f your_machines_makefile
-NeoBundle 'Shougo/vimproc'
+NeoBundle 'Shougo/vimproc', {
+      \ 'build' : {
+      \     'cygwin' : 'make -f make_cygwin.mak',
+      \     'mac' : 'make -f make_mac.mak',
+      \     'unix' : 'make -f make_unix.mak',
+      \    },
+      \ }
 
 NeoBundle 'vim-scripts/VST'
-NeoBundle 'kien/ctrlp.vim'
 NeoBundle 'editorconfig/editorconfig-vim'
 NeoBundle 'nono/vim-handlebars'
 NeoBundle 'othree/html5.vim'
@@ -39,14 +43,34 @@ NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-git'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 NeoBundle 'jelera/vim-javascript-syntax'
-NeoBundle 'tsaleh/vim-matchit'
-NeoBundle 'tpope/vim-rails'
+
+NeoBundle 'edsono/vim-matchit'
+" NeoBundle 'tpope/vim-rails'
 NeoBundle 'tpope/vim-rake'
 NeoBundle 'nvie/vim-rst-tables'
 NeoBundle 'vim-ruby/vim-ruby'
-NeoBundle 'Valloric/YouCompleteMe'
+
+" Fuzzy file finder
+NeoBundle 'kien/ctrlp.vim'
+" NeoBundle 'Shougo/unite.vim'
+
+" Completion
+NeoBundle 'Shougo/neocomplete.vim'
+" NeoBundle 'Valloric/YouCompleteMe'
+
+NeoBundle 'vim-scripts/bufkill.vim'
+NeoBundle 'tpope/vim-bundler'
+NeoBundle 'Shougo/vimshell.vim'
+NeoBundle 'tyru/restart.vim'
+
+filetype plugin indent on
+syntax enable
 
 NeoBundleCheck
+
+augroup Misc
+    autocmd!
+augroup END
 
 
 " Interface
@@ -68,11 +92,12 @@ autocmd!
 " permita que arquivos definam configuração
 set modeline
 
-" Highlight cursor line
-set cursorline
-
-" Highlight cursor column
-set cursorcolumn
+" Highlight cursor line and column
+set cursorline cursorcolumn
+augroup Misc
+    autocmd WinLeave * set nocursorline nocursorcolumn
+    autocmd WinEnter * set cursorline cursorcolumn
+augroup END
 
 " Turn on command line completion wild style
 set wildmenu
@@ -95,16 +120,16 @@ set lazyredraw
 set statusline=%{fugitive#statusline()}%*%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
 
 " have command-line completion <Tab> (for filenames, help topics, option names)
-" first list the available options and complete the longest common part, then
-" have further <Tab>s cycle through the possibilities:
-set wildmode=list:longest,full
+" first complete to longest common string, then list the available options and
+" complete the first optiont, then have further <Tab>s cycle through the
+" possibilities:
+set wildmode=list:longest,list:full
 
 " display the current mode and partially-typed commands in the status line:
 set showmode
 set showcmd
 
-" quebre linhas longas
-set wrap
+set nowrap
 
 " permita que buffers sejam trocados sem perder as alterações
 set hidden
@@ -125,20 +150,21 @@ set ignorecase
 set smartcase
 set incsearch
 
+set fillchars=vert:│,fold:-
+
 " Briefly jump to matching paren or bracket.  This is not milliseconds, but the
 " docs don't say what it is.
 " set showmatch
 " set matchtime=3
 
-filetype plugin indent on
-
-" Use symbols in Airline (requires capable font, both in terminal and in
-" GUI).
+" Use symbols in Airline (requires capable font, both in terminal and in GUI).
 let g:airline_powerline_fonts = 1
 
 
 " Colors
 " ======
+
+syntax on
 
 " configuração de cores para fundo escuro
 " set bg=dark
@@ -146,21 +172,17 @@ let g:airline_powerline_fonts = 1
 " Set the number of colors to 256.  This requires a capable terminal.
 set t_Co=256
 
-" sintaxe colorida
-syntax on
-
-let g:airline_theme = 'dark'
 if has('gui_running')
   let g:molokai_original = 1
-  colorscheme molokai
 
   " let g:indent_guides_auto_colors = 0
   " colorscheme rcabralc
 else
   let g:molokai_original = 1
   let g:rehash256 = 1
-  colorscheme molokai
 endif
+" colorscheme molokai
+colorscheme monokai
 
 " Mark text width column.
 set colorcolumn=+1
@@ -169,33 +191,18 @@ set colorcolumn=+1
 " Mappings
 " ========
 
+" Toggle highlight for searched terms.
+nnoremap <A-S-h> :set hlsearch!<CR>
+
 " Navigate between buffers (only normal mode)
-map <A-h> :bp<Return>
-map <A-l> :bn<Return>
-nnoremap <A-S-l> :bn!<CR>
-nnoremap <A-S-h> :bp!<CR>
+nnoremap <A-h> :bp<CR>
+nnoremap <A-l> :bn<CR>
 
-" <C-\> prompts for displaying an open file in the current buffer
-nnoremap <C-\> :buffer<Space>
+" <Leader>b prompts for displaying an open file in the current buffer
+nnoremap <Leader>b :buffer<Space>
 
-" <Leader>K kills a buffer ignoring changes and closes the window, <Leader>k
-" kills a buffer when there's no changes and preserves the window.
-" map <Leader>k :call KillBuffer()<CR>
-" function! KillBuffer()
-"     let del_buf_nr = bufnr("%")
-"     let new_buf_nr = bufnr("#")
-"     if ((new_buf_nr != -1) && (new_buf_nr != del_buf_nr) && buflisted(new_buf_nr))
-"         execute "b " . new_buf_nr
-"     else
-"         bnext
-"     endif
-"     if (bufnr("%") == del_buf_nr)
-"         new
-"     endif
-"     execute "bw " . del_buf_nr
-" endfunction
-map <Leader>k :bw<CR>
-map <Leader>K :bw!<CR>
+nnoremap <Leader>k :BW<CR>
+nnoremap <Leader>K :bw!<CR>
 
 " navigate between windows without pressing C-W
 nnoremap <C-h> <C-W><C-h>
@@ -345,6 +352,9 @@ augroup sgml
   " place of the line is really crappy.
   autocmd FileType svg,xhtml,html,xml setlocal indentkeys=o,O,<>>,{,}
   autocmd FileType svg,xhtml,html,xml setlocal fo+=tl tw=79 ts=2 sw=2 sts=2 et
+
+  autocmd FileType svg,xhtml,html,xml imap <buffer> <Leader>xc </<c-x><c-o><esc>a
+  autocmd FileType svg,xhtml,html,xml imap <buffer> <Leader>Xc </<c-x><c-o><esc>F<i
 augroup END
 
 augroup vim
@@ -400,45 +410,21 @@ let g:syntastic_auto_loc_list=1
 let g:syntastic_enable_signs=1
 let g:syntastic_python_checkers = ['flake8']
 
-" Hilite trailing spaces as spelling errors
-highlight link TrailingSpace SpellBad
-autocmd Syntax * call matchadd('TrailingSpace', '\s\+$', 100)
+highlight! TrailingSpace ctermbg=red guibg=red
+match TrailingSpace /\s\+$/
 
-" Hilite excess in long lines as spelling errors
-function! s:MatchOverLength()
-    if !&textwidth
-        execute "match OverLength //"
-        return
-    endif
-
-    if &colorcolumn =~ "^+"
-        " Sum &tw value with &cc value.
-        let column = eval(&textwidth.&colorcolumn)
-    else
-        if &colorcolumn != ''
-            let column = &colorcolumn
-        else
-            let column = &textwidth
-        endif
-    endif
-
-    execute "match OverLength /.\\%>".column."v/"
-endfunction
-
-highlight link OverLength SpellBad
-autocmd Syntax,WinEnter,WinLeave * call <sid>MatchOverLength()
-
-let g:already_bored_with_overlength = 1
+augroup Misc
+    autocmd BufWinEnter * if &modifiable && &ft!='unite' | match TrailingSpace /\s\+$/ | endif
+    autocmd InsertEnter * if &modifiable && &ft!='unite' | match TrailingSpace /\s\+\%#\@<!$/ | endif
+    autocmd InsertLeave * if &modifiable && &ft!='unite' | match TrailingSpace /\s\+$/ | endif
+    autocmd BufWinLeave * if &modifiable && &ft!='unite' | call clearmatches() | endif
+augroup END
 
 function! s:ToggleRelativeNumber()
     if &relativenumber
-        set number
-        autocmd! RelativeNumberAutoCommands
+        set norelativenumber
     else
         set relativenumber
-        augroup RelativeNumberAutoCommands
-            autocmd CursorMoved <buffer> call <sid>ToggleRelativeNumber()
-        augroup END
     endif
 endfunction
 
@@ -473,29 +459,27 @@ let g:ctrlp_max_files = 0
 let g:ctrlp_extensions = ['line']
 
 if has('python3')
-python3 << EOPython
-import vim, sys
-sys.path.append('/home/rcabralc/.vim/')
-import ctrlp
-EOPython
+python3 import vim, ctrlp
 elseif has('python')
-python << EOPython
-import vim, sys
-sys.path.append('/home/rcabralc/.vim/')
-import ctrlp
-EOPython
+python import vim, ctrlp
 endif
 
-let g:ctrlp_match_func = { 'match': 'Customctrlpmatch' }
+let g:ctrlp_match_func = { 'match': 'CustomCtrlpMatch' }
 
-fu! Customctrlpmatch(lines, input, limit, mmode, ispath, crfile, regexp)
-    let matchlist = FilterCtrlpList(a:lines, a:input, a:limit, a:mmode, a:ispath, a:crfile, a:regexp)
+fu! CustomCtrlpMatch(lines, input, limit, mmode, ispath, crfile, regexp)
+    if a:ispath
+        call filter(a:lines, 'v:val != a:crfile')
+    endif
+
+    let matchlist = FilterCtrlpList(a:lines, a:input, a:limit, a:mmode, a:regexp)
 
     call s:highlight(matchlist)
 
-    cal map(matchlist, 'v:val["value"]')
-    return matchlist
+    return map(matchlist, 'v:val.original_value')
 endfu
+
+" call unite#custom#source('file,file/new,buffer,file_rec', 'matchers', 'matcher_fuzzy')
+" nnoremap <C-p> :Unite -start-insert file_rec/async<CR>
 
 " The function below as stolen from
 " https://github.com/JazzCore/ctrlp-cmatcher/blob/master/autoload/matcher.vim
@@ -515,8 +499,8 @@ fu! s:highlight(matchlist)
     call clearmatches()
 
     for i in range(len(a:matchlist))
-        for j in range(len(a:matchlist[i]["highlight"]))
-            let highlight = a:matchlist[i]["highlight"][j]
+        for j in range(len(a:matchlist[i]["spans"]))
+            let highlight = a:matchlist[i]["spans"][j]
 
             let beginning = s:escapechars(highlight['beginning'])
             let middle = '\zs'.s:escapechars(highlight['middle']).'\ze'
@@ -527,3 +511,154 @@ fu! s:highlight(matchlist)
     endfor
 endf
 
+
+" Airline
+" =======
+
+let g:airline#extensions#tabline#enabled = 1
+
+
+" Neocomplete
+" ===========
+
+let g:neocomplete#enable_at_startup = 1
+
+
+" Highlight words to avoid in tech writing
+" =======================================
+"
+" obviously, basically, simply, of course, clearly,
+" just, everyone knows, However, So, easy
+
+" http://css-tricks.com/words-avoid-educational-writing/
+
+highlight! TechWordsToAvoid guisp=#ff6000 gui=undercurl
+function! MatchTechWordsToAvoid()
+  match TechWordsToAvoid /\c\<\(obviously\|basically\|simply\|of\scourse\|clearly\|just\|everyone\sknows\|however\|so,\|easy\)\>/
+endfunction
+
+augroup Misc
+    autocmd FileType markdown,rst,human call MatchTechWordsToAvoid()
+    autocmd BufWinEnter *.md,*.rst,*.human call MatchTechWordsToAvoid()
+    autocmd InsertEnter *.md,*.rst,*.human call MatchTechWordsToAvoid()
+    autocmd InsertLeave *.md,*.rst,*.human call MatchTechWordsToAvoid()
+    autocmd BufWinLeave *.md,*.rst,*.human call clearmatches()
+
+    " <C-k> interferes with the mapping to switch to the window above.
+    autocmd FileType vimshell nunmap <buffer> <C-k>
+
+    " Make text wrap.
+    autocmd FileType qf setlocal wrap
+augroup END
+
+
+" Airline theme.
+
+" Palette
+let s:black     = "#272822"
+let s:darkgray  = "#49483e"
+let s:lightgray = "#75715e"
+let s:white     = "#f8f8f2"
+let s:lime      = "#a6e22e"
+let s:yellow    = "#e6db74"
+let s:purple    = "#ae81ff"
+let s:cyan      = "#66d9ef"
+let s:orange    = "#fd971f"
+let s:magenta   = "#f92672"
+
+" Terminal versions
+let s:tblack     = 235
+let s:tdarkgray  = 238 "237
+let s:tlightgray = 242
+let s:twhite     = 255 "231
+let s:tlime      = 148
+let s:tyellow    = 186
+let s:tpurple    = 141
+let s:tcyan      = 81
+let s:torange    = 208
+let s:tmagenta   = 197
+
+let g:airline#themes#monokai#palette = {}
+
+let g:airline#themes#monokai#palette.accents = {
+            \ 'red':    [s:magenta, '', s:tmagenta , '', ''],
+            \ 'green':  [s:lime,    '', s:tlime,     '', ''],
+            \ 'blue':   [s:cyan,    '', s:tcyan,     '', ''],
+            \ 'yellow': [s:yellow,  '', s:tyellow,   '', ''],
+            \ 'orange': [s:orange,  '', s:torange,   '', ''],
+            \ 'purple': [s:purple,  '', s:tpurple,   '', ''],
+            \ }
+
+
+" Normal mode
+let s:N1 = [s:black,    s:purple, s:tblack,    s:tpurple] " mode
+let s:N2 = [s:white,    s:black,  s:twhite,    s:tblack] " info
+let s:N3 = [s:darkgray, s:white,  s:tdarkgray, s:twhite] " statusline
+
+let g:airline#themes#monokai#palette.normal = airline#themes#generate_color_map(s:N1, s:N2, s:N3)
+let g:airline#themes#monokai#palette.normal_modified = {
+            \ 'airline_c': [s:black, s:purple, s:tblack , s:tpurple, ''],
+            \ }
+
+
+" Insert mode
+let s:I1 = [s:black,    s:cyan,  s:tblack,    s:tcyan]
+let s:I2 = [s:white,    s:black, s:twhite,    s:tblack]
+let s:I3 = [s:darkgray, s:white, s:tdarkgray, s:twhite]
+
+let g:airline#themes#monokai#palette.insert = airline#themes#generate_color_map(s:I1, s:I2, s:I3)
+let g:airline#themes#monokai#palette.insert_modified = {
+            \ 'airline_c': [s:black, s:cyan, s:tblack, s:tcyan, ''],
+            \ }
+
+
+" Replace mode
+let g:airline#themes#monokai#palette.replace = copy(g:airline#themes#monokai#palette.insert)
+let g:airline#themes#monokai#palette.replace.airline_a = [s:I1[0], s:magenta, s:I1[2], s:tmagenta, '']
+let g:airline#themes#monokai#palette.replace_modified = {
+            \ 'airline_c': [s:black, s:magenta, s:tblack, s:tmagenta, ''],
+            \ }
+
+
+" Visual mode
+let s:V1 = [s:black,    s:orange, s:tblack,    s:torange]
+let s:V2 = [s:white,    s:black,  s:twhite,    s:tblack]
+let s:V3 = [s:darkgray, s:white,  s:tdarkgray, s:twhite]
+
+let g:airline#themes#monokai#palette.visual = airline#themes#generate_color_map(s:V1, s:V2, s:V3)
+let g:airline#themes#monokai#palette.visual_modified = {
+            \ 'airline_c': [s:black, s:orange, s:tblack, s:torange, ''],
+            \ }
+
+
+" Inactive
+let s:IA = [s:black, s:lightgray, s:tblack, s:tlightgray]
+let g:airline#themes#monokai#palette.inactive = airline#themes#generate_color_map(s:IA, s:IA, s:IA)
+let g:airline#themes#monokai#palette.inactive_modified = {
+            \ 'airline_c': [s:white, '', s:twhite, '', 'bold'],
+            \ }
+
+
+" CtrlP
+if !get(g:, 'loaded_ctrlp', 0)
+  finish
+endif
+let g:airline#themes#monokai#palette.ctrlp = airline#extensions#ctrlp#generate_color_map(
+            \ [s:white, s:lightgray, s:twhite, s:tlightgray, 'bold'],
+            \ [s:white, s:black,     s:twhite, s:tblack,     'bold'],
+            \ [s:black, s:yellow,    s:tblack, s:tyellow,    ''])
+
+let g:airline_theme = 'monokai'
+
+
+" Highlighting optimizations
+" --------------------------
+hi! link rubyBlockParameter Argument
+
+hi! link javaScriptFuncArg Argument
+hi! link javaScriptFuncExp Normal
+hi! link javaScriptGlobal Normal
+" Strangely enough, these JS identifiers are actually keywords.
+hi! link javaScriptIdentifier Keyword
+" I don't care that these be not highlighted in a special way.
+hi! link javaScriptHtmlElemProperties Normal
