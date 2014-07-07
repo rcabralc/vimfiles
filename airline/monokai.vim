@@ -26,47 +26,49 @@ let s:tmagenta   = 197
 let g:airline#themes#monokai#palette = {}
 
 let g:airline#themes#monokai#palette.accents = {
-            \ 'red':    [s:magenta, '', s:tmagenta , '', ''],
-            \ 'green':  [s:lime,    '', s:tlime,     '', ''],
-            \ 'blue':   [s:cyan,    '', s:tcyan,     '', ''],
-            \ 'yellow': [s:yellow,  '', s:tyellow,   '', ''],
-            \ 'orange': [s:orange,  '', s:torange,   '', ''],
-            \ 'purple': [s:purple,  '', s:tpurple,   '', ''],
+            \ 'red':    [s:magenta, '', s:tmagenta, '', ''],
+            \ 'green':  [s:lime, '', s:tlime, '', ''],
+            \ 'blue':   [s:cyan, '', s:tcyan, '', ''],
+            \ 'yellow': [s:yellow, '', s:tyellow, '', ''],
+            \ 'orange': [s:orange, '', s:torange, '', ''],
+            \ 'purple': [s:purple, '', s:tpurple, '', ''],
             \ }
 
 
+let s:default_modified = [s:magenta, s:black, s:tmagenta , s:tblack, 'bold']
+
 " Normal mode
-let s:N1 = [s:black, s:lightgray, s:tblack, s:tlightgray] " mode
+let s:N1 = [s:white, s:black, s:twhite, s:tblack] " mode
 let s:N2 = [s:white, s:darkgray, s:twhite, s:tdarkgray] " info
-let s:N3 = [s:lightgray, s:black, s:tlightgray, s:tblack] " statusline
+let s:N3 = [s:lime, s:black, s:tlime, s:tblack] " statusline
 
 let g:airline#themes#monokai#palette.normal = airline#themes#generate_color_map(s:N1, s:N2, s:N3)
 let g:airline#themes#monokai#palette.normal_modified = {
-            \ 'airline_c': [s:white, s:black, s:twhite , s:tblack, ''],
+            \ 'airline_c': s:default_modified,
             \ }
 
 
 " Insert mode
 let g:airline#themes#monokai#palette.insert = copy(g:airline#themes#monokai#palette.normal)
-let g:airline#themes#monokai#palette.insert.airline_a = [s:N1[0], s:cyan, s:N1[2], s:tcyan, '']
+let g:airline#themes#monokai#palette.insert.airline_a = [s:black, s:cyan, s:tblack, s:tcyan, '']
 let g:airline#themes#monokai#palette.insert_modified = {
-            \ 'airline_c': [s:white, s:black, s:twhite, s:tblack, ''],
+            \ 'airline_c': s:default_modified,
             \ }
 
 
 " Replace mode
 let g:airline#themes#monokai#palette.replace = copy(g:airline#themes#monokai#palette.normal)
-let g:airline#themes#monokai#palette.replace.airline_a = [s:N1[0], s:magenta, s:N1[2], s:tmagenta, '']
+let g:airline#themes#monokai#palette.replace.airline_a = [s:black, s:magenta, s:tblack, s:tmagenta, '']
 let g:airline#themes#monokai#palette.replace_modified = {
-            \ 'airline_c': [s:white, s:black, s:twhite, s:tblack, ''],
+            \ 'airline_c': s:default_modified,
             \ }
 
 
 " Visual mode
 let g:airline#themes#monokai#palette.visual = copy(g:airline#themes#monokai#palette.normal)
-let g:airline#themes#monokai#palette.visual.airline_a = [s:N1[0], s:orange, s:N1[2], s:torange, '']
+let g:airline#themes#monokai#palette.visual.airline_a = [s:black, s:orange, s:tblack, s:torange, '']
 let g:airline#themes#monokai#palette.visual_modified = {
-            \ 'airline_c': [s:white, s:black, s:twhite, s:tblack, ''],
+            \ 'airline_c': s:default_modified,
             \ }
 
 
@@ -74,7 +76,7 @@ let g:airline#themes#monokai#palette.visual_modified = {
 let s:IA = [s:lightgray, s:darkgray, s:tlightgray, s:tdarkgray]
 let g:airline#themes#monokai#palette.inactive = airline#themes#generate_color_map(s:IA, s:IA, s:IA)
 let g:airline#themes#monokai#palette.inactive_modified = {
-            \ 'airline_c': [s:white, '', s:twhite, '', ''],
+            \ 'airline_c': s:default_modified,
             \ }
 
 
