@@ -547,14 +547,28 @@ augroup END
 
 
 " Airline theme.
-runtime airline/monokai.vim
+let g:airline_mode_map = {
+    \ '__' : '-',
+    \ 'n'  : 'N',
+    \ 'i'  : 'I',
+    \ 'R'  : 'R',
+    \ 'c'  : 'C',
+    \ 'v'  : 'V',
+    \ 'V'  : 'V',
+    \ '' : 'V',
+    \ 's'  : 'S',
+    \ 'S'  : 'S',
+    \ '' : 'S',
+    \ }
+let g:airline#extensions#hunks#enabled = 0
+let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+let g:airline_theme = 'monokai'
 
 
 " Highlighting optimizations
 " --------------------------
-hi! link rubyBlockParameter Argument
+hi! link rubyBlockParameter Special
 
-hi! link javaScriptFuncArg Argument
 hi! link javaScriptFuncExp Normal
 hi! link javaScriptGlobal Normal
 " Strangely enough, these JS identifiers are actually keywords.
