@@ -25,11 +25,11 @@ NeoBundle 'Shougo/vimproc', {
       \    },
       \ }
 
+NeoBundle 'rcabralc/monokai.vim'
 NeoBundle 'vim-scripts/VST'
 NeoBundle 'editorconfig/editorconfig-vim'
 NeoBundle 'nono/vim-handlebars'
 NeoBundle 'othree/html5.vim'
-NeoBundle 'tomasr/molokai'
 NeoBundle 'bling/vim-airline'
 NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'cakebaker/scss-syntax.vim'
@@ -172,16 +172,10 @@ syntax on
 " Set the number of colors to 256.  This requires a capable terminal.
 set t_Co=256
 
-if has('gui_running')
-  let g:molokai_original = 1
-
-  " let g:indent_guides_auto_colors = 0
-  " colorscheme rcabralc
-else
-  let g:molokai_original = 1
-  let g:rehash256 = 1
-endif
-" colorscheme molokai
+" if has('gui_running')
+"   let g:indent_guides_auto_colors = 0
+"   colorscheme rcabralc
+" endif
 colorscheme monokai
 
 " Mark text width column.
@@ -553,102 +547,7 @@ augroup END
 
 
 " Airline theme.
-
-" Palette
-let s:black     = "#272822"
-let s:darkgray  = "#49483e"
-let s:lightgray = "#75715e"
-let s:white     = "#f8f8f2"
-let s:lime      = "#a6e22e"
-let s:yellow    = "#e6db74"
-let s:purple    = "#ae81ff"
-let s:cyan      = "#66d9ef"
-let s:orange    = "#fd971f"
-let s:magenta   = "#f92672"
-
-" Terminal versions
-let s:tblack     = 235
-let s:tdarkgray  = 238 "237
-let s:tlightgray = 242
-let s:twhite     = 255 "231
-let s:tlime      = 148
-let s:tyellow    = 186
-let s:tpurple    = 141
-let s:tcyan      = 81
-let s:torange    = 208
-let s:tmagenta   = 197
-
-let g:airline#themes#monokai#palette = {}
-
-let g:airline#themes#monokai#palette.accents = {
-            \ 'red':    [s:magenta, '', s:tmagenta , '', ''],
-            \ 'green':  [s:lime,    '', s:tlime,     '', ''],
-            \ 'blue':   [s:cyan,    '', s:tcyan,     '', ''],
-            \ 'yellow': [s:yellow,  '', s:tyellow,   '', ''],
-            \ 'orange': [s:orange,  '', s:torange,   '', ''],
-            \ 'purple': [s:purple,  '', s:tpurple,   '', ''],
-            \ }
-
-
-" Normal mode
-let s:N1 = [s:black,    s:purple, s:tblack,    s:tpurple] " mode
-let s:N2 = [s:white,    s:black,  s:twhite,    s:tblack] " info
-let s:N3 = [s:darkgray, s:white,  s:tdarkgray, s:twhite] " statusline
-
-let g:airline#themes#monokai#palette.normal = airline#themes#generate_color_map(s:N1, s:N2, s:N3)
-let g:airline#themes#monokai#palette.normal_modified = {
-            \ 'airline_c': [s:black, s:purple, s:tblack , s:tpurple, ''],
-            \ }
-
-
-" Insert mode
-let s:I1 = [s:black,    s:cyan,  s:tblack,    s:tcyan]
-let s:I2 = [s:white,    s:black, s:twhite,    s:tblack]
-let s:I3 = [s:darkgray, s:white, s:tdarkgray, s:twhite]
-
-let g:airline#themes#monokai#palette.insert = airline#themes#generate_color_map(s:I1, s:I2, s:I3)
-let g:airline#themes#monokai#palette.insert_modified = {
-            \ 'airline_c': [s:black, s:cyan, s:tblack, s:tcyan, ''],
-            \ }
-
-
-" Replace mode
-let g:airline#themes#monokai#palette.replace = copy(g:airline#themes#monokai#palette.insert)
-let g:airline#themes#monokai#palette.replace.airline_a = [s:I1[0], s:magenta, s:I1[2], s:tmagenta, '']
-let g:airline#themes#monokai#palette.replace_modified = {
-            \ 'airline_c': [s:black, s:magenta, s:tblack, s:tmagenta, ''],
-            \ }
-
-
-" Visual mode
-let s:V1 = [s:black,    s:orange, s:tblack,    s:torange]
-let s:V2 = [s:white,    s:black,  s:twhite,    s:tblack]
-let s:V3 = [s:darkgray, s:white,  s:tdarkgray, s:twhite]
-
-let g:airline#themes#monokai#palette.visual = airline#themes#generate_color_map(s:V1, s:V2, s:V3)
-let g:airline#themes#monokai#palette.visual_modified = {
-            \ 'airline_c': [s:black, s:orange, s:tblack, s:torange, ''],
-            \ }
-
-
-" Inactive
-let s:IA = [s:black, s:lightgray, s:tblack, s:tlightgray]
-let g:airline#themes#monokai#palette.inactive = airline#themes#generate_color_map(s:IA, s:IA, s:IA)
-let g:airline#themes#monokai#palette.inactive_modified = {
-            \ 'airline_c': [s:white, '', s:twhite, '', 'bold'],
-            \ }
-
-
-" CtrlP
-if !get(g:, 'loaded_ctrlp', 0)
-  finish
-endif
-let g:airline#themes#monokai#palette.ctrlp = airline#extensions#ctrlp#generate_color_map(
-            \ [s:white, s:lightgray, s:twhite, s:tlightgray, 'bold'],
-            \ [s:white, s:black,     s:twhite, s:tblack,     'bold'],
-            \ [s:black, s:yellow,    s:tblack, s:tyellow,    ''])
-
-let g:airline_theme = 'monokai'
+runtime airline/monokai.vim
 
 
 " Highlighting optimizations
