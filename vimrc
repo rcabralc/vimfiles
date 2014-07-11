@@ -144,7 +144,11 @@ set shiftround
 
 " Don't wait forever on key codes.
 set ttimeout
-set ttimeoutlen=50
+set ttimeoutlen=100
+set noesckeys
+
+" The colorscheme is not too invasive, so highlight searched terms.
+set hlsearch
 
 set ignorecase
 set smartcase
@@ -176,6 +180,9 @@ set t_Co=256
 "   let g:indent_guides_auto_colors = 0
 "   colorscheme rcabralc
 " endif
+if !has('gui_running')
+  let g:monokai_transparent_background = 1
+endif
 colorscheme monokai
 
 " Mark text width column.
@@ -185,8 +192,11 @@ set colorcolumn=+1
 " Mappings
 " ========
 
+" This seems more logical
+nmap Y y$
+
 " Toggle highlight for searched terms.
-nnoremap <A-S-h> :set hlsearch!<CR>
+nmap <C-C> :set hlsearch!<CR>
 
 " Navigate between buffers (only normal mode)
 nnoremap <A-h> :bp<CR>
@@ -563,6 +573,10 @@ let g:airline_mode_map = {
 let g:airline#extensions#hunks#enabled = 0
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 let g:airline_theme = 'monokai'
+
+" Soft motions
+" ------------
+runtime! 'softmotions.vim'
 
 
 " Highlighting optimizations
