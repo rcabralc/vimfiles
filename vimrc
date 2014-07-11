@@ -463,9 +463,17 @@ let g:ctrlp_max_files = 0
 let g:ctrlp_extensions = ['line']
 
 if has('python3')
-python3 import vim, ctrlp
+python3 <<PYTHON
+import sys, os, vim
+sys.path[0:0] = [os.path.join(os.path.expanduser('~'), '.vim', 'python')]
+import ctrlp
+PYTHON
 elseif has('python')
-python import vim, ctrlp
+python <<PYTHON
+import sys, os, vim
+sys.path[0:0] = [os.path.join(os.path.expanduser('~'), '.vim', 'python')]
+import ctrlp
+PYTHON
 endif
 
 let g:ctrlp_match_func = { 'match': 'CustomCtrlpMatch' }
