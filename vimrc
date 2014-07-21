@@ -4,6 +4,9 @@
 " ===================
 
 set nocompatible " Be iMproved
+
+set shell=/bin/sh " Avoid problems with fish shell
+
 " Plugins
 " =======
 
@@ -62,6 +65,7 @@ NeoBundle 'vim-scripts/bufkill.vim'
 NeoBundle 'tpope/vim-bundler'
 NeoBundle 'Shougo/vimshell.vim'
 NeoBundle 'tyru/restart.vim'
+NeoBundle 'dag/vim-fish'
 
 filetype plugin indent on
 syntax enable
@@ -375,6 +379,10 @@ augroup END
 
 augroup snippet
   autocmd FileType snippet setlocal noexpandtab sw=2 ts=2
+augroup END
+
+augroup fish
+  autocmd FileType fish compiler fish
 augroup END
 
 
