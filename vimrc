@@ -269,10 +269,6 @@ set smarttab
 " Text width at 79 chars allows me to easily split windows vertically.
 set textwidth=79
 
-" Ragtag plugin global mappings.
-inoremap <M-o> <Esc>o
-let g:ragtag_global_maps = 1
-
 " Python highlighting options.
 let python_highlight_all = 1
 let python_slow_sync = 1
