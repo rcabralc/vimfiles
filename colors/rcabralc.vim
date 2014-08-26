@@ -25,6 +25,7 @@ hi CursorColumn                            guibg=#1A0808
 hi ColorColumn                             guibg=#240C0C
 hi Search                                  guibg=#5A647E
 hi StatusLine 	             guifg=#FFFFFF guibg=#381010 gui=bold
+hi User1                                   guibg=#501010
 hi StatusLineNC              guifg=#A05F5F guibg=#401818 gui=NONE
 hi LineNr                    guifg=#806060 guibg=#301616
 hi VertSplit                 guifg=#603030 guibg=#281616 gui=NONE
