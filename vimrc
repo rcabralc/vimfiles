@@ -66,6 +66,7 @@ NeoBundle 'tpope/vim-bundler'
 NeoBundle 'Shougo/vimshell.vim'
 NeoBundle 'tyru/restart.vim'
 NeoBundle 'dag/vim-fish'
+NeoBundle '/home/rcabralc/devel/vim/monokai-airline.vim/', { 'type': 'nosync' }
 
 filetype plugin indent on
 syntax enable
@@ -251,6 +252,12 @@ cnoremap <Esc>f <S-Right>
 
 " Open URL under cursor.
 nnoremap <Leader>o :silent !xdg-open <C-R>=escape("<C-R><C-F>", "#?&;\|%")<CR><CR>
+
+" vim-gitgutter: enable/disable line hightlighting
+nmap <Leader>H <Plug>GitGutterLineHighlightsToggle
+" vim-gitgutter: next/previous hunks
+nmap <Leader>[ <Plug>GitGutterPrevHunk
+nmap <Leader>] <Plug>GitGutterNextHunk
 
 " Text formatting
 " ===============
@@ -588,7 +595,7 @@ let g:airline_theme = 'monokai'
 
 " Soft motions
 " ------------
-runtime! 'softmotions.vim'
+runtime! softmotions.vim
 
 
 " Highlighting optimizations
