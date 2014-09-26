@@ -31,7 +31,6 @@ NeoBundle 'Shougo/vimproc', {
 NeoBundle 'rcabralc/monokai.vim'
 NeoBundle 'vim-scripts/VST'
 NeoBundle 'editorconfig/editorconfig-vim'
-NeoBundle 'nono/vim-handlebars'
 NeoBundle 'othree/html5.vim'
 NeoBundle 'bling/vim-airline'
 NeoBundle 'airblade/vim-gitgutter'
@@ -46,27 +45,19 @@ NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-git'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 NeoBundle 'jelera/vim-javascript-syntax'
-
+NeoBundle 'osyo-manga/vim-over'
 NeoBundle 'edsono/vim-matchit'
-" NeoBundle 'tpope/vim-rails'
-NeoBundle 'tpope/vim-rake'
 NeoBundle 'nvie/vim-rst-tables'
 NeoBundle 'vim-ruby/vim-ruby'
+NeoBundle 'vim-scripts/bufkill.vim'
+NeoBundle 'dag/vim-fish'
+NeoBundle '/home/rcabralc/devel/vim/monokai-airline.vim/', { 'type': 'nosync' }
 
 " Fuzzy file finder
 NeoBundle 'kien/ctrlp.vim'
-" NeoBundle 'Shougo/unite.vim'
 
 " Completion
 NeoBundle 'Shougo/neocomplete.vim'
-" NeoBundle 'Valloric/YouCompleteMe'
-
-NeoBundle 'vim-scripts/bufkill.vim'
-NeoBundle 'tpope/vim-bundler'
-NeoBundle 'Shougo/vimshell.vim'
-NeoBundle 'tyru/restart.vim'
-NeoBundle 'dag/vim-fish'
-NeoBundle '/home/rcabralc/devel/vim/monokai-airline.vim/', { 'type': 'nosync' }
 
 filetype plugin indent on
 syntax enable
@@ -155,7 +146,6 @@ set noesckeys
 " The colorscheme is not too invasive, so highlight searched terms.
 set hlsearch
 
-set ignorecase
 set smartcase
 set incsearch
 
@@ -228,7 +218,12 @@ nnoremap <A-j> i<CR><ESC>_
 nmap <Leader>w 073l<A-j>
 
 " Search in current git tree.
-nmap <C-S> :Ggrep  <bar> copen<CR>
+nmap <C-S> :Ggrep -I  <bar> copen<CR>
+
+" Just highlight pattern under cursor (hlsearch must be on).
+nmap <A-8> *<S-n>
+
+nmap <Leader>r :%s///gc
 
 " For Emacs-style editing on the command-line:
 " start of line
@@ -258,6 +253,16 @@ nmap <Leader>H <Plug>GitGutterLineHighlightsToggle
 " vim-gitgutter: next/previous hunks
 nmap <Leader>[ <Plug>GitGutterPrevHunk
 nmap <Leader>] <Plug>GitGutterNextHunk
+
+" Neocomplete
+" <CR>: close popup and save indent.
+inoremap <silent> <CR> <C-r>=<SID>NeocompleteCR()<CR>
+function! s:NeocompleteCR()
+    return neocomplete#close_popup() . "\<CR>"
+    " For no inserting <CR> key.
+    "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
+endfunction
+
 
 " Text formatting
 " ===============
@@ -290,6 +295,9 @@ let g:python_auto_complete_variables = 0
 let g:ruby_operators = 1
 let g:ruby_space_errors = 1
 let g:ruby_no_trail_space_error = 1 " As we already have support for this for all filetypes
+
+" Ruby filetype options.
+let g:ruby_indent_access_modifier_style = 'outdent'
 
 
 " Tipos de arquivos específicos
@@ -443,7 +451,7 @@ function! s:ToggleRelativeNumber()
     endif
 endfunction
 
-nmap <Leader>r :call <sid>ToggleRelativeNumber()<CR>
+nmap <Leader>n :call <sid>ToggleRelativeNumber()<CR>
 
 
 " CtrlP configuration
@@ -568,7 +576,7 @@ augroup Misc
     autocmd BufWinLeave *.md,*.rst,*.human call clearmatches()
 
     " <C-k> interferes with the mapping to switch to the window above.
-    autocmd FileType vimshell nunmap <buffer> <C-k>
+    " autocmd FileType vimshell nunmap <buffer> <C-k>
 
     " Make text wrap.
     autocmd FileType qf setlocal wrap
