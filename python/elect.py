@@ -24,7 +24,7 @@ Options:
     -n, --negate             Selects results which don't match any PATTERN.  No
                              sorting is done, since there's no matched portion.
     -r, --reverse            Reverse the returning order of candidates.
-    -o, --output=FILE        Outputs to a FILE instead of standard output.
+    --asdict                 Output results as Python dictionaries.
 """
 
 from __future__ import division
@@ -97,8 +97,7 @@ class RegexTerm(object):
 
 
 class UnhighlightedFuzzyMatch(object):
-    indices = frozenset()
-    pattern_length = 0
+    distance = 1
 
     def __init__(self, entry):
         self.length = len(entry.value)
@@ -109,45 +108,45 @@ class UnhighlightedFuzzyMatch(object):
     def __bool__(self):
         return self.length > 0
 
-    def __iter__(self):
-        return iter(())
-
-    def __len__(self):
-        return self.length
-
-    def merge(self, other):
-        return other.merge(self)
+    @property
+    def indices(self):
+        return frozenset()
 
 
 class FuzzyMatch(object):
-    _indices = None
-    _length = None
-
-    def __init__(self, match, pattern=None):
+    def __init__(self, match, pattern):
         self.match = match
         self.pattern = pattern
+        self.pattern_length = pattern.length
+        length = len(match.groups()[0])
+        self.distance = length / self.pattern_length
 
-        if match and pattern:
-            self.pattern_length = pattern.length
+    @property
+    def indices(self):
+        indices = []
 
-    def __len__(self):
-        if self._length is None:
-            if self.match:
-                # Avoid computing indices here if a match is available.
-                self._length = len(self.match.groups()[0])
-            elif self.indices:
-                self._length = max(self.indices) - min(self.indices)
-            else:
-                self._length = 0
-        return self._length
+        string = self.match.string
+        pattern = self.pattern.pattern
+        pattern_length = self.pattern_length
+        current = self.match.start()
+        pos = 0
+        find = string.find
 
-    def __nonzero__(self):
-        return self.__bool__()
+        while pos < pattern_length:
+            current = find(pattern[pos], current)
+            indices.append(current)
+            pos += 1
+            current += 1
 
-    def __bool__(self):
-        if self.match is not None:
-            return True
-        return len(self.indices) > 0
+        return frozenset(indices)
+
+
+FuzzyMatch.unhighlighted = UnhighlightedFuzzyMatch
+
+
+class FuzzyIndices(object):
+    def __init__(self, indices):
+        self.indices = indices
 
     def __iter__(self):
         if not self.indices:
@@ -169,36 +168,7 @@ class FuzzyMatch(object):
             yield chunk[0], chunk[-1] + 1
 
     def merge(self, other):
-        new_item = FuzzyMatch(None)
-        new_item._indices = self.indices.union(other.indices)
-        return new_item
-
-    @property
-    def indices(self):
-        if self._indices is None:
-            indices = []
-
-            if self.match and self.pattern:
-                string = self.match.string
-                pattern = self.pattern.pattern
-                pattern_length = self.pattern_length
-                current = self.match.start()
-                pos = 0
-                find = string.find
-
-                while pos < pattern_length:
-                    current = find(pattern[pos], current)
-                    indices.append(current)
-                    pos += 1
-                    current += 1
-
-            self._indices = frozenset(indices)
-
-        return self._indices
-
-
-FuzzyMatch.none = FuzzyMatch(None)
-FuzzyMatch.unhighlighted = UnhighlightedFuzzyMatch
+        return type(self)(self.indices.union(other.indices))
 
 
 class FuzzyPattern(object):
@@ -231,27 +201,32 @@ class FuzzyPattern(object):
     def __len__(self):
         return self.length
 
+    def __nonzero__(self):
+        return self.__bool__()
+
+    def __bool__(self):
+        return self.length > 0
+
     def find_shortest(self, entry):
         string = entry.lower if self._ignore_case else entry.value
         regexiter = self.regex.finditer(string)
         shortest = next(regexiter, None)
 
         if shortest is None:
-            return FuzzyMatch.none
+            return
 
         shortest_length = len(shortest.groups()[0])
         pattern_length = self.length
 
-        if shortest_length != pattern_length:
-            for match in regexiter:
-                match_length = len(match.groups()[0])
+        for match in regexiter:
+            match_length = len(match.groups()[0])
 
-                if match_length < shortest_length:
-                    shortest = match
-                    shortest_length = match_length
+            if match_length < shortest_length:
+                shortest = match
+                shortest_length = match_length
 
-                if match_length == pattern_length:
-                    break
+            if match_length == pattern_length:
+                break
 
         return FuzzyMatch(shortest, self)
 
@@ -259,24 +234,19 @@ class FuzzyPattern(object):
 class FuzzyTerm(object):
     def __init__(self, entry, *patterns):
         self.entry = entry
-        self._matches = [pattern.find_shortest(entry) for pattern in patterns]
+        self._pattern_count = len(patterns)
+        self._matches = tuple(
+            m for m in (pattern.find_shortest(entry) for pattern in patterns)
+            if m
+        )
 
     def matched(self):
-        for match in self._matches:
-            if not match:
-                return False
-        return True
+        return self._pattern_count == len(self._matches)
 
     @property
     def rank(self):
         length = len(self.entry.value)
-
-        def rank_for(match):
-            if match.pattern_length == 0:
-                return length
-            return len(match) * length / match.pattern_length
-
-        return sum(rank_for(match) for match in self._matches)
+        return sum(match.distance * length for match in self._matches)
 
     @property
     def value(self):
@@ -284,8 +254,11 @@ class FuzzyTerm(object):
 
     @property
     def spans(self):
-        match = functools.reduce(lambda acc, m: acc.merge(m), self._matches)
-        for start, end in match:
+        indiceses = functools.reduce(
+            lambda acc, indices: acc.merge(indices),
+            (FuzzyIndices(m.indices) for m in self._matches)
+        )
+        for start, end in indiceses:
             yield (start, end)
 
 
@@ -370,6 +343,14 @@ if __name__ == '__main__':
     if args['--reverse']:
         results = reversed(results)
 
-    sys.stdout.write(u'\n'.join(result.original_value for result in results))
+    if args['--asdict']:
+        sys.stdout.write(
+            u'\n'.join(str(result.asdict()) for result in results)
+        )
+    else:
+        sys.stdout.write(
+            u'\n'.join(result.original_value for result in results)
+        )
+
     sys.stdout.write(u'\n')
     sys.stdout.flush()
