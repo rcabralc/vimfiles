@@ -34,7 +34,8 @@ nmap <C-S> :Ggrep -I  <bar> copen<CR>
 " Just highlight pattern under cursor (hlsearch must be on).
 nmap <A-8> *<S-n>
 
-nmap <Leader>r :%s///gc
+nmap <Leader>r :OverCommandLine<CR>%s///gc
+vnoremap <Leader>r :OverCommandLine<CR>s//gc
 
 " For Emacs-style editing on the command-line:
 " start of line
