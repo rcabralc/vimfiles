@@ -71,7 +71,7 @@ class Entry(object):
 
 
 class RegexTerm(object):
-    def __init__(self, patterns, entry):
+    def __init__(self, entry, *patterns):
         self.entry = entry
         self.value = entry.value
         self._matches = [p.search(self.value) for p in patterns]
@@ -297,7 +297,7 @@ def filter(algorithm, candidates, patterns, limit=None, transform=Entry):
             re.compile('(?iu)' + pattern if pattern else '.*')
             for pattern in patterns
         ]
-        factory = lambda i: RegexTerm(patterns, i)
+        factory = lambda i: RegexTerm(i, *patterns)
     elif algorithm == 'fuzzy':
         patterns = [FuzzyPattern(''.join(p)) for p in patterns]
         factory = lambda i: FuzzyTerm(i, *patterns)
