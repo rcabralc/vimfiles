@@ -76,17 +76,14 @@ class RegexTerm(object):
         self.value = entry.value
         self._matches = [p.search(self.value) for p in patterns]
 
-        if None in self.matches:
-            self.rank = len(self.matches) * len(self.value) + 1
-        else:
-            if self._matches:
-                rank = 0
-                for m in self._matches:
-                    start, end = self._match.span()
-                    rank += 1 - (end - start) / len(self.value)
-                self.rank = rank
+        rank = 0
+        for m in self._matches:
+            if m is not None:
+                start, end = m.span()
+                rank += 1 - (end - start) / len(self.value)
             else:
-                self.rank = 1
+                rank += 1
+        self.rank = rank
 
     def matched(self):
         return bool(None not in self._matches)
@@ -297,7 +294,7 @@ class Result(object):
 def filter(algorithm, candidates, patterns, limit=None, transform=Entry):
     if algorithm == 're':
         patterns = [
-            re.compile('(?iu)' + patterns if pattern else '.*')
+            re.compile('(?iu)' + pattern if pattern else '.*')
             for pattern in patterns
         ]
         factory = lambda i: RegexTerm(patterns, i)
