@@ -38,6 +38,7 @@ augroup END
 
 
 hi! link rubyBlockParameter Special
+hi! link erubyDelimiter Operator
 
 hi! link javaScriptFuncExp Normal
 hi! link javaScriptGlobal Normal
