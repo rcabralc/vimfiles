@@ -174,19 +174,21 @@ class FuzzyPattern(object):
 
         if pattern_lower != pattern:
             input = self.pattern = pattern
-            self._ignore_case = False
+            ignore_case = False
         else:
             input = self.pattern = pattern_lower
-            self._ignore_case = True
+            ignore_case = True
 
         self.head = input[0:1]
         if self.head:
             self.regex = re.compile(
-                '(?u)(?=((%s)' % re.escape(self.head) +
-                ''.join(
-                    '[^%(c)s]*?(%(c)s)' % {'c': re.escape(c)}
-                    for c in input[1:]
-                ) + '))'
+                '(?%(flags)su)(?=((%(cooked)s)))' % dict(
+                    flags='i' if ignore_case else '',
+                    cooked=re.escape(self.head) + ''.join(
+                        '[^%(c)s]*?(%(c)s)' % {'c': re.escape(c)}
+                        for c in input[1:]
+                    )
+                )
             )
         else:
             self.regex = re.compile('')
@@ -205,26 +207,22 @@ class FuzzyPattern(object):
         return self.length > 0
 
     def find_shortest(self, entry):
-        string = entry.lower if self._ignore_case else entry.value
-        regexiter = self.regex.finditer(string)
+        regexiter = self.regex.finditer(entry.value)
         shortest = next(regexiter, None)
 
         if shortest is None:
             return
 
-        shortest_length = len(shortest.groups()[0])
-        pattern_length = self.length
+        shortest = FuzzyMatch(shortest, self)
 
         for match in regexiter:
-            match_length = len(match.groups()[0])
-
-            if match_length < shortest_length:
+            match = FuzzyMatch(match, self)
+            if match.distance < shortest.distance:
                 shortest = match
-                if match_length == pattern_length:
+                if shortest.distance == 1:
                     break
-                shortest_length = match_length
 
-        return FuzzyMatch(shortest, self)
+        return shortest
 
 
 class FuzzyTerm(object):
