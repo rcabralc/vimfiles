@@ -260,14 +260,16 @@ class FuzzyTerm(object):
 
 
 class Contest(object):
-    def __init__(self, term_factory, transform):
+    def __init__(self, term_factory, transform, patterns):
         self.term_factory = term_factory
         self.transform = transform
+        self.patterns = patterns
 
     def elect(self, candidates, limit=None):
         f = self.term_factory
+        patterns = self.patterns
         transform = self.transform
-        terms = (f(transform(c)) for c in candidates if c)
+        terms = (f(transform(c), *patterns) for c in candidates if c)
 
         sorted_terms = sorted(
             (term for term in terms if term.matched()),
@@ -297,14 +299,14 @@ def filter(algorithm, candidates, patterns, limit=None, transform=Entry):
             re.compile('(?iu)' + pattern if pattern else '.*')
             for pattern in patterns
         ]
-        factory = lambda i: RegexTerm(i, *patterns)
+        factory = RegexTerm
     elif algorithm == 'fuzzy':
         patterns = [FuzzyPattern(''.join(p)) for p in patterns]
-        factory = lambda i: FuzzyTerm(i, *patterns)
+        factory = FuzzyTerm
     else:
         raise ValueError("Unknown algorithm: %r" % algorithm)
 
-    return Contest(factory, transform).elect(candidates, limit)
+    return Contest(factory, transform, patterns).elect(candidates, limit)
 
 
 if __name__ == '__main__':
