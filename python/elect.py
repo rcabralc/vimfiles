@@ -220,10 +220,9 @@ class FuzzyPattern(object):
 
             if match_length < shortest_length:
                 shortest = match
+                if match_length == pattern_length:
+                    break
                 shortest_length = match_length
-
-            if match_length == pattern_length:
-                break
 
         return FuzzyMatch(shortest, self)
 
