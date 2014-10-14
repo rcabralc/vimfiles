@@ -80,3 +80,7 @@ set smarttab
 
 " Text width at 79 chars allows me to easily split windows vertically.
 set textwidth=79
+
+" Reduce the maximum column in which syntax is applied.  Following lines may
+" have syntax highlighting compromised.  (defaults to 3000)
+set synmaxcol=200
