@@ -74,19 +74,24 @@ class RegexTerm(object):
     def __init__(self, entry, *patterns):
         self.entry = entry
         self.value = entry.value
-        self._matches = [p.search(self.value) for p in patterns]
+        self._matches = []
+        self._matched = True
+        self.rank = 0
 
-        rank = 0
-        for m in self._matches:
+        for pattern in patterns:
+            m = pattern.search(self.value)
+
             if m is not None:
+                self._matches.append(m)
                 start, end = m.span()
-                rank += 1 - (end - start) / len(self.value)
+                self.rank += 1 - (end - start) / len(self.value)
             else:
-                rank += 1
-        self.rank = rank
+                self._matched = False
+                self.rank = float('+inf')
+                break
 
     def matched(self):
-        return bool(None not in self._matches)
+        return self._matched
 
     @property
     def spans(self):
@@ -229,13 +234,19 @@ class FuzzyTerm(object):
     def __init__(self, entry, *patterns):
         self.entry = entry
         self._pattern_count = len(patterns)
-        self._matches = tuple(
-            m for m in (pattern.find_shortest(entry) for pattern in patterns)
-            if m
-        )
+        self._matches = []
+        self._matched = True
+
+        for pattern in patterns:
+            m = pattern.find_shortest(entry)
+            if m:
+                self._matches.append(m)
+            else:
+                self._matched = False
+                break
 
     def matched(self):
-        return self._pattern_count == len(self._matches)
+        return self._matched
 
     @property
     def rank(self):
