@@ -35,6 +35,11 @@ def filter(items, pat, limit, mmode, isregex):
     if isregex:
         algorithm = 're'
         patterns = [pat]
+    elif ' ' not in pat and '\\' not in pat:
+        # Optimization for the common case of a single pattern:  Don't parse
+        # it, since it doesn't contain any special character.
+        algorithm = 'fuzzy'
+        patterns = [pat]
     else:
         algorithm = 'fuzzy'
         it = iter(pat.lstrip())
