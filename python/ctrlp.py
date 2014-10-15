@@ -8,7 +8,8 @@ CHARSET = 'utf-8'
 
 class FilenameEntry(elect.Entry):
     def __init__(self, value):
-        super(FilenameEntry, self).__init__(os.path.basename(value))
+        self.original_value = value
+        self.value = os.path.basename(value)
 
     def translate(self, spans):
         offset = len(self.original_value) - len(self.value)
@@ -18,14 +19,15 @@ class FilenameEntry(elect.Entry):
 
 class FirstNonTab(elect.Entry):
     def __init__(self, value):
-        super(FirstNonTab, self).__init__(value.split('\t')[0])
+        self.original_value = value
+        self.value = value.split('\t')[0]
 
 
 class UntilLastTabTransform(elect.Entry):
     def __init__(self, v):
-        super(UntilLastTabTransform, self).__init__(
+        self.original_value = v
+        self.value = \
             '\t'.join(v.split('\t')[:-1]).strip('\t') if '\t' in v else v
-        )
 
 
 def filter(items, pat, limit, mmode, isregex):
