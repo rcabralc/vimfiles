@@ -75,7 +75,7 @@ PYTHON
 let g:ctrlp_match_func = { 'match': 'CustomCtrlpMatch' }
 
 fu! CustomCtrlpMatch(items, pat, limit, mmode, ispath, crfile, regex)
-    let l:text_results = []
+    let l:results = []
     let l:matchlist = []
 
 py << PYTHON
@@ -83,32 +83,29 @@ import sys
 import vim
 import ctrlp
 
-items = vim.eval('a:items')
+items = set(vim.eval('a:items'))
 pat = vim.eval('a:pat')
-limit = vim.eval('a:limit')
+limit = int(vim.eval('a:limit')) + 10
 mmode = vim.eval('a:mmode')
 ispath = vim.eval('a:ispath')
 crfile = vim.eval('a:crfile')
 isregex = vim.eval('a:regex')
 
-text_results = vim.bindeval('l:text_results')
+results = vim.bindeval('l:results')
 matchlist = vim.bindeval('l:matchlist')
 
-if ispath and crfile in items:
-    items.remove(crfile)
+if ispath:
+    items.discard(crfile)
 
-results = list(
-    result.asdict()
-    for result in ctrlp.filter(items, pat, limit, mmode, isregex)
-)
+matches = list(ctrlp.filter(items, pat, limit, mmode, isregex))
 
-text_results.extend([r['original_value'] for r in results])
-matchlist.extend([r['spans'] for r in results]);
+results.extend([m.original_value for m in matches])
+matchlist.extend([m.spans for m in matches]);
 PYTHON
 
     call s:highlight(l:matchlist)
 
-    return l:text_results
+    return l:results
 endfu
 
 " call unite#custom#source('file,file/new,buffer,file_rec', 'matchers', 'matcher_fuzzy')
