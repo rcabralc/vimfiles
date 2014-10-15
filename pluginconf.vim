@@ -67,32 +67,48 @@ let g:ctrlp_show_hidden = 1
 let g:ctrlp_max_files = 0
 let g:ctrlp_extensions = ['line']
 
-if has('python3')
-python3 <<PYTHON
-import sys, os, vim
+py << PYTHON
+import sys, os
 sys.path[0:0] = [os.path.join(os.path.expanduser('~'), '.vim', 'python')]
-import ctrlp
 PYTHON
-elseif has('python')
-python <<PYTHON
-import sys, os, vim
-sys.path[0:0] = [os.path.join(os.path.expanduser('~'), '.vim', 'python')]
-import ctrlp
-PYTHON
-endif
 
 let g:ctrlp_match_func = { 'match': 'CustomCtrlpMatch' }
 
-fu! CustomCtrlpMatch(lines, input, limit, mmode, ispath, crfile, regexp)
-    if a:ispath
-        call filter(a:lines, 'v:val != a:crfile')
-    endif
+fu! CustomCtrlpMatch(items, pat, limit, mmode, ispath, crfile, regex)
+    let l:text_results = []
+    let l:matchlist = []
 
-    let matchlist = FilterCtrlpList(a:lines, a:input, a:limit, a:mmode, a:regexp)
+py << PYTHON
+import sys
+import vim
+import ctrlp
 
-    call s:highlight(matchlist)
+items = vim.eval('a:items')
+pat = vim.eval('a:pat')
+limit = vim.eval('a:limit')
+mmode = vim.eval('a:mmode')
+ispath = vim.eval('a:ispath')
+crfile = vim.eval('a:crfile')
+isregex = vim.eval('a:regex')
 
-    return map(matchlist, 'v:val.original_value')
+text_results = vim.bindeval('l:text_results')
+matchlist = vim.bindeval('l:matchlist')
+
+if ispath and crfile in items:
+    items.remove(crfile)
+
+results = list(
+    result.asdict()
+    for result in ctrlp.filter(items, pat, limit, mmode, isregex)
+)
+
+text_results.extend([r['original_value'] for r in results])
+matchlist.extend([r['spans'] for r in results]);
+PYTHON
+
+    call s:highlight(l:matchlist)
+
+    return l:text_results
 endfu
 
 " call unite#custom#source('file,file/new,buffer,file_rec', 'matchers', 'matcher_fuzzy')
@@ -116,8 +132,8 @@ fu! s:highlight(matchlist)
     call clearmatches()
 
     for i in range(len(a:matchlist))
-        for j in range(len(a:matchlist[i]["spans"]))
-            let highlight = a:matchlist[i]["spans"][j]
+        for j in range(len(a:matchlist[i]))
+            let highlight = a:matchlist[i][j]
 
             let beginning = s:escapechars(highlight['beginning'])
             let middle = '\zs'.s:escapechars(highlight['middle']).'\ze'
@@ -135,9 +151,12 @@ endf
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
-let g:syntastic_auto_loc_list=1
-let g:syntastic_enable_signs=1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_enable_signs = 1
 let g:syntastic_python_checkers = ['flake8']
+let g:syntastic_ruby_checkers = ['rubocop']
+let g:syntastic_ruby_rubocop_args = '-D'
+
 
 " Filetypes
 " =========

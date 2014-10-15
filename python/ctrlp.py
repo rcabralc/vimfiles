@@ -1,48 +1,14 @@
-from __future__ import division
 from __future__ import unicode_literals
 
 import elect
 import os.path
-import sys
-
-try:
-    import vim_bridge
-    HAS_VIM_BRIDGE = True
-except ImportError:
-    HAS_VIM_BRIDGE = False
-
-try:
-    unicode
-    PY3 = False
-except NameError:
-    PY3 = True
 
 CHARSET = 'utf-8'
 
 
-def cached(fn):
-    cached_name = '_' + fn.__name__
-
-    def cached(self):
-        if getattr(self, cached_name, None) is None:
-            setattr(self, cached_name, fn())
-        return getattr(self, cached_name)
-
-    return cached
-
-
-class ComputedEntry(elect.Entry):
-    _value = None
-
-    @cached
-    def value(self):
-        return self._compute_value()
-
-
-class FilenameEntry(ComputedEntry):
-    @cached
-    def value(self):
-        return os.path.basename(self.original_value)
+class FilenameEntry(elect.Entry):
+    def __init__(self, value):
+        super(FilenameEntry, self).__init__(os.path.basename(value))
 
     def translate(self, spans):
         offset = len(self.original_value) - len(self.value)
@@ -50,20 +16,19 @@ class FilenameEntry(ComputedEntry):
         return super(FilenameEntry, self).translate(spans)
 
 
-class FirstNonTab(ComputedEntry):
-    @cached
-    def value(self):
-        return self.original_value.split('\t')[0]
+class FirstNonTab(elect.Entry):
+    def __init__(self, value):
+        super(FirstNonTab, self).__init__(value.split('\t')[0])
 
 
-class UntilLastTabTransform(ComputedEntry):
-    @cached
-    def value(self):
-        v = self.original_value
-        return '\t'.join(v.split('\t')[:-1]).strip('\t') if '\t' in v else v
+class UntilLastTabTransform(elect.Entry):
+    def __init__(self, v):
+        super(UntilLastTabTransform, self).__init__(
+            '\t'.join(v.split('\t')[:-1]).strip('\t') if '\t' in v else v
+        )
 
 
-def _filter(items, pat, limit, mmode, isregex):
+def filter(items, pat, limit, mmode, isregex):
     limit = int(limit)
     isregex = int(isregex)
 
@@ -120,28 +85,3 @@ def _filter(items, pat, limit, mmode, isregex):
     )[mmode.replace('-', '')]
 
     return elect.filter(algorithm, items, patterns, limit, transform)
-
-
-def filter_ctrlp_list(items, pat, limit, mmode, isregex):
-    try:
-        return [
-            result.asdict()
-            for result in _filter(items, pat, limit, mmode, isregex)
-        ]
-    except Exception:
-        if __name__ == '__main__':
-            raise
-
-        import traceback
-        return list(reversed(
-            dict(highlight=[], value=line.encode(CHARSET))
-            for line in traceback.format_exception(*sys.exc_info())
-        ))
-
-
-if HAS_VIM_BRIDGE:
-    try:
-        filter_ctrlp_list = vim_bridge.bridged(filter_ctrlp_list)
-    except ImportError:
-        # Vim Bridge tries to import vim during the call to bridge().
-        pass
