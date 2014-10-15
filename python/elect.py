@@ -298,7 +298,11 @@ class Result(object):
     def asdict(self):
         return dict(value=self.entry.value,
                     original_value=self.entry.original_value,
-                    spans=self.entry.translate(self.term.spans))
+                    spans=self.spans)
+
+    @property
+    def spans(self):
+        return self.entry.translate(self.term.spans)
 
 
 def filter(algorithm, candidates, patterns, limit=None, transform=Entry):
