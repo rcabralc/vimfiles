@@ -35,15 +35,15 @@ def filter(items, pat, limit, mmode, isregex):
     isregex = int(isregex)
 
     if isregex:
-        algorithm = 're'
+        filter = elect.filter_re
         patterns = [pat]
     elif ' ' not in pat and '\\' not in pat:
         # Optimization for the common case of a single pattern:  Don't parse
         # it, since it doesn't contain any special character.
-        algorithm = 'fuzzy'
+        filter = elect.filter_fuzzy
         patterns = [pat]
     else:
-        algorithm = 'fuzzy'
+        filter = elect.filter_fuzzy
         it = iter(pat.lstrip())
         c = next(it, None)
 
@@ -91,4 +91,4 @@ def filter(items, pat, limit, mmode, isregex):
         untillasttab=UntilLastTabTransform,
     )[mmode.replace('-', '')]
 
-    return elect.filter(algorithm, items, patterns, limit, transform)
+    return filter(items, limit=limit, transform=transform, *patterns)

@@ -73,25 +73,23 @@ class Entry(object):
 class RegexTerm(object):
     def __init__(self, entry, *patterns):
         self.entry = entry
-        self.value = entry.value
         self._matches = []
-        self._matched = True
+        self.matched = False
         self.rank = 0
 
+        value = entry.value
         for pattern in patterns:
-            m = pattern.search(self.value)
+            m = pattern.search(value)
 
-            if m is not None:
-                self._matches.append(m)
-                start, end = m.span()
-                self.rank += 1 - (end - start) / len(self.value)
-            else:
-                self._matched = False
+            if m is None:
                 self.rank = float('+inf')
-                break
+                return
 
-    def matched(self):
-        return self._matched
+            self._matches.append(m)
+            start, end = m.span()
+            self.rank += 1 - (end - start) / len(value)
+
+        self.matched = True
 
     @property
     def spans(self):
@@ -177,29 +175,27 @@ class FuzzyPattern(object):
     def __init__(self, pattern):
         pattern_lower = pattern.lower()
 
-        if pattern_lower != pattern:
-            input = self.pattern = pattern
-            ignore_case = False
-        else:
-            input = self.pattern = pattern_lower
-            ignore_case = True
+        if pattern_lower:
+            if pattern_lower != pattern:
+                input = self.pattern = pattern
+                ignore_case = False
+            else:
+                input = self.pattern = pattern_lower
+                ignore_case = True
 
-        self.head = input[0:1]
-        if self.head:
-            self.regex = re.compile(
-                '(?%(flags)su)(?=((%(cooked)s)))' % dict(
+            self.length = len(input)
+
+            self._finditer = re.compile(
+                '(?%(flags)su)(?=(%(cooked)s))' % dict(
                     flags='i' if ignore_case else '',
-                    cooked=re.escape(self.head) + ''.join(
-                        '[^%(c)s]*?(%(c)s)' % {'c': re.escape(c)}
+                    cooked=re.escape(input[0]) + ''.join(
+                        '[^%(c)s]*?%(c)s' % {'c': re.escape(c)}
                         for c in input[1:]
                     )
                 )
-            )
+            ).finditer
         else:
-            self.regex = re.compile('')
-
-        self.length = len(input)
-        if not input:
+            self.length = 0
             self.find_shortest = FuzzyMatch.unhighlighted
 
     def __len__(self):
@@ -212,7 +208,7 @@ class FuzzyPattern(object):
         return self.length > 0
 
     def find_shortest(self, entry):
-        regexiter = self.regex.finditer(entry.value)
+        regexiter = self._finditer(entry.value)
         shortest = next(regexiter, None)
 
         if shortest is None:
@@ -233,20 +229,16 @@ class FuzzyPattern(object):
 class FuzzyTerm(object):
     def __init__(self, entry, *patterns):
         self.entry = entry
-        self._pattern_count = len(patterns)
         self._matches = []
-        self._matched = True
+        self.matched = False
 
         for pattern in patterns:
             m = pattern.find_shortest(entry)
-            if m:
-                self._matches.append(m)
-            else:
-                self._matched = False
-                break
+            if not m:
+                return
+            self._matches.append(m)
 
-    def matched(self):
-        return self._matched
+        self.matched = True
 
     @property
     def rank(self):
@@ -268,32 +260,34 @@ class FuzzyTerm(object):
 
 
 class Contest(object):
-    def __init__(self, term_factory, transform, patterns):
+    def __init__(self, term_factory, *patterns):
         self.term_factory = term_factory
-        self.transform = transform
         self.patterns = patterns
 
-    def elect(self, candidates, limit=None):
-        f = self.term_factory
-        patterns = self.patterns
-        transform = self.transform
-        terms = (f(transform(c), *patterns) for c in candidates if c)
-
-        sorted_terms = sorted(
-            (term for term in terms if term.matched()),
-            key=operator.attrgetter('rank')
-        )
+    def elect(self, candidates, limit=None, transform=Entry):
+        sorted_terms = sorted(self._process_terms(candidates, transform),
+                              key=operator.attrgetter('rank'))
         if limit is not None:
             sorted_terms = sorted_terms[:limit]
 
-        return (Result(term.entry, term) for term in sorted_terms)
+        return (Result(term) for term in sorted_terms)
+
+    def _process_terms(self, candidates, transform):
+        f = self.term_factory
+        patterns = self.patterns
+
+        return (
+            term
+            for term in (f(transform(c), *patterns) for c in candidates if c)
+            if term.matched
+        )
 
 
 class Result(object):
-    def __init__(self, entry, term):
-        self.entry = entry
+    def __init__(self, term):
         self.term = term
-        self.original_value = entry.original_value
+        self.entry = term.entry
+        self.original_value = term.entry.original_value
 
     def asdict(self):
         return dict(value=self.entry.value,
@@ -305,20 +299,19 @@ class Result(object):
         return self.entry.translate(self.term.spans)
 
 
-def filter(algorithm, candidates, patterns, limit=None, transform=Entry):
-    if algorithm == 're':
-        patterns = [
-            re.compile('(?iu)' + pattern if pattern else '.*')
-            for pattern in patterns
-        ]
-        factory = RegexTerm
-    elif algorithm == 'fuzzy':
-        patterns = [FuzzyPattern(''.join(p)) for p in patterns]
-        factory = FuzzyTerm
-    else:
-        raise ValueError("Unknown algorithm: %r" % algorithm)
+def filter_re(candidates, *patterns, **options):
+    return Contest(
+        RegexTerm,
+        *[re.compile('(?iu)' + pattern if pattern else '.*')
+          for pattern in patterns]
+    ).elect(candidates, **options)
 
-    return Contest(factory, transform, patterns).elect(candidates, limit)
+
+def filter_fuzzy(candidates, *patterns, **options):
+    return Contest(
+        FuzzyTerm,
+        *[FuzzyPattern(''.join(p)) for p in patterns]
+    ).elect(candidates, **options)
 
 
 if __name__ == '__main__':
@@ -344,11 +337,17 @@ if __name__ == '__main__':
         patterns = [p.decode(CHARSET) for p in patterns]
         entries = (line.decode(CHARSET) for line in entries)
 
+    if algorithm == 're':
+        filter = filter_re
+    elif algorithm == 'fuzzy':
+        filter = filter_fuzzy
+    else:
+        raise ValueError("Unknown algorithm: %r" % algorithm)
+
     results = filter(
-        algorithm,
         entries,
-        patterns,
-        limit,
+        limit=limit,
+        *patterns
     )
 
     if args['--reverse']:
