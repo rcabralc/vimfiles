@@ -61,6 +61,7 @@ set noesckeys
 " The colorscheme is not too invasive, so highlight searched terms.
 set hlsearch
 
+set ignorecase
 set smartcase
 set incsearch
 
