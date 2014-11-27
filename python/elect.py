@@ -21,8 +21,6 @@ Arguments:
 Options:
     -h, --help               Show this.
     -l LIMIT, --limit=LIMIT  Limit output up to LIMIT results.
-    -n, --negate             Selects results which don't match any PATTERN.  No
-                             sorting is done, since there's no matched portion.
     -r, --reverse            Reverse the returning order of candidates.
     --asdict                 Output results as Python dictionaries.
 """
@@ -218,7 +216,7 @@ class FuzzyPattern(object):
             ).finditer
         else:
             self.length = 0
-            self.find_shortest = FuzzyMatch.unhighlighted
+            self.best_match = FuzzyMatch.unhighlighted
 
     def __len__(self):
         return self.length
@@ -229,7 +227,7 @@ class FuzzyPattern(object):
     def __bool__(self):
         return self.length > 0
 
-    def find_shortest(self, entry):
+    def best_match(self, entry):
         regexiter = self._finditer(entry.value)
         shortest = next(regexiter, None)
 
@@ -248,6 +246,38 @@ class FuzzyPattern(object):
         return shortest
 
 
+class NegativeFuzzyPattern(object):
+    def __init__(self, pattern):
+        pattern_lower = pattern.lower()
+
+        if pattern_lower:
+            if pattern_lower != pattern:
+                input = self.pattern = pattern
+                self.ignore_case = False
+            else:
+                input = self.pattern = pattern_lower
+                self.ignore_case = True
+
+            self.length = len(input)
+        else:
+            self.length = 0
+            self.best_match = FuzzyMatch.unhighlighted
+
+    def __len__(self):
+        return self.length
+
+    def __nonzero__(self):
+        return self.__bool__()
+
+    def __bool__(self):
+        return self.length > 0
+
+    def best_match(self, entry):
+        if entry.value.find(self.pattern) != -1:
+            return
+        return FuzzyMatch.unhighlighted(entry)
+
+
 class FuzzyTerm(object):
     def __init__(self, entry, *patterns):
         self.entry = entry
@@ -255,7 +285,7 @@ class FuzzyTerm(object):
         self.matched = False
 
         for pattern in patterns:
-            m = pattern.find_shortest(entry)
+            m = pattern.best_match(entry)
             if not m:
                 return
             self._matches.append(m)
@@ -330,10 +360,16 @@ def filter_re(candidates, *patterns, **options):
     ).elect(candidates, **options)
 
 
+def make_fuzzy_pattern(pattern):
+    if pattern.startswith('!'):
+        return NegativeFuzzyPattern(pattern[1:])
+    return FuzzyPattern(pattern)
+
+
 def filter_fuzzy(candidates, *patterns, **options):
     return Contest(
         FuzzyTerm,
-        *[FuzzyPattern(''.join(p)) for p in patterns]
+        *[make_fuzzy_pattern(''.join(p)) for p in patterns]
     ).elect(candidates, **options)
 
 
