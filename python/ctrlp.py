@@ -84,6 +84,9 @@ def filter(items, pat, limit, mmode, isregex):
                 pattern.append(c)
             c = next(it, None)
 
+        if len(patterns) > 1 and not patterns[-1]:
+            del patterns[-1]
+
     transform = dict(
         fullline=elect.Entry,
         filenameonly=FilenameEntry,
