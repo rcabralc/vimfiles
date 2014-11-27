@@ -69,6 +69,24 @@ class Entry(object):
 
         return translation
 
+    def translate_merging(self, spans):
+        translation = []
+        last_end = 0
+
+        for start, end in sorted(spans):
+            translation.append(dict(
+                nohl=self.original_value[last_end:start],
+                hl=self.original_value[start:end]
+            ))
+            last_end = end
+
+        translation.append(dict(
+            nohl=self.original_value[last_end:],
+            hl=''
+        ))
+
+        return translation
+
 
 class RegexTerm(object):
     def __init__(self, entry, *patterns):
@@ -291,8 +309,9 @@ class Result(object):
 
     def asdict(self):
         return dict(value=self.entry.value,
-                    original_value=self.entry.original_value,
-                    spans=self.spans)
+                    original_value=self.original_value,
+                    spans=self.spans,
+                    merged_spans=self.entry.translate_merging(self.term.spans))
 
     @property
     def spans(self):
