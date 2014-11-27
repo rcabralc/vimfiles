@@ -144,10 +144,14 @@ class FuzzyMatch(object):
         indices = []
 
         string = self.match.string
+        if self.pattern.ignore_case:
+            string = string.lower()
+
         pattern = self.pattern.pattern
         pattern_length = self.pattern_length
         current = self.match.start()
         pos = 0
+
         find = string.find
 
         while pos < pattern_length:
@@ -196,10 +200,10 @@ class FuzzyPattern(object):
         if pattern_lower:
             if pattern_lower != pattern:
                 input = self.pattern = pattern
-                ignore_case = False
+                self.ignore_case = ignore_case = False
             else:
                 input = self.pattern = pattern_lower
-                ignore_case = True
+                self.ignore_case = ignore_case = True
 
             self.length = len(input)
 
