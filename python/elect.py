@@ -146,7 +146,7 @@ FuzzyMatch.unhighlighted = UnhighlightedFuzzyMatch
 
 class FuzzyIndices(object):
     def __init__(self, indices):
-        self.indices = indices
+        self.indices = set(indices)
 
     def __iter__(self):
         if not self.indices:
