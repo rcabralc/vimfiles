@@ -145,14 +145,18 @@ endf
 " Syntastic
 " =========
 
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_enable_signs = 1
-let g:syntastic_python_checkers = ['flake8']
-let g:syntastic_ruby_checkers = ['rubocop']
-let g:syntastic_ruby_rubocop_args = '-D'
+if !exists('g:configured_syntastic')
+    set statusline+=%#warningmsg#
+    set statusline+=%{SyntasticStatuslineFlag()}
+    set statusline+=%*
+    let g:syntastic_auto_loc_list = 1
+    let g:syntastic_enable_signs = 1
+    let g:syntastic_python_checkers = ['flake8']
+    let g:syntastic_ruby_checkers = ['rubocop']
+    let g:syntastic_ruby_rubocop_args = '-D'
+
+    let g:configured_syntastic = 1
+end
 
 
 " Filetypes
