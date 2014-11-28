@@ -94,18 +94,22 @@ class RegexTerm(object):
         self.rank = 0
 
         value = entry.value
-        for pattern in patterns:
-            m = pattern.search(value)
+        if patterns:
+            for pattern in patterns:
+                m = pattern.search(value)
 
-            if m is None:
-                self.rank = float('+inf')
-                return
+                if m is None:
+                    self.rank = float('+inf')
+                    return
 
-            self._matches.append(m)
-            start, end = m.span()
-            self.rank += 1 - (end - start) / len(value)
+                self._matches.append(m)
+                start, end = m.span()
+                self.rank += 1 - (end - start) / len(value)
 
-        self.matched = True
+            self.matched = True
+        else:
+            self.rank = 1 / len(value)
+            self.matched = True
 
     @property
     def spans(self):
@@ -355,8 +359,7 @@ class Result(object):
 def filter_re(candidates, *patterns, **options):
     return Contest(
         RegexTerm,
-        *[re.compile('(?iu)' + pattern if pattern else '.*')
-          for pattern in patterns]
+        *[re.compile('(?iu)' + pattern) for pattern in patterns if pattern]
     ).elect(candidates, **options)
 
 
