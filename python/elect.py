@@ -13,16 +13,24 @@ will tend to be returned before longer matches.
 
 Arguments:
     ALGORITHM  The algorithm to use (also affects how pattern is interpreted).
-               `re` will treat PATTERNs as regular expressions, while `fuzzy`
+               `re' will treat PATTERNs as regular expressions, while `fuzzy'
                will treat them as fuzzy substrings.
     PATTERN    The pattern string (there can be multiple ones).
 
 
 Options:
-    -h, --help               Show this.
-    -l LIMIT, --limit=LIMIT  Limit output up to LIMIT results.
-    -r, --reverse            Reverse the returning order of candidates.
-    --asdict                 Output results as Python dictionaries.
+    -h, --help     Show this.
+
+    -l LIMIT, --limit=LIMIT
+                   Limit output up to LIMIT results.
+
+    -r, --reverse  Reverse the returning order of candidates.
+
+    --ignore-bad-patterns
+                   If a re pattern is not valid, silently ignore it.  It's used
+                   only if the algorithm is `re'.
+
+    --asdict       Output results as Python dictionaries.
 """
 
 from __future__ import division
@@ -31,6 +39,7 @@ from __future__ import unicode_literals
 import functools
 import operator
 import re
+import sre_constants
 import sys
 
 try:
@@ -357,10 +366,20 @@ class Result(object):
 
 
 def filter_re(candidates, *patterns, **options):
-    return Contest(
-        RegexTerm,
-        *[re.compile('(?iu)' + pattern) for pattern in patterns if pattern]
-    ).elect(candidates, **options)
+    re_patterns = []
+    patterns = [p for p in patterns if p]
+    ignore_bad_patterns = options.pop('ignore_bad_patterns', False)
+
+    for pattern in patterns:
+        try:
+            regexp = re.compile('(?iu)' + pattern)
+        except sre_constants.error:
+            if not ignore_bad_patterns:
+                raise
+        else:
+            re_patterns.append(regexp)
+
+    return Contest(RegexTerm, *re_patterns).elect(candidates, **options)
 
 
 def make_fuzzy_pattern(pattern):
@@ -384,6 +403,7 @@ if __name__ == '__main__':
     patterns = args['PATTERN']
     algorithm = args['ALGORITHM']
     limit = args['--limit']
+    options = {}
 
     if algorithm not in ('re', 'fuzzy'):
         exit('Unknown algorithm: %r' % algorithm)
@@ -392,6 +412,10 @@ if __name__ == '__main__':
         limit = int(limit)
     else:
         limit = None
+    options['limit'] = limit
+
+    if args['--ignore-bad-patterns']:
+        options['ignore_bad_patterns'] = True
 
     entries = (line.strip() for line in sys.stdin.readlines())
 
@@ -406,11 +430,7 @@ if __name__ == '__main__':
     else:
         raise ValueError("Unknown algorithm: %r" % algorithm)
 
-    results = filter(
-        entries,
-        limit=limit,
-        *patterns
-    )
+    results = filter(entries, *patterns, **options)
 
     if args['--reverse']:
         results = reversed(results)
