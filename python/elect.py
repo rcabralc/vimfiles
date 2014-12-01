@@ -122,7 +122,24 @@ class RegexTerm(object):
 
     @property
     def spans(self):
-        return (match.span() for match in self._matches)
+        current_span = []
+        spans = [current_span]
+
+        overlaps = lambda s1, s2: s1[0] <= s2[1] and s2[0] <= s1[1]
+
+        for match in self._matches:
+            start, end = match.span()
+
+            if not current_span:
+                current_span.extend((start, end))
+            elif overlaps((start, end), current_span):
+                current_span[0] = min((current_span[0], start))
+                current_span[1] = max((current_span[1], end))
+            else:
+                current_span = [start, end]
+                spans.append(current_span)
+
+        return (tuple(span) for span in spans if span)
 
 
 class UnhighlightedFuzzyMatch(object):
