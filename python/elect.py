@@ -355,12 +355,11 @@ class Contest(object):
         return (Result(term) for term in sorted_terms)
 
     def _process_terms(self, candidates, transform):
-        f = self.term_factory
-        patterns = self.patterns
+        f = functools.partial(self.term_factory, patterns=self.patterns)
 
         return (
             term
-            for term in (f(transform(c), *patterns) for c in candidates if c)
+            for term in map(f, map(transform, (c for c in candidates if c)))
             if term.matched
         )
 
