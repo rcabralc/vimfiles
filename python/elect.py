@@ -368,8 +368,14 @@ class Contest(object):
 class Result(object):
     def __init__(self, term):
         self.term = term
-        self.entry = term.entry
-        self.original_value = term.entry.original_value
+
+    @property
+    def entry(self):
+        return self.term.entry
+
+    @property
+    def original_value(self):
+        return self.entry.original_value
 
     def asdict(self):
         return dict(value=self.entry.value,
