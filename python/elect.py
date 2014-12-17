@@ -6,9 +6,8 @@ Usage:
 Filter lines from standard input according to one or more patterns, and print
 them to standard output.
 
-The results are sorted by the sum of the length of the matched portion of the
-item for each pattern, weighted by the length of the item.  Shorter matches
-will tend to be returned before longer matches.
+Results are sorted by length of matched portion (average for more than one
+pattern), followed by length of item.
 
 
 Arguments:
@@ -24,13 +23,19 @@ Options:
     -l LIMIT, --limit=LIMIT
                    Limit output up to LIMIT results.
 
+    --sort-limit=LIMIT
+                   Sort output only if the number of results is below LIMIT.
+                   Set to zero to not sort the output.  Negative numbers are
+                   silently ignored, as if there were no limit.  There's no
+                   default value, so output is always sorted by default.
+
     -r, --reverse  Reverse the returning order of candidates.
 
     --ignore-bad-patterns
-                   If a re pattern is not valid, silently ignore it.  It's used
-                   only if the algorithm is `re'.
+                   If a regular expression pattern is not valid, silently
+                   ignore it.  It's used only if the algorithm is `re'.
 
-    --asdict       Output results as Python dictionaries.
+    -d --debug     Print additional information to STDERR.
 """
 
 from __future__ import division
@@ -51,23 +56,21 @@ except NameError:
 CHARSET = 'utf-8'
 
 
-class Entry(object):
-    _lower = None
+def debug(fn):
+    sys.stderr.write(fn() + "\n")
 
-    def __init__(self, value):
+
+class Term(object):
+    matched = False
+
+    def __init__(self, original_value, value, patterns):
+        self.original_value = original_value
         self.value = value
-        self.original_value = value
 
-    @property
-    def lower(self):
-        if self._lower is None:
-            self._lower = self.value.lower()
-        return self._lower
-
-    def translate(self, spans):
+    def translate(self):
         translation = []
 
-        for start, end in spans:
+        for start, end in self.spans():
             translation.append(dict(
                 beginning=self.original_value[:start],
                 middle=self.original_value[start:end],
@@ -76,11 +79,11 @@ class Entry(object):
 
         return translation
 
-    def translate_merging(self, spans):
+    def translate_merging(self):
         translation = []
         last_end = 0
 
-        for start, end in sorted(spans):
+        for start, end in sorted(self.spans()):
             translation.append(dict(
                 nohl=self.original_value[last_end:start],
                 hl=self.original_value[start:end]
@@ -95,32 +98,33 @@ class Entry(object):
         return translation
 
 
-class RegexTerm(object):
-    def __init__(self, entry, *patterns):
-        self.entry = entry
+class RegexTerm(Term):
+    def __init__(self, original_value, value, patterns):
+        super(RegexTerm, self).__init__(original_value, value, patterns)
+
         self._matches = []
-        self.matched = False
         self.rank = 0
 
-        value = entry.value
-        if patterns:
-            for pattern in patterns:
-                m = pattern.search(value)
-
-                if m is None:
-                    self.rank = float('+inf')
-                    return
-
-                self._matches.append(m)
-                start, end = m.span()
-                self.rank += 1 - (end - start) / len(value)
-
+        value = self.value
+        l = len(value)
+        if not patterns:
+            self.rank = l
             self.matched = True
-        else:
-            self.rank = 1 / len(value)
-            self.matched = True
+            return
 
-    @property
+        matches = [m for m in (pattern.search(value) for pattern in patterns)
+                   if m is not None]
+
+        if len(matches) < len(patterns):
+            return
+
+        self._matches = matches
+        self.rank += sum(
+            (end - start) * 10000 + l
+            for start, end in (m.span() for m in matches)
+        )
+        self.matched = True
+
     def spans(self):
         current_span = []
         spans = [current_span]
@@ -143,10 +147,10 @@ class RegexTerm(object):
 
 
 class UnhighlightedFuzzyMatch(object):
-    distance = 1
+    length = 0
 
-    def __init__(self, entry):
-        self.length = len(entry.value)
+    def __init__(self, value):
+        self.length = len(value)
 
     def __nonzero__(self):
         return self.__bool__()
@@ -164,8 +168,7 @@ class FuzzyMatch(object):
         self.match = match
         self.pattern = pattern
         self.pattern_length = pattern.length
-        length = len(match.groups()[0])
-        self.distance = length / self.pattern_length
+        self.length = len(match.groups()[0])
 
     @property
     def indices(self):
@@ -223,6 +226,7 @@ class FuzzyIndices(object):
 
 class FuzzyPattern(object):
     def __init__(self, pattern):
+        self.value = pattern
         pattern_lower = pattern.lower()
 
         if pattern_lower:
@@ -257,9 +261,10 @@ class FuzzyPattern(object):
     def __bool__(self):
         return self.length > 0
 
-    def best_match(self, entry):
-        regexiter = self._finditer(entry.value)
+    def best_match(self, value):
+        regexiter = self._finditer(value)
         shortest = next(regexiter, None)
+        length = self.length
 
         if shortest is None:
             return
@@ -268,9 +273,9 @@ class FuzzyPattern(object):
 
         for match in regexiter:
             match = FuzzyMatch(match, self)
-            if match.distance < shortest.distance:
+            if match.length < shortest.length:
                 shortest = match
-                if shortest.distance == 1:
+                if shortest.length == length:
                     break
 
         return shortest
@@ -278,6 +283,7 @@ class FuzzyPattern(object):
 
 class NegativeFuzzyPattern(object):
     def __init__(self, pattern):
+        self.value = pattern
         pattern_lower = pattern.lower()
 
         if pattern_lower:
@@ -302,36 +308,30 @@ class NegativeFuzzyPattern(object):
     def __bool__(self):
         return self.length > 0
 
-    def best_match(self, entry):
-        if entry.value.find(self.pattern) != -1:
+    def best_match(self, value):
+        if value.find(self.pattern) != -1:
             return
-        return FuzzyMatch.unhighlighted(entry)
+        return FuzzyMatch.unhighlighted(value)
 
 
-class FuzzyTerm(object):
-    def __init__(self, entry, *patterns):
-        self.entry = entry
+class FuzzyTerm(Term):
+    def __init__(self, original_value, value, patterns):
+        super(FuzzyTerm, self).__init__(original_value, value, patterns)
+
         self._matches = []
-        self.matched = False
-
         for pattern in patterns:
-            m = pattern.best_match(entry)
+            m = pattern.best_match(value)
             if not m:
-                return
+                break
             self._matches.append(m)
-
-        self.matched = True
+        else:
+            self.matched = True
 
     @property
     def rank(self):
-        length = len(self.entry.value)
-        return sum(match.distance * length for match in self._matches)
+        l = len(self.value)
+        return sum(m.length * 10000 + l for m in self._matches)
 
-    @property
-    def value(self):
-        return self.entry.value
-
-    @property
     def spans(self):
         indiceses = functools.reduce(
             lambda acc, indices: acc.merge(indices),
@@ -346,20 +346,36 @@ class Contest(object):
         self.term_factory = term_factory
         self.patterns = patterns
 
-    def elect(self, candidates, limit=None, transform=Entry):
-        sorted_terms = sorted(self._process_terms(candidates, transform),
-                              key=operator.attrgetter('rank'))
-        if limit is not None:
-            sorted_terms = sorted_terms[:limit]
+    def elect(self, candidates, **kw):
+        limit = kw.get('limit', None)
+        transform = kw.get('transform', None)
+        sort_limit = kw.get('sort_limit', -1)
+        key = operator.attrgetter('rank')
 
-        return (Result(term) for term in sorted_terms)
+        if sort_limit < 0:
+            terms = sorted(self._process_terms(candidates, transform), key=key)
+        else:
+            terms = list(self._process_terms(candidates, transform))
+            if len(terms) < sort_limit:
+                terms = sorted(terms, key=key)
+
+        if limit is not None:
+            terms = terms[:limit]
+
+        return (Result(term) for term in terms)
 
     def _process_terms(self, candidates, transform):
-        f = functools.partial(self.term_factory, patterns=self.patterns)
+        patterns = self.patterns
+        factory = self.term_factory
+        entries = (c for c in candidates if c)
+
+        if transform:
+            f = lambda v, _, pats: factory(v, transform(v), patterns)
+        else:
+            f = factory
 
         return (
-            term
-            for term in map(f, map(transform, (c for c in candidates if c)))
+            term for term in (f(e, e, patterns) for e in entries)
             if term.matched
         )
 
@@ -369,22 +385,14 @@ class Result(object):
         self.term = term
 
     @property
-    def entry(self):
-        return self.term.entry
-
-    @property
     def original_value(self):
-        return self.entry.original_value
+        return self.term.original_value
 
     def asdict(self):
-        return dict(value=self.entry.value,
-                    original_value=self.original_value,
-                    spans=self.spans,
-                    merged_spans=self.entry.translate_merging(self.term.spans))
-
-    @property
-    def spans(self):
-        return self.entry.translate(self.term.spans)
+        return dict(value=self.term.value,
+                    original_value=self.term.original_value,
+                    spans=self.term.translate(),
+                    merged_spans=self.term.translate_merging())
 
 
 def filter_re(candidates, *patterns, **options):
@@ -410,14 +418,80 @@ def make_fuzzy_pattern(pattern):
     return FuzzyPattern(pattern)
 
 
+fuzzy_cache = {}
+
+
 def filter_fuzzy(candidates, *patterns, **options):
-    return Contest(
-        FuzzyTerm,
-        *[make_fuzzy_pattern(''.join(p)) for p in patterns]
-    ).elect(candidates, **options)
+    all_patterns = [make_fuzzy_pattern(''.join(p)) for p in patterns]
+    contest = Contest(FuzzyTerm, *all_patterns)
+
+    incremental = options.pop('incremental', False)
+    negative_patterns = [
+        p for p in all_patterns if isinstance(p, NegativeFuzzyPattern)
+    ]
+
+    def candidates_from_cache(patterns):
+        def broaden(patterns):
+            patterns[-1] = patterns[-1][:-1]
+
+            if not patterns[-1]:
+                return patterns[:-1]
+
+            return patterns
+
+        def possibilities(patterns):
+            if not patterns:
+                return
+
+            yield tuple(patterns)
+            for patterns in possibilities(broaden(list(patterns))):
+                yield patterns
+
+        direct = True
+        for p in possibilities(patterns):
+            from_cache = fuzzy_cache.get(p, None)
+            if from_cache is not None:
+                return (direct, p, from_cache)
+            direct = False
+
+        return (False, (), [])
+
+    def update_candidates_from_cache(patterns, results):
+        results = list(results)
+        fuzzy_cache[tuple(patterns)] = results
+        return results
+
+    if options.get('debug', False):
+        _debug = debug
+    else:
+        _debug = lambda f: None
+
+    if all_patterns and incremental and not negative_patterns:
+        pattern_set = tuple(p.value for p in all_patterns)
+        direct, hit, results = candidates_from_cache(pattern_set)
+
+        if hit:
+            _debug(lambda: "cache: hit on {}\n".format(hit))
+            _debug(lambda: "cache size: {}\n".format(len(results)))
+
+            if direct:
+                _debug(lambda: "using result directly from cache\n")
+                return results
+
+            results = contest.elect(
+                [r.original_value for r in results],
+                **options
+            )
+        else:
+            _debug(lambda: "cache: miss, patterns: {}\n".format(pattern_set))
+            results = contest.elect(candidates, **options)
+
+        return update_candidates_from_cache(pattern_set, results)
+
+    return contest.elect(candidates, **options)
 
 
-if __name__ == '__main__':
+def main():
     from docopt import docopt
 
     args = docopt(__doc__)
@@ -425,46 +499,51 @@ if __name__ == '__main__':
     patterns = args['PATTERN']
     algorithm = args['ALGORITHM']
     limit = args['--limit']
+    sort_limit = args['--sort-limit']
     options = {}
 
     if algorithm not in ('re', 'fuzzy'):
         exit('Unknown algorithm: %r' % algorithm)
 
     if limit is not False and limit is not None:
-        limit = int(limit)
-    else:
-        limit = None
-    options['limit'] = limit
+        options['limit'] = int(limit)
+
+    if sort_limit is not False and sort_limit is not None:
+        options['sort_limit'] = int(sort_limit)
 
     if args['--ignore-bad-patterns']:
         options['ignore_bad_patterns'] = True
 
-    entries = (line.strip() for line in sys.stdin.readlines())
+    if args['--debug']:
+        options['debug'] = True
+
+    strip = str.strip
+    entries = (strip(line) for line in sys.stdin.readlines())
 
     if not PY3:
         patterns = [p.decode(CHARSET) for p in patterns]
         entries = (line.decode(CHARSET) for line in entries)
 
     if algorithm == 're':
-        filter = filter_re
+        f = filter_re
     elif algorithm == 'fuzzy':
-        filter = filter_fuzzy
+        f = filter_fuzzy
     else:
         raise ValueError("Unknown algorithm: %r" % algorithm)
 
-    results = filter(entries, *patterns, **options)
+    results = f(entries, *patterns, **options)
 
     if args['--reverse']:
         results = reversed(results)
 
-    if args['--asdict']:
-        sys.stdout.write(
-            u'\n'.join(str(result.asdict()) for result in results)
-        )
-    else:
-        sys.stdout.write(
-            u'\n'.join(result.original_value for result in results)
-        )
+    sys.stdout.write(
+        u'\n'.join(result.original_value for result in results)
+    )
 
     sys.stdout.write(u'\n')
     sys.stdout.flush()
+
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())
