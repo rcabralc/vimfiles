@@ -10,6 +10,7 @@ runtime! autocommands.vim
 runtime! mappings.vim
 
 syntax enable
+filetype plugin indent on
 
 " Calculator using python
 " =======================

@@ -1,54 +1,41 @@
-if has('vim_starting')
-    set runtimepath+=~/.vim/bundle/neobundle.vim/
+if !filereadable(expand("~/.vim/autoload/plug.vim"))
+    !curl -fLo ~/.vim/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    source ~/.vim/autoload/plug.vim
 endif
 
-" Activate NeoBundle
-call neobundle#begin(expand('~/.vim/bundle/'))
+call plug#begin('~/.vim/bundle')
 
-" Let NeoBundle manage NeoBundle
-NeoBundleFetch 'Shougo/neobundle.vim'
-
-NeoBundle 'Shougo/vimproc', {
-      \ 'build' : {
-      \     'cygwin' : 'make -f make_cygwin.mak',
-      \     'mac' : 'make -f make_mac.mak',
-      \     'unix' : 'make -f make_unix.mak',
-      \    },
-      \ }
-
-NeoBundle 'rcabralc/monokai.vim'
-NeoBundle 'vim-scripts/VST'
-NeoBundle 'editorconfig/editorconfig-vim'
-NeoBundle 'othree/html5.vim'
-NeoBundle 'bling/vim-airline'
-NeoBundle 'airblade/vim-gitgutter'
-NeoBundle 'cakebaker/scss-syntax.vim'
-NeoBundle 'msanders/snipmate.vim'
-NeoBundle 'scrooloose/syntastic'
-NeoBundle 'tomtom/tcomment_vim'
-NeoBundle 'kchmck/vim-coffee-script'
-NeoBundle 'hail2u/vim-css3-syntax'
-NeoBundle 'tpope/vim-endwise'
-NeoBundle 'tpope/vim-fugitive'
-NeoBundle 'tpope/vim-git'
-NeoBundle 'nathanaelkane/vim-indent-guides'
-NeoBundle 'jelera/vim-javascript-syntax'
-NeoBundle 'osyo-manga/vim-over'
-NeoBundle 'edsono/vim-matchit'
-NeoBundle 'nvie/vim-rst-tables'
-NeoBundle 'vim-ruby/vim-ruby'
-NeoBundle 'vim-scripts/bufkill.vim'
-NeoBundle 'dag/vim-fish'
-NeoBundle '/home/rcabralc/devel/vim/monokai-airline.vim/', { 'type': 'nosync' }
+Plug 'Rykka/riv.vim'
+"Plug 'vim-scripts/VST'
+Plug 'editorconfig/editorconfig-vim'
+Plug 'othree/html5.vim'
+Plug 'bling/vim-airline'
+Plug 'airblade/vim-gitgutter'
+Plug 'cakebaker/scss-syntax.vim'
+Plug 'msanders/snipmate.vim'
+Plug 'scrooloose/syntastic'
+Plug 'tomtom/tcomment_vim'
+Plug 'kchmck/vim-coffee-script'
+Plug 'hail2u/vim-css3-syntax'
+Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-git'
+Plug 'nathanaelkane/vim-indent-guides'
+Plug 'jelera/vim-javascript-syntax'
+Plug 'osyo-manga/vim-over'
+Plug 'edsono/vim-matchit'
+Plug 'nvie/vim-rst-tables'
+Plug 'vim-ruby/vim-ruby'
+Plug 'vim-scripts/bufkill.vim'
+Plug 'dag/vim-fish'
+Plug 'christoomey/vim-tmux-navigator'
+Plug '~/devel/vim/monokai.vim'
+Plug '~/devel/vim/monokai-airline.vim/'
 
 " Fuzzy file finder
-NeoBundle 'kien/ctrlp.vim'
+Plug 'ctrlpvim/ctrlp.vim'
 
 " Completion
-NeoBundle 'Shougo/neocomplete.vim'
+Plug 'Shougo/neocomplete.vim'
 
-call neobundle#end()
-
-filetype plugin indent on
-
-NeoBundleCheck
+call plug#end()
