@@ -22,6 +22,21 @@ elseif has('python')
     py import math
 endif
 
+" Ctags for Git repos.  This requires .git/hooks/ctags available.  This can
+" be achieved following Tim Pope instructions at
+" http://tbaggery.com/2011/08/08/effortless-ctags-with-git.html
+map <C-F6> :RegenerateCTagsForGitRepo<CR>
+
+function! s:regenerate_ctags_for_git_repo()
+    if filereadable('.git/hooks/ctags')
+        !.git/hooks/ctags
+    else
+        echo "Not available. Are you inside a Git repo with .git/hooks/ctags?"
+    endif
+endfunction
+
+command! RegenerateCTagsForGitRepo call s:regenerate_ctags_for_git_repo()
+
 
 " Highlighting optimizations
 " ==========================
