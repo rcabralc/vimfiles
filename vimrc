@@ -5,7 +5,6 @@ set shell=/bin/sh " Avoid problems with fish shell
 
 runtime! defaults.vim
 runtime! plugins.vim
-runtime! pluginconf.vim
 runtime! autocommands.vim
 runtime! mappings.vim
 

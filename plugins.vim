@@ -39,3 +39,5 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'Shougo/neocomplete.vim'
 
 call plug#end()
+
+runtime! pluginconf.vim
