@@ -38,20 +38,10 @@ endfunction
 
 command! RegenerateCTagsForGitRepo call s:regenerate_ctags_for_git_repo()
 
+colorscheme monokai
 
 " Highlighting optimizations
 " ==========================
-
-highlight! TrailingSpace ctermbg=red guibg=red
-match TrailingSpace /\s\+$/
-
-augroup Misc
-    autocmd BufWinEnter * if &modifiable | match TrailingSpace /\s\+$/ | endif
-    autocmd InsertEnter * if &modifiable | match TrailingSpace /\s\+\%#\@<!$/ | endif
-    autocmd InsertLeave * if &modifiable | match TrailingSpace /\s\+$/ | endif
-    autocmd BufWinLeave * if &modifiable | call clearmatches() | endif
-augroup END
-
 
 hi! link rubyBlockParameter Special
 hi! link erubyDelimiter Operator
@@ -63,4 +53,10 @@ hi! link javaScriptIdentifier Keyword
 " I don't care that these be not highlighted in a special way.
 hi! link javaScriptHtmlElemProperties Normal
 
-colorscheme monokai
+autocmd BufWinEnter * if &modifiable | match TrailingSpace /\s\+$/ | endif
+autocmd InsertEnter * if &modifiable | match TrailingSpace /\s\+\%#\@<!$/ | endif
+autocmd InsertLeave * if &modifiable | match TrailingSpace /\s\+$/ | endif
+autocmd BufWinLeave * if &modifiable | call clearmatches() | endif
+
+highlight! TrailingSpace ctermbg=red guibg=red
+match TrailingSpace /\s\+$/
