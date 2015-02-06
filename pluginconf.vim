@@ -46,6 +46,12 @@ if !exists('g:configured_airline')
 end
 
 
+" Fugitive
+if exists('*fugitive#statusline')
+    set statusline=%{fugitive#statusline()}%*%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
+endif
+
+
 " riv.vim
 " =======
 
@@ -193,7 +199,7 @@ endfu
 " Syntastic
 " =========
 
-if !exists('g:configured_syntastic')
+if !exists('g:configured_syntastic') && exists('*SyntasticStatuslineFlag')
     set statusline+=%#warningmsg#
     set statusline+=%{SyntasticStatuslineFlag()}
     set statusline+=%*

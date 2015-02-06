@@ -33,9 +33,6 @@ set laststatus=2
 " Lazy redraw.
 set lazyredraw
 
-" fugitive indication.
-set statusline=%{fugitive#statusline()}%*%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
-
 " display the current mode and partially-typed commands in the status line:
 set showmode
 set showcmd
