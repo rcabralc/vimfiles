@@ -14,11 +14,12 @@ nnoremap <Leader>b :buffer<Space>
 nnoremap <Leader>k :BW<CR>
 nnoremap <Leader>K :bw!<CR>
 
-" navigate between windows without pressing C-W
-nnoremap <C-h> <C-W><C-h>
-nnoremap <C-j> <C-W><C-j>
-nnoremap <C-k> <C-W><C-k>
-nnoremap <C-l> <C-W><C-l>
+" navigate between windows without pressing C-W (these are being handled
+" through vim-tmux-navigator).
+" nnoremap <C-h> <C-W><C-h>
+" nnoremap <C-j> <C-W><C-j>
+" nnoremap <C-k> <C-W><C-k>
+" nnoremap <C-l> <C-W><C-l>
 
 " Mappings for breaking lines on every white space or cursor
 nnoremap <Leader>j f<Space>xi<CR><ESC>_

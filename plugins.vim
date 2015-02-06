@@ -29,6 +29,7 @@ Plug 'vim-ruby/vim-ruby'
 Plug 'vim-scripts/bufkill.vim'
 Plug 'dag/vim-fish'
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'tmux-plugins/vim-tmux'
 Plug '~/devel/vim/monokai.vim'
 Plug '~/devel/vim/monokai-airline.vim/'
 
