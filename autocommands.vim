@@ -1,12 +1,23 @@
 autocmd!
 
+" Move between logical lines rather than physical lines on wrap mode.
+function! <SID>add_line_motions()
+    if &ft == 'qf'
+        silent! nunmap j
+        silent! nunmap k
+    else
+        nnoremap <buffer> j gj
+        nnoremap <buffer> k gk
+    endif
+endfunction
+
 " Highlight cursor line and column
 set cursorline cursorcolumn
 augroup Misc
     autocmd WinLeave * set nocursorline nocursorcolumn
     autocmd WinEnter * set cursorline cursorcolumn
+    autocmd FileType * call <SID>add_line_motions()
 augroup END
-
 
 autocmd BufNewFile,BufRead *.txt setfiletype human
 autocmd FileType mail,human,rst,gitcommit setlocal flp=^\s*\(\d\+\\|[a-z]\)[\].)]\s*
@@ -20,7 +31,7 @@ autocmd FileType yaml setlocal et ts=2 sw=2 sts=2 tw=79
 
 " Change identation keys.  The automatic indent when <Return> is used in any
 " place of the line is really crappy.
-autocmd FileType svg,xhtml,html,xml setlocal indentkeys=o,O,<>>,{,}
+" autocmd FileType svg,xhtml,html,xml setlocal indentkeys=o,O,<>>,{,}
 autocmd FileType svg,xhtml,html,xml setlocal fo+=tl tw=79 ts=2 sw=2 sts=2 et
 
 autocmd FileType svg,xhtml,html,xml imap <buffer> <Leader>xc </<c-x><c-o><esc>a
@@ -47,9 +58,7 @@ autocmd FileType python setlocal tw=79 et ts=4 sw=4 sts=4
 " Ruby
 autocmd FileType ruby setlocal et ts=2 sw=2 sts=2 tw=79
 autocmd FileType eruby setlocal et ts=2 sw=2 sts=2 tw=79
-" Change identation keys.  The automatic indent when <Return> is used in any
-" place of the line is really crappy.
-autocmd FileType eruby setlocal indentkeys=o,O,<Return>,<>>,{,},0),0],o,O,!^F,=end,=else,=elsif,=rescue,=ensure,=when,=end,=else,=cat,=fina,=END,0\
+" autocmd FileType eruby setlocal indentkeys=o,O,<Return>,<>>,{,},0),0],o,O,!^F,=end,=else,=elsif,=rescue,=ensure,=when,=end,=else,=cat,=fina,=END,0\
 
 " Recognize Zope's controller python scripts and validators as python.
 autocmd BufNewFile,BufRead *.cpy,*.vpy setfiletype python
