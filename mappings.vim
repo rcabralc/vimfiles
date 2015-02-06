@@ -83,6 +83,7 @@ map <A-b> :call <SID>softmotion('b')<CR>
 map <A-w> :call <SID>softmotion('w')<CR>
 map <A-e> :call <SID>softmotion('e')<CR>
 
+map <F6> :!git ls-files <bar> ctags -L -<CR>
 
 function! s:ToggleRelativeNumber()
     if &relativenumber
