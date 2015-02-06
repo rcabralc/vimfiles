@@ -46,7 +46,11 @@ if !exists('g:configured_airline')
 end
 
 
+" riv.vim
+" =======
 
+let g:riv_disable_folding = 1
+let g:riv_highlight_code = 'lua,python,cpp,javascript,vim,sh,ruby'
 
 
 " Colorscheme
