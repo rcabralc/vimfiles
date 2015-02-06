@@ -1,9 +1,19 @@
-if !filereadable(expand("~/.vim/autoload/plug.vim"))
-    !curl -fLo ~/.vim/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    source ~/.vim/autoload/plug.vim
+if match($VIM, 'nvim') == -1
+    let vimdir = '~/.vim/'
+else
+    let vimdir = '~/.nvim/'
 endif
 
-call plug#begin('~/.vim/bundle')
+let was_installed = 1
+
+if !filereadable(expand(vimdir . "autoload/plug.vim"))
+    call system('mkdir -p ' . vimdir . 'autoload')
+    call system('curl -fLo ' . vimdir . 'autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim')
+    execute 'source ' . vimdir . 'autoload/plug.vim'
+    let was_installed = 0
+endif
+
+call plug#begin(vimdir . 'bundle')
 
 Plug 'Rykka/riv.vim'
 "Plug 'vim-scripts/VST'
@@ -34,5 +44,9 @@ Plug '~/devel/vim/monokai.vim'
 Plug '~/devel/vim/monokai-airline.vim/'
 
 call plug#end()
+
+if !was_installed
+    execute "PlugInstall"
+endif
 
 runtime! pluginconf.vim
