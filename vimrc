@@ -44,6 +44,7 @@ colorscheme monokai
 
 hi! link rubyBlockParameter Special
 hi! link erubyDelimiter Operator
+hi! link rubyPseudoVariable Boolean
 
 hi! link javaScriptFuncExp Normal
 hi! link javaScriptGlobal Normal
