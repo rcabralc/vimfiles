@@ -32,9 +32,6 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug '~/devel/vim/monokai.vim'
 Plug '~/devel/vim/monokai-airline.vim/'
 
-" Completion
-Plug 'Shougo/neocomplete.vim'
-
 call plug#end()
 
 runtime! pluginconf.vim

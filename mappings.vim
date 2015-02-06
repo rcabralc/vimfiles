@@ -66,9 +66,6 @@ nmap <Leader>H <Plug>GitGutterLineHighlightsToggle
 nmap <Leader>[ <Plug>GitGutterPrevHunk
 nmap <Leader>] <Plug>GitGutterNextHunk
 
-" neocomplete.vim: <CR>: close popup and save indent.
-inoremap <silent> <CR> <C-r>=<SID>NeocompleteCR()<CR>
-
 nmap <Leader>n :call <SID>ToggleRelativeNumber()<CR>
 
 " Load a session in the current directory.
@@ -85,11 +82,6 @@ map <A-b> :call <SID>softmotion('b')<CR>
 map <A-w> :call <SID>softmotion('w')<CR>
 map <A-e> :call <SID>softmotion('e')<CR>
 
-function! s:NeocompleteCR()
-    return neocomplete#close_popup() . "\<CR>"
-    " For no inserting <CR> key.
-    "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
-endfunction
 
 function! s:ToggleRelativeNumber()
     if &relativenumber
