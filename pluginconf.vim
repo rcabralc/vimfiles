@@ -1,27 +1,50 @@
 " Airline
 " =======
 
-" Use symbols in Airline (requires capable font, both in terminal and in GUI).
-let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
+if !exists('g:configured_airline')
+    let g:airline_powerline_fonts = 0
 
-" Airline theme.
-let g:airline_mode_map = {
-    \ '__' : '-',
-    \ 'n'  : 'N',
-    \ 'i'  : 'I',
-    \ 'R'  : 'R',
-    \ 'c'  : 'C',
-    \ 'v'  : 'V',
-    \ 'V'  : 'V',
-    \ '' : 'V',
-    \ 's'  : 'S',
-    \ 'S'  : 'S',
-    \ '' : 'S',
-    \ }
-let g:airline#extensions#hunks#enabled = 0
-let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
-let g:airline_theme = 'monokai'
+    let g:airline_symbols = {}
+    let g:airline_left_sep = ''
+    let g:airline_left_alt_sep = '|'
+    let g:airline_right_sep = ''
+    let g:airline_right_alt_sep = '|'
+    let g:airline_symbols.linenr = ''
+    let g:airline_symbols.branch = ''
+    let g:airline_symbols.paste = '∥'
+    let g:airline_symbols.readonly = '⭤'
+    let g:airline_symbols.whitespace = 'Ξ'
+
+    " Airline theme.
+    let g:airline_mode_map = {
+        \ '__' : '-',
+        \ 'n'  : 'N',
+        \ 'i'  : 'I',
+        \ 'R'  : 'R',
+        \ 'c'  : 'C',
+        \ 'v'  : 'V',
+        \ 'V'  : 'V',
+        \ '' : 'V',
+        \ 's'  : 'S',
+        \ 'S'  : 'S',
+        \ '' : 'S',
+        \ }
+
+    let g:airline#extensions#tabline#enabled = 1
+    let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+    let g:airline#extensions#tabline#left_sep = ''
+    let g:airline#extensions#tabline#left_alt_sep = ''
+    let g:airline#extensions#tabline#right_sep = ''
+    let g:airline#extensions#tabline#right_alt_sep = ''
+
+    let g:airline#extensions#whitespace#enabled = 1
+    let g:airline#extensions#hunks#enabled = 1
+
+    let g:airline_theme = 'monokai'
+
+    let g:configured_airline = 1
+end
+
 
 
 " Neocomplete
