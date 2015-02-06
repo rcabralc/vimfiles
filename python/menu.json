@@ -1,0 +1,24 @@
+{
+    "theme": {
+        "font-family": "Lato",
+        "background-color": "#272822",
+        "color": "#f8f8f2",
+        "prompt-background-color": "#272822",
+        "prompt-color": "#66d9ef",
+        "prompt-over-limit-color": "#fd971f",
+        "input-background-color": "#272822",
+        "input-color": "#f8f8f2",
+        "input-not-found-color": "#f92672",
+        "input-history-color": "#fd971f",
+        "counters-color": "#a6e22e",
+        "entries-background-color": "#272822",
+        "entries-color": "#75715e",
+        "entries-hl-background-color": "#272822",
+        "entries-hl-color": "#ae81ff",
+        "entries-preformatted-font-family": "Monaco",
+        "selected-entry-background-color": "#49483e",
+        "selected-entry-color": "#f8f8f2",
+        "selected-entry-hl-background-color": "#49483e",
+        "selected-entry-hl-color": "#ae81ff"
+    }
+}

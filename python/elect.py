@@ -146,7 +146,7 @@ class RegexTerm(Term):
         return (tuple(span) for span in spans if span)
 
 
-class UnhighlightedFuzzyMatch(object):
+class UnhighlightedMatch(object):
     length = 0
 
     def __init__(self, value):
@@ -161,6 +161,27 @@ class UnhighlightedFuzzyMatch(object):
     @property
     def indices(self):
         return frozenset()
+
+
+class ExactMatch(object):
+    def __init__(self, value, pattern):
+        self.value = value
+        self.pattern = pattern
+        self.pattern_length = self.length = pattern.length
+
+    @property
+    def indices(self):
+        indices = []
+
+        string = self.value
+        if self.pattern.ignore_case:
+            string = string.lower()
+
+        current = string.find(self.pattern.pattern)
+        for index in range(current, current + self.pattern_length):
+            indices.append(index)
+
+        return frozenset(indices)
 
 
 class FuzzyMatch(object):
@@ -194,9 +215,6 @@ class FuzzyMatch(object):
         return frozenset(indices)
 
 
-FuzzyMatch.unhighlighted = UnhighlightedFuzzyMatch
-
-
 class FuzzyIndices(object):
     def __init__(self, indices):
         self.indices = set(indices)
@@ -224,7 +242,7 @@ class FuzzyIndices(object):
         return type(self)(self.indices.union(other.indices))
 
 
-class FuzzyPattern(object):
+class Pattern(object):
     def __init__(self, pattern):
         self.value = pattern
         pattern_lower = pattern.lower()
@@ -232,25 +250,15 @@ class FuzzyPattern(object):
         if pattern_lower:
             if pattern_lower != pattern:
                 input = self.pattern = pattern
-                self.ignore_case = ignore_case = False
+                self.ignore_case = False
             else:
                 input = self.pattern = pattern_lower
-                self.ignore_case = ignore_case = True
+                self.ignore_case = True
 
             self.length = len(input)
-
-            self._finditer = re.compile(
-                '(?%(flags)su)(?=(%(cooked)s))' % dict(
-                    flags='i' if ignore_case else '',
-                    cooked=re.escape(input[0]) + ''.join(
-                        '[^%(c)s]*?%(c)s' % {'c': re.escape(c)}
-                        for c in input[1:]
-                    )
-                )
-            ).finditer
         else:
             self.length = 0
-            self.best_match = FuzzyMatch.unhighlighted
+            self.best_match = UnhighlightedMatch
 
     def __len__(self):
         return self.length
@@ -260,6 +268,31 @@ class FuzzyPattern(object):
 
     def __bool__(self):
         return self.length > 0
+
+
+class ExactPattern(Pattern):
+    def best_match(self, value):
+        if self.pattern not in value:
+            return
+        return ExactMatch(value, self)
+
+
+class FuzzyPattern(Pattern):
+    def __init__(self, pattern):
+        super(FuzzyPattern, self).__init__(pattern)
+
+        if self.length > 0:
+            input = self.pattern
+
+            self._finditer = re.compile(
+                '(?%(flags)su)(?=(%(cooked)s))' % dict(
+                    flags='i' if self.ignore_case else '',
+                    cooked=re.escape(input[0]) + ''.join(
+                        '[^%(c)s]*?%(c)s' % {'c': re.escape(c)}
+                        for c in input[1:]
+                    )
+                )
+            ).finditer
 
     def best_match(self, value):
         regexiter = self._finditer(value)
@@ -281,37 +314,18 @@ class FuzzyPattern(object):
         return shortest
 
 
-class NegativeFuzzyPattern(object):
-    def __init__(self, pattern):
-        self.value = pattern
-        pattern_lower = pattern.lower()
-
-        if pattern_lower:
-            if pattern_lower != pattern:
-                input = self.pattern = pattern
-                self.ignore_case = False
-            else:
-                input = self.pattern = pattern_lower
-                self.ignore_case = True
-
-            self.length = len(input)
-        else:
-            self.length = 0
-            self.best_match = FuzzyMatch.unhighlighted
-
-    def __len__(self):
-        return self.length
-
-    def __nonzero__(self):
-        return self.__bool__()
-
-    def __bool__(self):
-        return self.length > 0
-
+class InverseFuzzyPattern(FuzzyPattern):
     def best_match(self, value):
-        if value.find(self.pattern) != -1:
+        if next(self._finditer(value), None):
             return
-        return FuzzyMatch.unhighlighted(value)
+        return UnhighlightedMatch(value)
+
+
+class InverseExactPattern(ExactPattern):
+    def best_match(self, value):
+        if self.pattern in value:
+            return
+        return UnhighlightedMatch(value)
 
 
 class FuzzyTerm(Term):
@@ -362,7 +376,8 @@ class Contest(object):
         if limit is not None:
             terms = terms[:limit]
 
-        return (Result(term) for term in terms)
+        result_factory = Result
+        return (result_factory(term) for term in terms)
 
     def _process_terms(self, candidates, transform):
         patterns = self.patterns
@@ -413,8 +428,12 @@ def filter_re(candidates, *patterns, **options):
 
 
 def make_fuzzy_pattern(pattern):
-    if pattern.startswith('!'):
-        return NegativeFuzzyPattern(pattern[1:])
+    if pattern.startswith("!'"):
+        return InverseExactPattern(pattern[2:])
+    elif pattern.startswith('!'):
+        return InverseFuzzyPattern(pattern[1:])
+    elif pattern.startswith("'"):
+        return ExactPattern(pattern[1:])
     return FuzzyPattern(pattern)
 
 
@@ -427,7 +446,8 @@ def filter_fuzzy(candidates, *patterns, **options):
 
     incremental = options.pop('incremental', False)
     negative_patterns = [
-        p for p in all_patterns if isinstance(p, NegativeFuzzyPattern)
+        p for p in all_patterns
+        if isinstance(p, (InverseFuzzyPattern, InverseExactPattern))
     ]
 
     def candidates_from_cache(patterns):
@@ -536,9 +556,14 @@ def main():
     if args['--reverse']:
         results = reversed(results)
 
-    sys.stdout.write(
-        u'\n'.join(result.original_value for result in results)
-    )
+    if args['--debug']:
+        sys.stdout.write(
+            u'\n'.join(repr(result.asdict()) for result in results)
+        )
+    else:
+        sys.stdout.write(
+            u'\n'.join(result.original_value for result in results)
+        )
 
     sys.stdout.write(u'\n')
     sys.stdout.flush()

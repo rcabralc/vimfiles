@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="menu.js"></script>
+
+    <style type="text/css" id="scrollbar-style-height"></style>
+    <style type="text/css" id="scrollbar-style-position"></style>
+
+    <style type="text/css">
+
+      ::-webkit-scrollbar {
+        width: 0;
+      }
+
+      html {
+        background-color: #333;
+        background-color: %(background-color)s;
+
+        color: #ddd;
+        color: %(color)s;
+
+        font-family: sans-serif;
+        font-family: %(font-family)s;
+
+        font-size: 16px;
+        font-size: %(font-size)s;
+
+        line-height: 1.5;
+        font-feature-settings: "kern" 1, "liga" 1;
+        text-rendering: optimizeLegibility;
+      }
+
+      body {
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+      }
+
+      body > div {
+        display: table;
+        width: 100%;
+      }
+
+      #prompt {
+        background-color: #999;
+        background-color: %(prompt-background-color)s;
+
+        color: black;
+        color: %(prompt-color)s;
+
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        display: table-cell;
+        padding: 0 0 0 0.5em;
+        width: 1em;
+        white-space: nowrap;
+      }
+
+      #prompt.over-limit {
+        background-color: inherit;
+        background-color: %(prompt-over-limit-background-color)s;
+
+        color: orange;
+        color: %(prompt-over-limit-color)s;
+      }
+
+      .not-found #prompt {
+        background-color: %(input-not-found-background-color)s;
+
+        color: orange;
+        color: %(input-not-found-color)s;
+      }
+
+      #input {
+        background-color: #666;
+        background-color: %(input-background-color)s;
+
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+
+        color: white;
+        color: %(input-color)s;
+
+        display: table-cell;
+
+        font-family: inherit;
+        font-family: %(input-font-family)s;
+
+        font-size: inherit;
+        font-family: %(input-font-size)s;
+
+        border: none;
+        line-height: 2.5;
+        margin: 0;
+        padding: 0 0.5em;
+        width: 100%;
+      }
+
+      #input.history-mode {
+        color: orange;
+        color: %(input-history-color)s;
+      }
+
+      .not-found #input {
+        background-color: %(input-not-found-background-color)s;
+
+        color: orange;
+        color: %(input-not-found-color)s;
+      }
+
+      #input:focus {
+        outline: none;
+      }
+
+      #counters {
+        background-color: #666;
+        background-color: %(input-background-color)s;
+
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+
+        color: white;
+        color: %(counters-color)s;
+
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        display: table-cell;
+        padding: 0 0.5em 0 0;
+        width: 1em;
+        white-space: nowrap;
+      }
+
+      .not-found #counters {
+        background-color: %(input-not-found-background-color)s;
+
+        color: orange;
+        color: %(input-not-found-color)s;
+      }
+
+      #entries {
+        font-family: inherit;
+        font-family: %(entries-font-family)s;
+
+        font-size: inherit;
+        font-family: %(entries-font-size)s;
+
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+
+        bottom: 0;
+        left: 0;
+        overflow-y: scroll;
+        position: fixed;
+        right: 0;
+        top: 2.5em;
+      }
+
+      #scrollbar {
+        box-sizing: border-box;
+        height: calc(100% - 2.5em);
+        overflow-y: scroll;
+        padding: 3px;
+        position: fixed;
+        right: 0;
+        top: 2.5em;
+        width: 12px;
+      }
+
+      #scrollbar .track {
+        height: 100%;
+        position: relative;
+      }
+
+      #scrollbar .thumb {
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 4px;
+        position: absolute;
+        right: 0;
+        width: 100%;
+      }
+
+      #entries li {
+        background-color: #333;
+        background-color: %(entries-background-color)s;
+        color: #ddd;
+        color: %(entries-color)s;
+        padding: 0.5em;
+        position: relative;
+        transition: all 0.2s;
+      }
+
+      #entries.preformatted li {
+        font-family: monospace;
+        font-family: %(entries-preformatted-font-family)s;
+
+        white-space: pre;
+      }
+
+      #entries li .hl {
+        background-color: #555;
+        background-color: %(entries-hl-background-color)s;
+        color: lime;
+        color: %(entries-hl-color)s;
+        transition: all 0.2s;
+      }
+
+      #entries li:nth-child(2n + 1),
+      #entries li:nth-child(2n + 1) .hl {
+        background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1))
+      }
+
+      #entries li.selected {
+        background-color: #444;
+        background-color: %(selected-entry-background-color)s;
+        color: white;
+        color: %(selected-entry-color);
+      }
+
+      #entries li.selected .hl {
+        background-color: #666;
+        background-color: %(selected-entry-hl-background-color)s;
+        color: lime;
+        color: %(selected-entry-hl-color)s;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <span id="prompt">&gt;&gt;&gt;</span>
+      <input type="text" id="input" value="%(initial-value)s" />
+      <span id="counters">100/1000</span>
+    </div>
+
+    <ul id="entries" class="%(entries-class)s">
+      <li>Entry <span class="hl">highlight</span>ed</li>
+      <li class="selected">Other entry <span class="hl">highlight</span>ed</li>
+      <li class="selected">Other entry <span class="hl">highlight</span>ed</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+      <li>Normal entry</li>
+    </ul>
+
+    <div id="scrollbar"><div class="track"><div class="thumb"></div></div></div>
+  </body>
+</html>

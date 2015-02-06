@@ -32,9 +32,6 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug '~/devel/vim/monokai.vim'
 Plug '~/devel/vim/monokai-airline.vim/'
 
-" Fuzzy file finder
-Plug 'ctrlpvim/ctrlp.vim'
-
 " Completion
 Plug 'Shougo/neocomplete.vim'
 

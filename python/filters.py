@@ -1,49 +1,22 @@
 from __future__ import unicode_literals
 
 import elect
-import os.path
-
-CHARSET = 'utf-8'
 
 
-class FilenameEntry(elect.Entry):
-    def __init__(self, value):
-        self.original_value = value
-        self.value = os.path.basename(value)
+def filter(items, pat, **options):
+    algorithm = options.pop('algorithm', 'fuzzy')
 
-    def translate(self, spans):
-        offset = len(self.original_value) - len(self.value)
-        spans = ((start + offset, end + offset) for start, end in spans)
-        return super(FilenameEntry, self).translate(spans)
-
-
-class FirstNonTab(elect.Entry):
-    def __init__(self, value):
-        self.original_value = value
-        self.value = value.split('\t')[0]
-
-
-class UntilLastTabTransform(elect.Entry):
-    def __init__(self, v):
-        self.original_value = v
-        self.value = \
-            '\t'.join(v.split('\t')[:-1]).strip('\t') if '\t' in v else v
-
-
-def filter(items, pat, limit, mmode, isregex):
-    limit = int(limit)
-    isregex = int(isregex)
-
-    if isregex:
+    if algorithm == 're':
         filter = elect.filter_re
-        patterns = [pat]
-    elif ' ' not in pat and '\\' not in pat:
-        # Optimization for the common case of a single pattern:  Don't parse
-        # it, since it doesn't contain any special character.
-        filter = elect.filter_fuzzy
-        patterns = [pat]
+        options.setdefault('ignore_bad_patterns', True)
     else:
         filter = elect.filter_fuzzy
+
+    if ' ' not in pat and '\\' not in pat:
+        # Optimization for the common case of a single pattern:  Don't parse
+        # it, since it doesn't contain any special character.
+        patterns = [pat]
+    else:
         it = iter(pat.lstrip())
         c = next(it, None)
 
@@ -84,14 +57,6 @@ def filter(items, pat, limit, mmode, isregex):
                 pattern.append(c)
             c = next(it, None)
 
-        if len(patterns) > 1 and not patterns[-1]:
-            del patterns[-1]
+        patterns = [''.join(p) for p in patterns if p]
 
-    transform = dict(
-        fullline=elect.Entry,
-        filenameonly=FilenameEntry,
-        firstnontab=FirstNonTab,
-        untillasttab=UntilLastTabTransform,
-    )[mmode.replace('-', '')]
-
-    return filter(items, limit=limit, transform=transform, *patterns)
+    return filter(items, *patterns, **options)

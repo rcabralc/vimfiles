@@ -40,106 +40,131 @@ if !has('gui_running')
   let g:monokai_transparent_background = 1
 endif
 
-" CtrlP
-" =====
+" Homebrewed fuzzy finder in Qt
+" =============================
+"
+" Qt was choosen because:
+"
+"   1. I could do it from Python, and I feel confortable programming in this
+"      language, which is a lot better than VimL.
+"   2. I could use QtWebKit, and hence HTML, CSS and JavaScript to build the
+"      UI, in which, again, I feel a lot more confortable than in VimL.
+"   3. I like Qt, mainly because of KDE, and wanted to explore it.
+"
+" Despite the fact that it's done in Qt, it also works in console Vim.
+"
+" By now, launching a Qt process everytime a file or a buffer needs to be
+" opened may be too slow when the memory is low, because Python will need to
+" load lots of megabytes of modules/bindings/actual lib code from Qt, just to
+" render a window, and the kernel will have to make room for that by swapping
+" stuff out to the disk...  This is not optimal.  But this was the simplest
+" (since my skills in VimL are far from good, and I don't like it) way to get
+" it done.
+"
+" I see two possible solutions for this:
+"
+"   1. Use a daemon process (there's some outline in the Python module's doc
+"      about this).  The daemon should be the heaviest part of this fuzzy
+"      finder, so it'll load once and forever.  Further requests will only
+"      bring it up, which can be a bit slow if the code got swapped to disk,
+"      but still it's likely to be faster than the current implementation,
+"      since it may happen that just some of its pages got swapped, while
+"      others may be around in physical RAM.  Also, if may files are being
+"      constantly opened through this fuzzy finder, the kernel is likely to
+"      delay as much as possible the swapping of these pages.
+"   2. Don't use Qt, just reimplement all of this functionality in a Vim split
+"      window (just like CtrlP), but this requires some VimL skills.
 
-let g:ctrlp_open_new_file = 'r'
-let g:ctrlp_default_input = 1
+" Find a file and pass it to cmd
+function! FuzzyFileOpen(cmd)
+    let dirname = resolve(expand('%:p:h'))
+    let gittoplevel = system('cd ' . dirname . ' && git rev-parse --show-toplevel 2>/dev/null')
+    let gittoplevel = substitute(gittoplevel, '\n$', '', '')
 
-let g:ctrlp_user_command = {
-    \ 'types': {
-        \ 1: ['.git', 'cd %s && git ls-files -co --exclude-standard | uniq'],
-        \ 2: ['.hg', 'hg --cwd %s status -numac -I . $(hg root)'],
-        \ },
-    \ 'fallback': 'find %s -type f'
-    \ }
+    if empty(gittoplevel)
+        let initial = ''
+        let toplevel = dirname
+        let filescmd = 'cd ' .
+                    \ shellescape(toplevel) .
+                    \ ' && ag . -i --nocolor --nogroup --hidden '.
+                    \ '--ignore .git '.
+                    \ '--ignore .hg '.
+                    \ '--ignore .DS_Store '.
+                    \ '-g ""'
+    else
+        let toplevel = gittoplevel
+        let gittoplevel = s:regexescape(gittoplevel)
+        let initial = substitute(dirname, '^' . gittoplevel, '', '')
+        let initial = substitute(initial, '^/', '', '')
 
-if executable('ag')
-    set grepprg=ag\ --nogroup\ --nocolor
-    let g:ctrlp_user_command['fallback'] = 'ag %s -i --nocolor --nogroup --hidden '.
-        \ '--ignore .git '.
-        \ '--ignore .hg '.
-        \ '--ignore .DS_Store '.
-        \ '-g ""'
-endif
+        let filescmd = 'cd ' .
+            \ shellescape(toplevel) .
+            \ ' && git ls-files -co --exclude-standard | uniq'
+    endif
 
-let g:ctrlp_show_hidden = 1
-let g:ctrlp_max_files = 0
-let g:ctrlp_extensions = ['line']
+    let menucmd = filescmd .
+        \ ' | python -u ~/.vim/python/menu.py --limit 20 ' .
+        \ '--completion-sep "/" ' .
+        \ '--history-key ' . shellescape(toplevel)
 
-py << PYTHON
-import sys, os
-sys.path[0:0] = [os.path.join(os.path.expanduser('~'), '.vim', 'python')]
-PYTHON
+    if !empty(initial)
+        let menucmd = menucmd . " --input " . shellescape(initial) . '/'
+    endif
 
-let g:ctrlp_match_func = { 'match': 'CustomCtrlpMatch' }
+    let menucmd = menucmd . " 2>/dev/null"
+    let fname = Chomp(system(menucmd))
 
-fu! CustomCtrlpMatch(items, pat, limit, mmode, ispath, crfile, regex)
-    let l:results = []
-    let l:matchlist = []
+    if empty(fname)
+        return
+    endif
 
-py << PYTHON
-import sys
-import vim
-import ctrlp
+    execute a:cmd . " " .  resolve(toplevel . '/' . fname)
+endfunction
+map <C-f> :call FuzzyFileOpen('e')<CR>
 
-items = set(vim.eval('a:items'))
-pat = vim.eval('a:pat')
-limit = int(vim.eval('a:limit')) + 10
-mmode = vim.eval('a:mmode')
-ispath = vim.eval('a:ispath')
-crfile = vim.eval('a:crfile')
-isregex = vim.eval('a:regex')
+function! FuzzyBufferReOpen(cmd)
+    let tempfile = tempname()
 
-results = vim.bindeval('l:results')
-matchlist = vim.bindeval('l:matchlist')
+    execute "redir >" . tempfile
+    silent ls
+    redir END
 
-if ispath:
-    items.discard(crfile)
+    let menucmd = 'cat ' . tempfile .
+        \ ' | grep "." ' .
+        \ ' | sed "s/^.*\"\([^\"]*\)\".*\$/\\1/" ' .
+        \ ' | python -u ~/.vim/python/menu.py --limit 100 2>/dev/null'
 
-matches = list(ctrlp.filter(items, pat, limit, mmode, isregex))
+    let fname = Chomp(system(menucmd))
 
-results.extend([m.original_value for m in matches])
-matchlist.extend([m.spans for m in matches]);
-PYTHON
+    call system('rm ' . tempfile)
 
-    call s:highlight(l:matchlist)
+    if empty(fname)
+        return
+    endif
 
-    return l:results
-endfu
+    execute a:cmd . " " .  fname
+endfunction
+map <C-b> :call FuzzyBufferReOpen('e')<CR>
 
-" call unite#custom#source('file,file/new,buffer,file_rec', 'matchers', 'matcher_fuzzy')
-" nnoremap <C-p> :Unite -start-insert file_rec/async<CR>
+" Strip the newline from the end of a string
+function! Chomp(str)
+    return substitute(a:str, '\n$', '', '')
+endfunction
 
-" The function below as stolen from
-" https://github.com/JazzCore/ctrlp-cmatcher/blob/master/autoload/matcher.vim
-" Copyright 2010-2012 Wincent Colaiuta. All rights reserved.
-fu! s:escapechars(chars)
+" Borrowed from somewhere in Internet, lost reference...
+fu! s:regexescape(str)
+  let str = a:str
+
   if exists('+ssl') && !&ssl
-    cal map(a:chars, 'escape(v:val, ''\'')')
+    let str = escape(str, '\')
   en
+
   for each in ['^', '$', '.']
-    cal map(a:chars, 'escape(v:val, each)')
+    let str = escape(str, each)
   endfo
 
-  return a:chars
+  return str
 endfu
-
-fu! s:highlight(matchlist)
-    call clearmatches()
-
-    for i in range(len(a:matchlist))
-        for j in range(len(a:matchlist[i]))
-            let highlight = a:matchlist[i][j]
-
-            let beginning = s:escapechars(highlight['beginning'])
-            let middle = '\zs'.s:escapechars(highlight['middle']).'\ze'
-            let ending = s:escapechars(highlight['ending'])
-
-            call matchadd('CtrlPMatch', '\c'.beginning.middle.ending)
-        endfor
-    endfor
-endf
 
 
 " Syntastic
