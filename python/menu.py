@@ -30,10 +30,6 @@ Options:
         directory, it'll remember the previous input, allowing the user to
         reuse it.
 
-    --preformatted
-        Options should have whitespace preserved (that is, not collapsed).  A
-        monospaced font is used for the entries.
-
     --daemonize
         Create a daemon process if none exists, bring its window to the top and
         connect to it.
@@ -470,7 +466,6 @@ def run(items, algorithm_name, input=None, **kw):
 
     history_path = os.path.join(basedir, 'history.json')
     history_key = kw.pop('history_key', None)
-    preformatted = kw.pop('preformatted', False)
 
     if algorithm_name not in algorithms.keys():
         exit('Unknown algorithm: %r' % algorithm_name)
@@ -486,9 +481,7 @@ def run(items, algorithm_name, input=None, **kw):
     view = MainView()
     frame = view.page().mainFrame()
 
-    view.setHtml(interpolate_html(html, config,
-                                  input=input,
-                                  preformatted=preformatted))
+    view.setHtml(interpolate_html(html, config, input=input))
     frame.evaluateJavaScript(jquery_source)
     frame.evaluateJavaScript(frontend_source)
 
@@ -506,12 +499,12 @@ def run(items, algorithm_name, input=None, **kw):
     return app.exec_()
 
 
-def interpolate_html(template, config, input='', preformatted=False):
+def interpolate_html(template, config, input=''):
     for key, value in config.get('theme', {}).items():
         template = template.replace('%(' + key + ')s', value)
     return template.\
         replace('%(initial-value)s', input).\
-        replace('%(entries-class)s', 'preformatted' if preformatted else '')
+        replace('%(entries-class)s', '')
 
 
 def main():
@@ -527,7 +520,6 @@ def main():
         limit=limit,
         sep=args['--completion-sep'],
         history_key=args['--history-key'],
-        preformatted=args['--preformatted'],
         debug=args['--debug']
     )
 
