@@ -30,7 +30,7 @@ Options:
         directory, it'll remember the previous input, allowing the user to
         reuse it.
 
-    --daemonize
+    -d, --daemonize
         Create a daemon process if none exists, bring its window to the top and
         connect to it.
 
