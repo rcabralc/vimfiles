@@ -4,9 +4,6 @@ Usage:
     menu [options]
 
 Options:
-    -a, --algorithm ALGORITHM
-        Choose the algorithm (`fuzzy' or `re').  [Default: fuzzy].
-
     -l, --limit LIMIT
         Limit output up to LIMIT results.  Use a negative number to not limit
         output.
@@ -63,7 +60,6 @@ Key bindings:
 """
 
 from docopt import docopt
-from itertools import cycle
 from PyQt5.QtCore import QObject, pyqtSlot
 from PyQt5.QtWebKitWidgets import QWebView
 from PyQt5.QtWidgets import QApplication
@@ -133,13 +129,9 @@ class Mode:
 
 MAX_HISTORY_ENTRIES = 100
 
-input_mode = Mode('input', 'I')
-history_mode = Mode('history', 'H')
-
-fuzzy_algorithm = Mode('fuzzy', 'F:')
-regexp_algorithm = Mode('re', 'R:')
-algorithms = dict((a.name, a) for a in [fuzzy_algorithm, regexp_algorithm])
-iter_algorithms = cycle(algorithms.values())
+insert_mode = Mode('insert', '>>>')
+normal_mode = Mode('normal', '---')
+history_mode = Mode('history', '<<<')
 
 
 class Menu:
@@ -188,18 +180,6 @@ class Menu:
         return self.input
 
     @property
-    def algorithm(self):
-        return self._algorithm
-
-    @algorithm.setter
-    def algorithm(self, value):
-        self._algorithm = value
-        self.frontend.prompt = value.prompt
-
-    def switch_algorithm(self):
-        self.algorithm = next(iter_algorithms)
-
-    @property
     def input(self):
         return self._input
 
@@ -207,7 +187,6 @@ class Menu:
     def input(self, value):
         self._input = value
         self.results = filter(self.all_items, value,
-                              algorithm=self.algorithm.name,
                               incremental=True,
                               debug=self.debug)
 
@@ -351,15 +330,6 @@ class Frontend:
     def select(self, index):
         self._evaluate('frontend.select(%d)' % index)
 
-    @property
-    def prompt(self):
-        return self._prompt
-
-    @prompt.setter
-    def prompt(self, value):
-        self._prompt = value
-        self._evaluate("frontend.switchPrompt(%s)" % json.dumps(value))
-
     def over_limit(self):
         self._evaluate("frontend.overLimit()")
 
@@ -370,6 +340,7 @@ class Frontend:
         self._evaluate("frontend.updateCounters(%d, %d)" % (selected, total))
 
     def report_mode(self, mode):
+        self._evaluate("frontend.switchPrompt(%s)" % json.dumps(mode.prompt))
         self._evaluate("frontend.reportMode(%s)" % json.dumps(mode.name))
 
     def _evaluate(self, js):
@@ -395,7 +366,7 @@ class Input:
 
     def enter(self, value):
         self.value = value
-        self.switch_mode(input_mode)
+        self.switch_mode(insert_mode)
 
     def switch_mode(self, mode):
         if self._mode is not mode:
@@ -438,7 +409,7 @@ class JSBridge(QObject):
     def enter(self, input):
         # self.input.enter(input)
         self.menu.input = input
-        self.mode_handler.switch(input_mode)
+        self.mode_handler.switch(insert_mode)
 
     @pyqtSlot()
     def acceptSelected(self):
@@ -477,13 +448,8 @@ class JSBridge(QObject):
 
     @pyqtSlot(result=str)
     def complete(self):
-        self.mode_handler.switch(input_mode)
+        self.mode_handler.switch(insert_mode)
         return self.menu.complete()
-
-    @pyqtSlot()
-    def switchAlgorithm(self):
-        self.menu.switch_algorithm()
-        self.menu.input = self.menu.input
 
     @pyqtSlot()
     def dismiss(self):
@@ -501,7 +467,7 @@ class MainView(QWebView):
         return r
 
 
-def run(items, algorithm_name, input=None, **kw):
+def run(items, input=None, **kw):
     basedir = os.path.dirname(__file__)
     with open(os.path.join(basedir, 'menu.html')) as f:
         html = f.read()
@@ -518,15 +484,12 @@ def run(items, algorithm_name, input=None, **kw):
     history_path = os.path.join(basedir, 'history.json')
     history_key = kw.pop('history_key', None)
 
-    if algorithm_name not in algorithms.keys():
-        exit('Unknown algorithm: %r' % algorithm_name)
-    algorithm = algorithms[algorithm_name]
     input = input or ''
 
     app = QApplication(sys.argv)
     menu = Menu(items, **kw)
     history = History(history_path, history_key)
-    mode_handler = ModeHandler(menu, input_mode)
+    mode_handler = ModeHandler(menu, insert_mode)
 
     bridge = JSBridge(app, menu, history, mode_handler)
     view = MainView()
@@ -537,12 +500,11 @@ def run(items, algorithm_name, input=None, **kw):
     frame.evaluateJavaScript(frontend_source)
 
     frontend = Frontend(frame, bridge)
-    frontend.report_mode(input_mode)
+    frontend.report_mode(insert_mode)
 
     menu.frontend = frontend
     mode_handler.frontend = frontend
 
-    menu.algorithm = algorithm
     menu.input = input
 
     view.show()
@@ -566,7 +528,6 @@ def main():
 
     return run(
         sys.stdin.readlines(),
-        args['--algorithm'] or 'fuzzy',
         input=args['--input'],
         limit=limit,
         sep=args['--completion-sep'],

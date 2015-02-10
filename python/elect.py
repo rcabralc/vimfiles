@@ -1,7 +1,7 @@
 """Elect.
 
 Usage:
-    elect [options] ALGORITHM PATTERN ...
+    elect [options] PATTERN ...
 
 Filter lines from standard input according to one or more patterns, and print
 them to standard output.
@@ -9,33 +9,40 @@ them to standard output.
 Results are sorted by length of matched portion (average for more than one
 pattern), followed by length of item.
 
-
 Arguments:
-    ALGORITHM  The algorithm to use (also affects how pattern is interpreted).
-               `re' will treat PATTERNs as regular expressions, while `fuzzy'
-               will treat them as fuzzy substrings.
     PATTERN    The pattern string (there can be multiple ones).
 
-
 Options:
-    -h, --help     Show this.
-
     -l LIMIT, --limit=LIMIT
-                   Limit output up to LIMIT results.
+        Limit output up to LIMIT results.
 
     --sort-limit=LIMIT
-                   Sort output only if the number of results is below LIMIT.
-                   Set to zero to not sort the output.  Negative numbers are
-                   silently ignored, as if there were no limit.  There's no
-                   default value, so output is always sorted by default.
+        Sort output only if the number of results is below LIMIT.  Set to zero
+        to not sort the output.  Negative numbers are silently ignored, as if
+        there were no limit.  There's no default value, so output is always
+        sorted by default.
 
-    -r, --reverse  Reverse the returning order of candidates.
+    -r, --reverse
+        Reverse the returning order of candidates.
 
     --ignore-bad-patterns
-                   If a regular expression pattern is not valid, silently
-                   ignore it.  It's used only if the algorithm is `re'.
+        If a regular expression pattern is not valid, silently ignore it.
 
-    -d --debug     Print additional information to STDERR.
+    -d --debug
+        Print additional information to STDERR.
+
+    -h, --help
+        Show this.
+
+Patterns:
+    The interpretation of the pattern is done accordingly to its initial
+    characters (which is not part of the pattern):
+
+        @                   Regular expression.
+        =                   Exact match.
+        !=                  Exact inverse match.
+        !                   Non-exact fuzzy inverse match.
+        <anything else>     Fuzzy match.
 """
 
 from __future__ import division
@@ -54,96 +61,6 @@ except NameError:
     PY3 = True
 
 CHARSET = 'utf-8'
-
-
-def debug(fn):
-    sys.stderr.write(fn() + "\n")
-
-
-class Term(object):
-    matched = False
-
-    def __init__(self, original_value, value, patterns):
-        self.original_value = original_value
-        self.value = value
-
-    def translate(self):
-        translation = []
-
-        for start, end in self.spans():
-            translation.append(dict(
-                beginning=self.original_value[:start],
-                middle=self.original_value[start:end],
-                ending=self.original_value[end:]
-            ))
-
-        return translation
-
-    def translate_merging(self):
-        translation = []
-        last_end = 0
-
-        for start, end in sorted(self.spans()):
-            translation.append(dict(
-                nohl=self.original_value[last_end:start],
-                hl=self.original_value[start:end]
-            ))
-            last_end = end
-
-        translation.append(dict(
-            nohl=self.original_value[last_end:],
-            hl=''
-        ))
-
-        return translation
-
-
-class RegexTerm(Term):
-    def __init__(self, original_value, value, patterns):
-        super(RegexTerm, self).__init__(original_value, value, patterns)
-
-        self._matches = []
-        self.rank = 0
-
-        value = self.value
-        l = len(value)
-        if not patterns:
-            self.rank = l
-            self.matched = True
-            return
-
-        matches = [m for m in (pattern.search(value) for pattern in patterns)
-                   if m is not None]
-
-        if len(matches) < len(patterns):
-            return
-
-        self._matches = matches
-        self.rank += sum(
-            (end - start) * 10000 + l
-            for start, end in (m.span() for m in matches)
-        )
-        self.matched = True
-
-    def spans(self):
-        current_span = []
-        spans = [current_span]
-
-        overlaps = lambda s1, s2: s1[0] <= s2[1] and s2[0] <= s1[1]
-
-        for match in self._matches:
-            start, end = match.span()
-
-            if not current_span:
-                current_span.extend((start, end))
-            elif overlaps((start, end), current_span):
-                current_span[0] = min((current_span[0], start))
-                current_span[1] = max((current_span[1], end))
-            else:
-                current_span = [start, end]
-                spans.append(current_span)
-
-        return (tuple(span) for span in spans if span)
 
 
 class UnhighlightedMatch(object):
@@ -165,20 +82,20 @@ class UnhighlightedMatch(object):
 
 class ExactMatch(object):
     def __init__(self, value, pattern):
-        self.value = value
-        self.pattern = pattern
-        self.pattern_length = self.length = pattern.length
+        self._value = value
+        self._pattern = pattern
+        self._pattern_length = self.length = pattern.length
 
     @property
     def indices(self):
         indices = []
 
-        string = self.value
-        if self.pattern.ignore_case:
+        string = self._value
+        if self._pattern.ignore_case:
             string = string.lower()
 
-        current = string.find(self.pattern.pattern)
-        for index in range(current, current + self.pattern_length):
+        current = string.find(self._pattern.value)
+        for index in range(current, current + self._pattern_length):
             indices.append(index)
 
         return frozenset(indices)
@@ -186,22 +103,22 @@ class ExactMatch(object):
 
 class FuzzyMatch(object):
     def __init__(self, match, pattern):
-        self.match = match
-        self.pattern = pattern
-        self.pattern_length = pattern.length
+        self._match = match
+        self._pattern = pattern
+        self._pattern_length = pattern.length
         self.length = len(match.groups()[0])
 
     @property
     def indices(self):
         indices = []
 
-        string = self.match.string
-        if self.pattern.ignore_case:
+        string = self._match.string
+        if self._pattern.ignore_case:
             string = string.lower()
 
-        pattern = self.pattern.pattern
-        pattern_length = self.pattern_length
-        current = self.match.start()
+        pattern = self._pattern.value
+        pattern_length = self._pattern_length
+        current = self._match.start()
         pos = 0
 
         find = string.find
@@ -215,7 +132,15 @@ class FuzzyMatch(object):
         return frozenset(indices)
 
 
-class FuzzyIndices(object):
+class RegexMatch(object):
+    def __init__(self, match):
+        self._match = match
+        start, end = match.span()
+        self.length = end - start
+        self.indices = range(start, end)
+
+
+class Streaks(object):
     def __init__(self, indices):
         self.indices = set(indices)
 
@@ -243,19 +168,13 @@ class FuzzyIndices(object):
 
 
 class Pattern(object):
+    incremental = False
+
     def __init__(self, pattern):
         self.value = pattern
-        pattern_lower = pattern.lower()
 
-        if pattern_lower:
-            if pattern_lower != pattern:
-                input = self.pattern = pattern
-                self.ignore_case = False
-            else:
-                input = self.pattern = pattern_lower
-                self.ignore_case = True
-
-            self.length = len(input)
+        if pattern:
+            self.length = len(pattern)
         else:
             self.length = 0
             self.best_match = UnhighlightedMatch
@@ -270,19 +189,41 @@ class Pattern(object):
         return self.length > 0
 
 
-class ExactPattern(Pattern):
+class SmartCasePattern(Pattern):
+    def __init__(self, pattern):
+        super(SmartCasePattern, self).__init__(pattern)
+
+        pattern_lower = pattern.lower()
+
+        if pattern_lower != pattern:
+            self.value = pattern
+            self.ignore_case = False
+        else:
+            self.value = pattern_lower
+            self.ignore_case = True
+
+
+class ExactPattern(SmartCasePattern):
+    incremental = True
+
     def best_match(self, value):
-        if self.pattern not in value:
+        if self.ignore_case:
+            value = value.lower()
+
+        if self.value not in value:
             return
+
         return ExactMatch(value, self)
 
 
-class FuzzyPattern(Pattern):
+class FuzzyPattern(SmartCasePattern):
+    incremental = True
+
     def __init__(self, pattern):
         super(FuzzyPattern, self).__init__(pattern)
 
         if self.length > 0:
-            input = self.pattern
+            input = self.value
 
             self._finditer = re.compile(
                 '(?%(flags)su)(?=(%(cooked)s))' % dict(
@@ -323,15 +264,39 @@ class InverseFuzzyPattern(FuzzyPattern):
 
 class InverseExactPattern(ExactPattern):
     def best_match(self, value):
-        if self.pattern in value:
+        if self.ignore_case:
+            value = value.lower()
+
+        if self.value in value:
             return
+
         return UnhighlightedMatch(value)
 
 
-class FuzzyTerm(Term):
-    def __init__(self, original_value, value, patterns):
-        super(FuzzyTerm, self).__init__(original_value, value, patterns)
+class RegexPattern(Pattern):
+    def __init__(self, pattern, ignore_bad_patterns=False):
+        if not pattern:
+            self.best_match = UnhighlightedMatch
+        else:
+            try:
+                self._re = re.compile('(?iu)' + pattern)
+            except sre_constants.error:
+                if not ignore_bad_patterns:
+                    raise
+                self.best_match = UnhighlightedMatch
 
+    def best_match(self, value):
+        match = self._re.search(value)
+        if match is not None:
+            return RegexMatch(match)
+
+
+class Term(object):
+    matched = False
+
+    def __init__(self, original_value, value, patterns):
+        self.original_value = original_value
+        self.value = value
         self._matches = []
         for pattern in patterns:
             m = pattern.best_match(value)
@@ -343,21 +308,61 @@ class FuzzyTerm(Term):
 
     @property
     def rank(self):
-        l = len(self.value)
-        return sum(m.length * 10000 + l for m in self._matches)
+        if getattr(self, '_rank', None) is not None:
+            return self._rank
+
+        if not self.matched:
+            rank = float('+inf')
+        elif not self.value:
+            rank = len(self.value)
+        else:
+            l = len(self.value)
+            rank = sum(m.length * 10000 + l for m in self._matches)
+
+        self._rank = rank
+        return self._rank
 
     def spans(self):
-        indiceses = functools.reduce(
-            lambda acc, indices: acc.merge(indices),
-            (FuzzyIndices(m.indices) for m in self._matches)
+        streaks = functools.reduce(
+            lambda acc, streaks: acc.merge(streaks),
+            (Streaks(m.indices) for m in self._matches)
         )
-        for start, end in indiceses:
+        for start, end in streaks:
             yield (start, end)
+
+    def translate(self):
+        translation = []
+
+        for start, end in self.spans():
+            translation.append(dict(
+                beginning=self.original_value[:start],
+                middle=self.original_value[start:end],
+                ending=self.original_value[end:]
+            ))
+
+        return translation
+
+    def translate_merging(self):
+        translation = []
+        last_end = 0
+
+        for start, end in sorted(self.spans()):
+            translation.append(dict(
+                nohl=self.original_value[last_end:start],
+                hl=self.original_value[start:end]
+            ))
+            last_end = end
+
+        translation.append(dict(
+            nohl=self.original_value[last_end:],
+            hl=''
+        ))
+
+        return translation
 
 
 class Contest(object):
-    def __init__(self, term_factory, *patterns):
-        self.term_factory = term_factory
+    def __init__(self, *patterns):
         self.patterns = patterns
 
     def elect(self, candidates, **kw):
@@ -381,7 +386,7 @@ class Contest(object):
 
     def _process_terms(self, candidates, transform):
         patterns = self.patterns
-        factory = self.term_factory
+        factory = Term
         entries = (c for c in candidates if c)
 
         if transform:
@@ -410,45 +415,53 @@ class Result(object):
                     merged_spans=self.term.translate_merging())
 
 
-def filter_re(candidates, *patterns, **options):
-    re_patterns = []
-    patterns = [p for p in patterns if p]
-    ignore_bad_patterns = options.pop('ignore_bad_patterns', False)
-
-    for pattern in patterns:
-        try:
-            regexp = re.compile('(?iu)' + pattern)
-        except sre_constants.error:
-            if not ignore_bad_patterns:
-                raise
-        else:
-            re_patterns.append(regexp)
-
-    return Contest(RegexTerm, *re_patterns).elect(candidates, **options)
-
-
-def make_fuzzy_pattern(pattern):
-    if pattern.startswith("!'"):
+def make_pattern(pattern, ignore_bad_re_patterns=False):
+    if pattern.startswith("!="):
         return InverseExactPattern(pattern[2:])
     elif pattern.startswith('!'):
         return InverseFuzzyPattern(pattern[1:])
-    elif pattern.startswith("'"):
+    elif pattern.startswith("="):
         return ExactPattern(pattern[1:])
+    elif pattern.startswith("@"):
+        return RegexPattern(pattern[1:],
+                            ignore_bad_patterns=ignore_bad_re_patterns)
     return FuzzyPattern(pattern)
 
 
-fuzzy_cache = {}
+incremental_cache = {}
 
 
-def filter_fuzzy(candidates, *patterns, **options):
-    all_patterns = [make_fuzzy_pattern(''.join(p)) for p in patterns]
-    contest = Contest(FuzzyTerm, *all_patterns)
+def filter_entries(candidates, *patterns, **options):
+    ignore_bad_patterns = options.pop('ignore_bad_patterns', False)
+
+    patterns = [
+        make_pattern(''.join(p), ignore_bad_re_patterns=ignore_bad_patterns)
+        for p in patterns
+    ]
+    contest = Contest(*patterns)
+
+    def full_filter(items):
+        return contest.elect(items, **options)
 
     incremental = options.pop('incremental', False)
-    negative_patterns = [
-        p for p in all_patterns
-        if isinstance(p, (InverseFuzzyPattern, InverseExactPattern))
-    ]
+    debug = options.get('debug', False)
+
+    if incremental:
+        return incremental_filter(candidates, patterns, full_filter,
+                                  debug=debug)
+    else:
+        return full_filter(candidates)
+
+
+def incremental_filter(candidates, patterns, full_filter, debug=False):
+    non_incremental_patterns = [p for p in patterns if not p.incremental]
+    if non_incremental_patterns or not patterns:
+        return full_filter(candidates)
+
+    if debug:
+        debug = lambda fn: sys.stderr.write(fn() + "\n")
+    else:
+        debug = lambda fn: None
 
     def candidates_from_cache(patterns):
         def broaden(patterns):
@@ -469,46 +482,35 @@ def filter_fuzzy(candidates, *patterns, **options):
 
         direct = True
         for p in possibilities(patterns):
-            from_cache = fuzzy_cache.get(p, None)
+            from_cache = incremental_cache.get(p, None)
             if from_cache is not None:
                 return (direct, p, from_cache)
             direct = False
 
         return (False, (), [])
 
-    def update_candidates_from_cache(patterns, results):
+    def update_candidates_from_cache(pattern_values, results):
         results = list(results)
-        fuzzy_cache[tuple(patterns)] = results
+        incremental_cache[tuple(pattern_values)] = results
         return results
 
-    if options.get('debug', False):
-        _debug = debug
+    pattern_values = tuple(p.value for p in patterns)
+    direct, hit, results = candidates_from_cache(pattern_values)
+
+    if hit:
+        debug(lambda: "cache: hit on {}\n".format(hit))
+        debug(lambda: "cache size: {}\n".format(len(results)))
+
+        if direct:
+            debug(lambda: "using result directly from cache\n")
+            return results
+
+        results = full_filter([r.original_value for r in results])
     else:
-        _debug = lambda f: None
+        debug(lambda: "cache: miss, patterns: {}\n".format(pattern_values))
+        results = full_filter(candidates)
 
-    if all_patterns and incremental and not negative_patterns:
-        pattern_set = tuple(p.value for p in all_patterns)
-        direct, hit, results = candidates_from_cache(pattern_set)
-
-        if hit:
-            _debug(lambda: "cache: hit on {}\n".format(hit))
-            _debug(lambda: "cache size: {}\n".format(len(results)))
-
-            if direct:
-                _debug(lambda: "using result directly from cache\n")
-                return results
-
-            results = contest.elect(
-                [r.original_value for r in results],
-                **options
-            )
-        else:
-            _debug(lambda: "cache: miss, patterns: {}\n".format(pattern_set))
-            results = contest.elect(candidates, **options)
-
-        return update_candidates_from_cache(pattern_set, results)
-
-    return contest.elect(candidates, **options)
+    return update_candidates_from_cache(pattern_values, results)
 
 
 def main():
@@ -517,13 +519,9 @@ def main():
     args = docopt(__doc__)
 
     patterns = args['PATTERN']
-    algorithm = args['ALGORITHM']
     limit = args['--limit']
     sort_limit = args['--sort-limit']
     options = {}
-
-    if algorithm not in ('re', 'fuzzy'):
-        exit('Unknown algorithm: %r' % algorithm)
 
     if limit is not False and limit is not None:
         options['limit'] = int(limit)
@@ -544,14 +542,7 @@ def main():
         patterns = [p.decode(CHARSET) for p in patterns]
         entries = (line.decode(CHARSET) for line in entries)
 
-    if algorithm == 're':
-        f = filter_re
-    elif algorithm == 'fuzzy':
-        f = filter_fuzzy
-    else:
-        raise ValueError("Unknown algorithm: %r" % algorithm)
-
-    results = f(entries, *patterns, **options)
+    results = filter_entries(entries, *patterns, **options)
 
     if args['--reverse']:
         results = reversed(results)

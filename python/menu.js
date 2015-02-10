@@ -18,9 +18,6 @@ window.backend = (function() {
     acceptSelected: function() {
       console.log('tell backend to accept selected item');
     },
-    switchAlgorithm: function() {
-      console.log('tell backend to switch algorithm');
-    },
     complete: function() {
       console.log('tell backend to complete current input');
     },
@@ -70,7 +67,6 @@ window.frontend = (function() {
   keyDownHandlers['Control-K'] = function() { backend.prev(); };
   keyDownHandlers['Control-Y'] = function() { backend.acceptInput(); };
   keyDownHandlers['Control-U'] = function() { $input.val('').change(); };
-  keyDownHandlers['Control-R'] = function() { backend.switchAlgorithm(); };
   keyDownHandlers['Control-W'] = function() { sendCtrlBs($input); };
 
   return {
