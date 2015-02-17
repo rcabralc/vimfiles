@@ -98,7 +98,7 @@ endif
 "      bring it up, which can be a bit slow if the code got swapped to disk,
 "      but still it's likely to be faster than the current implementation,
 "      since it may happen that just some of its pages got swapped, while
-"      others may be around in physical RAM.  Also, if may files are being
+"      others may be around in physical RAM.  Also, if many files are being
 "      constantly opened through this fuzzy finder, the kernel is likely to
 "      delay as much as possible the swapping of these pages.
 "   2. Don't use Qt, just reimplement all of this functionality in a Vim split
