@@ -72,7 +72,10 @@ endif
 " Homebrewed fuzzy finder in Qt
 " =============================
 "
-" Qt was choosen because:
+" A fuzzy finder that runs outside the Vim process, thus not succeptible to
+" slow syntax highlighting.  This could be a curses-based application, or a
+" graphical one (in GTK or Qt or something else).  A graphical application
+" suits better for use with GVim.  Qt was choosen because:
 "
 "   1. I could do it from Python, and I feel confortable programming in this
 "      language, which is a lot better than VimL.
@@ -102,7 +105,8 @@ endif
 "      constantly opened through this fuzzy finder, the kernel is likely to
 "      delay as much as possible the swapping of these pages.
 "   2. Don't use Qt, just reimplement all of this functionality in a Vim split
-"      window (just like CtrlP), but this requires some VimL skills.
+"      window (just like CtrlP), but this requires some VimL skills and could
+"      be slow because the syntax highlighting of Vim would play a role then.
 
 " Find a file and pass it to cmd
 function! FuzzyFileOpen(cmd)
