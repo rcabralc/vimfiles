@@ -459,7 +459,7 @@ def incremental_filter(candidates, patterns, full_filter, debug=False):
         return full_filter(candidates)
 
     if debug:
-        debug = lambda fn: sys.stderr.write(fn() + "\n")
+        debug = lambda fn: sys.stderr.write(fn())
     else:
         debug = lambda fn: None
 
