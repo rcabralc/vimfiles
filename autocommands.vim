@@ -96,9 +96,6 @@ augroup Misc
     autocmd InsertLeave *.md,*.rst,*.human call MatchTechWordsToAvoid()
     autocmd BufWinLeave *.md,*.rst,*.human call clearmatches()
 
-    " <C-k> interferes with the mapping to switch to the window above.
-    " autocmd FileType vimshell nunmap <buffer> <C-k>
-
     " Make text wrap.
     autocmd FileType qf setlocal wrap
 augroup END
