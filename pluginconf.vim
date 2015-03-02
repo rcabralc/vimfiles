@@ -145,13 +145,13 @@ function! FuzzyFileOpen(cmd)
     endif
 
     let menucmd = menucmd . " 2>/dev/null"
-    let fname = Chomp(system(menucmd))
+    let fname = s:chomp(system(menucmd))
 
     if empty(fname)
         return
     endif
 
-    execute a:cmd . " " .  resolve(toplevel . '/' . fname)
+    execute a:cmd . " " .  s:makepath(resolve(toplevel . '/' . fname))
 endfunction
 map <C-f> :call FuzzyFileOpen('e')<CR>
 
@@ -167,7 +167,7 @@ function! FuzzyBufferReOpen(cmd)
         \ ' | sed "s/^.*\"\([^\"]*\)\".*\$/\\1/" ' .
         \ ' | python -u ~/.vim/python/menu.py --limit 100 2>/dev/null'
 
-    let fname = Chomp(system(menucmd))
+    let fname = s:chomp(system(menucmd))
 
     call system('rm ' . tempfile)
 
@@ -180,8 +180,18 @@ endfunction
 map <C-b> :call FuzzyBufferReOpen('e')<CR>
 
 " Strip the newline from the end of a string
-function! Chomp(str)
+function! s:chomp(str)
     return substitute(a:str, '\n$', '', '')
+endfunction
+
+function! s:makepath(file)
+    let basedir = []
+python <<EOP
+import os.path, vim
+vim.bindeval('basedir').extend([os.path.dirname(vim.eval('a:file'))])
+EOP
+    call system('mkdir -p ' . shellescape(basedir[0]))
+    return a:file
 endfunction
 
 " Borrowed from somewhere in Internet, lost reference...
