@@ -431,9 +431,10 @@ class IncrementalCache(object):
     def clear(self):
         self._cache.clear()
 
-    def update(self, patterns, entries):
+    def update(self, patterns, entries, debug=False):
         if len(set(type(p) for p in patterns)) == 1:
-            self._cache[type(patterns[0])].update(patterns, entries)
+            self._cache[type(patterns[0])].update(patterns, entries,
+                                                  debug=debug)
 
     def find(self, patterns, default=frozenset(), debug=False):
         for pattern in patterns:
@@ -467,8 +468,15 @@ class PatternTypeCache(object):
     def __init__(self):
         self._cache = {}
 
-    def update(self, patterns, entries):
-        self._cache[tuple(patterns)] = frozenset(entries)
+    def update(self, patterns, entries, debug=False):
+        if debug:
+            debug = lambda fn: sys.stderr.write(fn())
+        else:
+            debug = lambda fn: None
+
+        patterns = tuple(p.value for p in patterns)
+        debug(lambda: "updating cache for patterns: {}\n".format(patterns))
+        self._cache[patterns] = frozenset(entries)
 
     def find(self, patterns, default=frozenset(), debug=False):
         patterns = tuple(p.value for p in patterns)
@@ -489,7 +497,7 @@ class PatternTypeCache(object):
 
             if entries is None or len(from_cache) < len(entries):
                 debug(lambda: "cache: hit on {}\n".format(expansion))
-                debug(lambda: "cache size: {}\n".format(len(entries)))
+                debug(lambda: "cache size: {}\n".format(len(from_cache)))
                 best_match = expansion
                 entries = from_cache
 
@@ -553,7 +561,8 @@ def incremental_filter(candidates, patterns, full_filter, debug=False):
                                       default=candidates, debug=debug)
 
     def update_candidates_from_cache(patterns, results):
-        incremental_cache.update(patterns, (r.value for r in results))
+        incremental_cache.update(patterns, (r.value for r in results),
+                                 debug=debug)
         return results
 
     results = list(full_filter(candidates_from_cache(patterns)))
