@@ -6,15 +6,22 @@ Usage:
 Filter lines from standard input according to one or more patterns, and print
 them to standard output.
 
-Results are sorted by length of matched portion (average for more than one
+Results are sorted by length of matched portion (sum for more than one
 pattern), followed by length of item.
+
+Depending on the given options, the output may or may not be printed as the
+input is read.  If sorting is being done (the default) or some limit is
+imposed, then the input will be fully read before processing candidates takes
+place.  So, to use this as a stream filter, disable sorting, don't apply a
+limit and don't reverse the order of the candidates.
 
 Arguments:
     PATTERN    The pattern string (there can be multiple ones).
 
 Options:
     -l LIMIT, --limit=LIMIT
-        Limit output up to LIMIT results.
+        Limit output up to LIMIT results.  Makes input to be fully read before
+        processing.
 
     --sort-limit=LIMIT
         Sort output only if the number of results is below LIMIT.  Set to zero
@@ -22,14 +29,28 @@ Options:
         there were no limit.  There's no default value, so output is always
         sorted by default.
 
+        If this option is not set or is set to a value greater than zero, input
+        will be fully read before processing.
+
+        Negative values are interpreted as zero.
+
     -r, --reverse
-        Reverse the returning order of candidates.
+        Reverse the returning order of candidates.  Makes input to be fully
+        read before processing.
+
+        This is applied after sorting and limiting is done, so this affects
+        only the output of the items, not the sorting itself.  If no sorting or
+        limiting is done, all candidates are returned in the reversed order of
+        input.
 
     --ignore-bad-patterns
         If a regular expression pattern is not valid, silently ignore it.
 
     -d --debug
         Print additional information to STDERR.
+
+    --json
+        Print lines as JSON objects.
 
     -h, --help
         Show this.
@@ -45,22 +66,14 @@ Patterns:
         <anything else>     Fuzzy match.
 """
 
-from __future__ import division
-from __future__ import unicode_literals
+from __future__ import print_function
 
 import functools
+import json
 import operator
 import re
 import sre_constants
 import sys
-
-try:
-    unicode
-    PY3 = False
-except NameError:
-    PY3 = True
-
-CHARSET = 'utf-8'
 
 
 class UnhighlightedMatch(object):
@@ -84,7 +97,6 @@ class ExactMatch(object):
     def __init__(self, value, pattern):
         self._value = value
         self._pattern = pattern
-        self._pattern_length = self.length = pattern.length
 
     @property
     def indices(self):
@@ -95,7 +107,7 @@ class ExactMatch(object):
             string = string.lower()
 
         current = string.find(self._pattern.value)
-        for index in range(current, current + self._pattern_length):
+        for index in range(current, current + self._pattern.length):
             indices.append(index)
 
         return frozenset(indices)
@@ -105,7 +117,6 @@ class FuzzyMatch(object):
     def __init__(self, match, pattern):
         self._match = match
         self._pattern = pattern
-        self._pattern_length = pattern.length
         self.length = len(match.groups()[0])
 
     @property
@@ -117,7 +128,7 @@ class FuzzyMatch(object):
             string = string.lower()
 
         pattern = self._pattern.value
-        pattern_length = self._pattern_length
+        pattern_length = self._pattern.length
         current = self._match.start()
         pos = 0
 
@@ -238,19 +249,23 @@ class FuzzyPattern(SmartCasePattern):
     def best_match(self, value):
         regexiter = self._finditer(value)
         shortest = next(regexiter, None)
-        length = self.length
 
         if shortest is None:
             return
 
+        length = self.length
         shortest = FuzzyMatch(shortest, self)
+
+        if shortest.length == length:
+            return shortest
 
         for match in regexiter:
             match = FuzzyMatch(match, self)
-            if match.length < shortest.length:
-                shortest = match
-                if shortest.length == length:
-                    break
+            if match.length >= shortest.length:
+                continue
+            if match.length == length:
+                return match
+            shortest = match
 
         return shortest
 
@@ -291,128 +306,108 @@ class RegexPattern(Pattern):
             return RegexMatch(match)
 
 
+class Patterns(object):
+    def __init__(self, patterns):
+        self._pattern_match = patterns.pop(0).best_match
+        if patterns:
+            self._next_match = Patterns(patterns).match
+        else:
+            self._next_match = EmptyPatterns().match
+
+    def match(self, value):
+        match = self._pattern_match(value)
+        if match is None:
+            return
+
+        next_matches = self._next_match(value)
+        if next_matches is None:
+            return
+
+        return (match,) + next_matches
+
+
+class EmptyPatterns(object):
+    def match(self, value):
+        return ()
+
+
 class Term(object):
-    matched = False
-
-    def __init__(self, original_value, value, patterns):
-        self.original_value = original_value
+    def __init__(self, index, value):
+        self.index = index
         self.value = value
-        self._matches = []
-        for pattern in patterns:
-            m = pattern.best_match(value)
-            if not m:
-                break
-            self._matches.append(m)
-        else:
-            self.matched = True
 
-    @property
-    def rank(self):
-        if getattr(self, '_rank', None) is not None:
-            return self._rank
+    def match(self, patterns):
+        matches = patterns.match(self.value)
 
-        if not self.matched:
-            rank = float('+inf')
-        elif not self.value:
-            rank = len(self.value)
-        else:
-            l = len(self.value)
-            rank = sum(m.length * 10000 + l for m in self._matches)
+        if matches is None:
+            return False
 
-        self._rank = rank
-        return self._rank
+        self._pattern_matches = matches
+        self.rank = (sum(m.length for m in matches), len(self.value))
+        return True
 
-    def spans(self):
+    def asdict(self):
+        return dict(value=self.value,
+                    index=self.index,
+                    rank=self.rank,
+                    matches=self.matches())
+
+    def matches(self):
+        translation = []
+        last_end = 0
+        value = self.value
+
+        for start, end in sorted(self._spans()):
+            translation.append(dict(
+                unmatched=value[last_end:start],
+                matched=value[start:end]
+            ))
+            last_end = end
+
+        remainder = value[last_end:]
+
+        if remainder:
+            translation.append(dict(unmatched=remainder, matched=''))
+
+        return translation
+
+    def _spans(self):
         streaks = functools.reduce(
             lambda acc, streaks: acc.merge(streaks),
-            (Streaks(m.indices) for m in self._matches)
+            (Streaks(m.indices) for m in self._pattern_matches)
         )
         for start, end in streaks:
             yield (start, end)
 
-    def translate(self):
-        translation = []
-
-        for start, end in self.spans():
-            translation.append(dict(
-                beginning=self.original_value[:start],
-                middle=self.original_value[start:end],
-                ending=self.original_value[end:]
-            ))
-
-        return translation
-
-    def translate_merging(self):
-        translation = []
-        last_end = 0
-
-        for start, end in sorted(self.spans()):
-            translation.append(dict(
-                nohl=self.original_value[last_end:start],
-                hl=self.original_value[start:end]
-            ))
-            last_end = end
-
-        translation.append(dict(
-            nohl=self.original_value[last_end:],
-            hl=''
-        ))
-
-        return translation
-
 
 class Contest(object):
     def __init__(self, *patterns):
-        self.patterns = patterns
+        self.patterns = Patterns(list(patterns))
 
     def elect(self, candidates, **kw):
+        patterns = self.patterns
         limit = kw.get('limit', None)
-        transform = kw.get('transform', None)
-        sort_limit = kw.get('sort_limit', -1)
+        sort_limit = kw.get('sort_limit', None)
         key = operator.attrgetter('rank')
+        terms = (Term(i, c) for i, c in enumerate(candidates) if c)
+        filtered_terms = (term for term in terms if term.match(patterns))
 
-        if sort_limit < 0:
-            terms = sorted(self._process_terms(candidates, transform), key=key)
+        if sort_limit is None:
+            processed_terms = sorted(filtered_terms, key=key)
+        elif sort_limit <= 0:
+            processed_terms = filtered_terms
         else:
-            terms = list(self._process_terms(candidates, transform))
-            if len(terms) < sort_limit:
-                terms = sorted(terms, key=key)
+            processed_terms = list(filtered_terms)
+            if len(processed_terms) < sort_limit:
+                processed_terms = sorted(processed_terms, key=key)
 
         if limit is not None:
-            terms = terms[:limit]
+            processed_terms = list(processed_terms)[:limit]
 
-        result_factory = Result
-        return (result_factory(term) for term in terms)
+        if kw.get('reverse', False):
+            processed_terms = reversed(list(processed_terms))
 
-    def _process_terms(self, candidates, transform):
-        patterns = self.patterns
-        factory = Term
-        entries = (c for c in candidates if c)
-
-        if transform:
-            f = lambda v, _, pats: factory(v, transform(v), patterns)
-        else:
-            f = factory
-
-        return (
-            term for term in (f(e, e, patterns) for e in entries)
-            if term.matched
-        )
-
-
-class Result(object):
-    def __init__(self, term):
-        self.term = term
-
-    @property
-    def original_value(self):
-        return self.term.original_value
-
-    def asdict(self):
-        return dict(value=self.term.value,
-                    original_value=self.term.original_value,
-                    spans=self.term.translate(),
-                    merged_spans=self.term.translate_merging())
+        return processed_terms
 
 
 def make_pattern(pattern, ignore_bad_re_patterns=False):
@@ -428,7 +423,102 @@ def make_pattern(pattern, ignore_bad_re_patterns=False):
     return FuzzyPattern(pattern)
 
 
-incremental_cache = {}
+class IncrementalCache(object):
+    def __init__(self):
+        self._cache = {}
+
+    def clear(self):
+        self._cache.clear()
+
+    def update(self, patterns, entries):
+        if len(set(type(p) for p in patterns)) == 1:
+            self._cache[type(patterns[0])].update(patterns, entries)
+
+    def find(self, patterns, default=frozenset(), debug=False):
+        for pattern in patterns:
+            self._cache.setdefault(type(pattern), PatternTypeCache())
+
+        return functools.reduce(
+            frozenset.union,
+            self._get_entries(patterns, default, debug)
+        )
+
+    def _get_entries(self, patterns, default, debug):
+        for pattern_type, patterns in self._group_types(patterns):
+            yield self._cache[pattern_type].find(patterns, default=default,
+                                                 debug=debug)
+
+    def _group_types(self, patterns):
+        groups = {}
+
+        for pattern in patterns:
+            group = groups.setdefault(type(pattern), [])
+            group.append(pattern)
+
+        for t, patterns in groups.items():
+            yield (t, patterns)
+
+
+incremental_cache = IncrementalCache()
+
+
+class PatternTypeCache(object):
+    def __init__(self):
+        self._cache = {}
+
+    def update(self, patterns, entries):
+        self._cache[tuple(patterns)] = frozenset(entries)
+
+    def find(self, patterns, default=frozenset(), debug=False):
+        patterns = tuple(p.value for p in patterns)
+        entries = None
+        best_match = ()
+
+        if debug:
+            debug = lambda fn: sys.stderr.write(fn())
+        else:
+            debug = lambda fn: None
+
+        for expansion in self._exhaust(patterns):
+            debug(lambda: "attempting expansion: {}\n".format(expansion))
+            from_cache = self._cache.get(expansion, None)
+
+            if not from_cache:
+                continue
+
+            if entries is None or len(from_cache) < len(entries):
+                debug(lambda: "cache: hit on {}\n".format(expansion))
+                debug(lambda: "cache size: {}\n".format(len(entries)))
+                best_match = expansion
+                entries = from_cache
+
+        if entries is None:
+            debug(lambda: "cache: miss, patterns: {}\n".format(patterns))
+            return frozenset(default)
+
+        if best_match == patterns:
+            debug(lambda: "using result directly from cache\n")
+
+        return entries
+
+    def _exhaust(self, patterns):
+        if len(patterns) == 1:
+            for exhaustion in self._exhaust_pattern(patterns[0]):
+                yield (exhaustion,)
+            return
+
+        for i in range(len(patterns) - 1, -1, -1):
+            pattern = patterns[i]
+            lpatterns = patterns[:i]
+            rpatterns = patterns[i + 1:]
+
+            for exhaustion in self._exhaust_pattern(pattern):
+                for subexhaustion in self._exhaust(rpatterns):
+                    yield lpatterns + (exhaustion,) + subexhaustion
+
+    def _exhaust_pattern(self, pattern):
+        for i in range(len(pattern) - 1, -1, -1):
+            yield pattern[0:i + 1]
 
 
 def filter_entries(candidates, *patterns, **options):
@@ -449,8 +539,7 @@ def filter_entries(candidates, *patterns, **options):
     if incremental:
         return incremental_filter(candidates, patterns, full_filter,
                                   debug=debug)
-    else:
-        return full_filter(candidates)
+    return full_filter(candidates)
 
 
 def incremental_filter(candidates, patterns, full_filter, debug=False):
@@ -458,59 +547,16 @@ def incremental_filter(candidates, patterns, full_filter, debug=False):
     if non_incremental_patterns or not patterns:
         return full_filter(candidates)
 
-    if debug:
-        debug = lambda fn: sys.stderr.write(fn())
-    else:
-        debug = lambda fn: None
-
     def candidates_from_cache(patterns):
-        def broaden(patterns):
-            patterns[-1] = patterns[-1][:-1]
+        return incremental_cache.find(patterns,
+                                      default=candidates, debug=debug)
 
-            if not patterns[-1]:
-                return patterns[:-1]
-
-            return patterns
-
-        def possibilities(patterns):
-            if not patterns:
-                return
-
-            yield tuple(patterns)
-            for patterns in possibilities(broaden(list(patterns))):
-                yield patterns
-
-        direct = True
-        for p in possibilities(patterns):
-            from_cache = incremental_cache.get(p, None)
-            if from_cache is not None:
-                return (direct, p, from_cache)
-            direct = False
-
-        return (False, (), [])
-
-    def update_candidates_from_cache(pattern_values, results):
-        results = list(results)
-        incremental_cache[tuple(pattern_values)] = results
+    def update_candidates_from_cache(patterns, results):
+        incremental_cache.update(patterns, (r.value for r in results))
         return results
 
-    pattern_values = tuple(p.value for p in patterns)
-    direct, hit, results = candidates_from_cache(pattern_values)
-
-    if hit:
-        debug(lambda: "cache: hit on {}\n".format(hit))
-        debug(lambda: "cache size: {}\n".format(len(results)))
-
-        if direct:
-            debug(lambda: "using result directly from cache\n")
-            return results
-
-        results = full_filter([r.original_value for r in results])
-    else:
-        debug(lambda: "cache: miss, patterns: {}\n".format(pattern_values))
-        results = full_filter(candidates)
-
-    return update_candidates_from_cache(pattern_values, results)
+    results = list(full_filter(candidates_from_cache(patterns)))
+    return update_candidates_from_cache(patterns, results)
 
 
 def main():
@@ -535,29 +581,19 @@ def main():
     if args['--debug']:
         options['debug'] = True
 
+    if args['--reverse']:
+        options['reverse'] = True
+
     strip = str.strip
-    entries = (strip(line) for line in sys.stdin.readlines())
-
-    if not PY3:
-        patterns = [p.decode(CHARSET) for p in patterns]
-        entries = (line.decode(CHARSET) for line in entries)
-
+    entries = (strip(line) for line in iter(sys.stdin.readline, ''))
     results = filter_entries(entries, *patterns, **options)
 
-    if args['--reverse']:
-        results = reversed(results)
-
-    if args['--debug']:
-        sys.stdout.write(
-            u'\n'.join(repr(result.asdict()) for result in results)
-        )
-    else:
-        sys.stdout.write(
-            u'\n'.join(result.original_value for result in results)
-        )
-
-    sys.stdout.write(u'\n')
-    sys.stdout.flush()
+    for result in results:
+        if args['--json']:
+            line = json.dumps(result.asdict())
+        else:
+            line = result.value
+        print(line)
 
     return 0
 
