@@ -97,6 +97,7 @@ class ExactMatch(object):
     def __init__(self, value, pattern):
         self._value = value
         self._pattern = pattern
+        self.length = pattern.length
 
     @property
     def indices(self):
