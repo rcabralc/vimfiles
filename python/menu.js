@@ -1,6 +1,14 @@
 /* global console */
 /* global backend */
 
+if (!String.prototype.startsWith) {
+  String.prototype.startsWith = function(searchString, position) {
+    "use strict";
+    position = position || 0;
+    return this.lastIndexOf(searchString, position) === position;
+  };
+}
+
 window.backend = (function() {
   // Stub backend implementation.
   "use strict";
@@ -12,11 +20,14 @@ window.backend = (function() {
     enter: function(input) {
       console.log('send input to backend as entered: ' + input);
     },
-    acceptInput: function(input) {
-      console.log('send input for backend acceptance: ' + input);
+    acceptInput: function() {
+      console.log('tell backend to accept current input');
     },
     acceptSelected: function() {
       console.log('tell backend to accept selected item');
+    },
+    copySelected: function() {
+      console.log('tell backend to copy selected item');
     },
     complete: function() {
       console.log('tell backend to complete current input');
@@ -39,74 +50,72 @@ window.backend = (function() {
 window.frontend = (function() {
   "use strict";
 
-  var $input,
-      $entries,
-      $scrollbar,
+  var _$input,
+      _$entries,
+      _$scrollbar,
       availableScroll,
       currentMode,
       keyUpHandlers = {},
-      keyDownHandlers = {};
+      keyDownHandlers = {},
+      // This order is important: iterated from right to left, no ambiguity
+      // should happen.  For example: '!=' must be tested before '!', otherwise
+      // '!' could inavertendly match '!='.  In summary, an item should not
+      // start with any item on right of it.
+      patternTypes = ['!', '=', '!=', '@'];
 
   keyUpHandlers.Enter = function() { backend.acceptSelected(); };
   keyUpHandlers.Escape = function() { backend.dismiss(); };
+  keyUpHandlers['Control-Enter'] = function() { backend.acceptInput(); };
 
   ['P', 'N'].forEach(function(k) {
     keyUpHandlers['Control-' + k] = function() { };
   });
 
   keyDownHandlers.Tab = function() {
-    $input.val(backend.complete()).change();
+    $input().val(backend.complete()).change();
   };
   keyDownHandlers['Control-P'] = function() {
-    $input.val(backend.historyPrev()).change();
+    $input().val(backend.historyPrev()).change();
   };
   keyDownHandlers['Control-N'] = function() {
-    $input.val(backend.historyNext()).change();
+    $input().val(backend.historyNext()).change();
   };
   keyDownHandlers['Control-J'] = function() { backend.next(); };
   keyDownHandlers['Control-K'] = function() { backend.prev(); };
-  keyDownHandlers['Control-Y'] = function() { backend.acceptInput(); };
-  keyDownHandlers['Control-U'] = function() { $input.val('').change(); };
-  keyDownHandlers['Control-W'] = function() { sendCtrlBs($input); };
+  keyDownHandlers['Control-U'] = function() { $input().val('').change(); };
+  keyDownHandlers['Control-W'] = function() { sendCtrlBs($input()); };
+  keyDownHandlers['Control-Y'] = function() { backend.copySelected(); };
+  keyDownHandlers['Control-R'] = function() { alternatePattern(); };
+
+  $(function() {
+    $input().focus().on({
+      'keydown': function(e) {
+        var handler = keyDownHandlers[key(e)];
+        if (handler) return swallow(e, handler);
+      },
+
+      'keyup': function(e) {
+        (keyUpHandlers[key(e)] || defaultHandler)();
+      },
+
+      'change': function() {
+        backend.filter($input().val());
+      },
+
+      'blur': function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      },
+    }).val($input().val());
+
+    $(window).on('resize', window.frontend.adjustScroll);
+    $entries().on('scroll', window.frontend.adjustScroll);
+  });
 
   return {
-    init: function() {
-      $(function() {
-        $entries = $('#entries');
-        $input = $('#input');
-        $scrollbar = $('#scrollbar');
-
-        function swallow(event, callback) {
-          event.preventDefault();
-          event.stopPropagation();
-          callback();
-          return false;
-        }
-
-        $input.focus().on({
-          'keydown': function(e) {
-            var handler = keyDownHandlers[key(e)];
-            if (handler) return swallow(e, handler);
-          },
-
-          'keyup': function(e) {
-            (keyUpHandlers[key(e)] || defaultHandler)();
-          },
-
-          'change': function() {
-            backend.filter($input.val());
-          },
-
-          'blur': function() {
-            setTimeout(function() { $input.focus(); }, 0);
-          },
-        });
-
-        $input.val($input.val()).change();
-
-        $(window).on('resize', window.frontend.adjustScroll);
-        $entries.on('scroll', window.frontend.adjustScroll);
-      });
+    setInput: function(input) {
+      $input().val(input).focus();
     },
 
     setItems: function(items) {
@@ -114,10 +123,10 @@ window.frontend = (function() {
         /* jshint camelcase: false */
         var $li = $(document.createElement('li'));
 
-        item.merged_spans.forEach(function(span) {
-          $li.append($(document.createElement('span')).text(span.nohl));
+        item.matches.forEach(function(span) {
+          $li.append($(document.createElement('span')).text(span.unmatched));
           $li.append($(document.createElement('span')).addClass('hl')
-            .text(span.hl));
+            .text(span.matched));
         });
 
         if (item.selected) {
@@ -127,12 +136,13 @@ window.frontend = (function() {
         return $li;
       });
 
-      $entries.html(entries);
+      $entries().html(entries);
+      // $entries().prepend('<li>' + window.backend.id() + '</li>');
 
       if (entries.length) {
-        $input.parent().removeClass('not-found');
+        $input().parent().removeClass('not-found');
       } else {
-        $input.parent().addClass('not-found');
+        $input().parent().addClass('not-found');
       }
 
       this.adjustScroll();
@@ -144,11 +154,10 @@ window.frontend = (function() {
 
     reportMode: function(newMode) {
       if (currentMode) {
-        $input.removeClass(currentMode + '-mode');
+        $input().removeClass(currentMode + '-mode');
       }
 
-      $input.addClass(newMode + '-mode');
-
+      $input().addClass(newMode + '-mode');
       currentMode = newMode;
     },
 
@@ -165,27 +174,27 @@ window.frontend = (function() {
     },
 
     select: function(index) {
-      $entries.find('li.selected').removeClass('selected');
+      $entries().find('li.selected').removeClass('selected');
       this.ensureVisible(
-        $entries.find('li:nth-child(' + (index + 1) + ')').addClass('selected')
+        $entries().find('li:nth-child(' + (index + 1) + ')').addClass('selected')
       );
     },
 
     ensureVisible: function($item) {
-      var top = $item.offset().top - $entries.offset().top,
-          eh = $entries.height(),
+      var top = $item.offset().top - $entries().offset().top,
+          eh = $entries().height(),
           bottom = top + $item.outerHeight() - eh,
-          current = $entries.scrollTop(),
+          current = $entries().scrollTop(),
           scroll = current + (bottom >= 0 ? bottom : (top < 0 ? top : 0));
 
-      $entries.scrollTop(scroll);
+      $entries().scrollTop(scroll);
     },
 
     adjustScroll: function() {
-      var height = $entries.height(), scroll = $entries.scrollTop();
+      var height = $entries().height(), scroll = $entries().scrollTop();
 
       availableScroll = Array.prototype.slice.call(
-        $entries.find('> li').map(function(i, el) {
+        $entries().find('> li').map(function(i, el) {
           return $(el).outerHeight();
         })
       ).reduce(function(a, b) { return a + b; }, 0);
@@ -194,18 +203,85 @@ window.frontend = (function() {
         var thumbHeight = 100 * height / availableScroll,
             top = 100 * scroll / availableScroll;
 
-        $scrollbar.find('.thumb').show().css({
+        $scrollbar().find('.thumb').show().css({
           height: thumbHeight + '%',
           top: top + '%',
         });
       } else {
-        $scrollbar.find('.thumb').hide().css({ height: 0, top: 0 });
+        $scrollbar().find('.thumb').hide().css({ height: 0, top: 0 });
       }
     },
   };
 
+  function $input() {
+    return (_$input = _$input || $('#input'));
+  }
+
+  function $entries() {
+    return (_$entries = _$entries || $('#entries'));
+  }
+
+  function $scrollbar() {
+    return (_$scrollbar = _$scrollbar || $('#scrollbar'));
+  }
+
+  function swallow(event, callback) {
+    event.preventDefault();
+    event.stopPropagation();
+    callback();
+    return false;
+  }
+
   function defaultHandler() {
-    backend.enter($input.val());
+    backend.enter($input().val());
+  }
+
+  function alternatePattern() {
+    var $field = $input(),
+        field = $field.get(0),
+        value = $field.val(),
+        pos = field.selectionDirection == 'backward' ?
+          field.selectionStart : field.selectionEnd,
+        lpos = pos, rpos,
+        str, i, pat;
+
+    while (lpos > 0) {
+      if (value[lpos - 1] == ' ') break;
+      lpos -= 1;
+    }
+    while (value[lpos] == ' ') lpos += 1;
+
+    rpos = lpos;
+    while (rpos < value.length - 1) {
+      if (value[rpos] == ' ') break;
+      rpos += 1;
+    }
+    while (value[rpos] == ' ') rpos -= 1;
+
+    str = value.slice(lpos, rpos + 1);
+    for (i = patternTypes.length - 1; i >= 0; i--) {
+      pat = patternTypes[i];
+      if (str.startsWith(pat)) {
+        str = str.slice(pat.length);
+        if (i == patternTypes.length - 1) {
+          pat = '';
+        } else {
+          pat = patternTypes[i + 1];
+        }
+        str = pat + str;
+        replace(lpos, rpos, str);
+        return;
+      }
+    }
+
+    str = patternTypes[0] + str;
+    replace(lpos, rpos, str);
+
+    function replace(lpos, rpos, str) {
+      $field.val(value.slice(0, lpos) + str + value.slice(rpos + 1));
+      field.selectionStart = lpos + str.length;
+      field.selectionEnd = field.selectionStart;
+    }
   }
 
   function key(event) {
@@ -289,7 +365,6 @@ window.frontend = (function() {
       isMeta(key),
       false // altGraph
     );
-    console.log(evt);
 
     node.dispatchEvent(evt);
   }

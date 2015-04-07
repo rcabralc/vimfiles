@@ -83,77 +83,41 @@ endif
 "      UI, in which, again, I feel a lot more confortable than in VimL.
 "   3. I like Qt, mainly because of KDE, and wanted to explore it.
 "
-" Despite the fact that it's done in Qt, it also works in console Vim.
+" Despite the fact that it's done in Qt, it also works in console Vim, provided
+" it runs inside an emulated terminal (a graphical server is needed).
 "
-" By now, launching a Qt process everytime a file or a buffer needs to be
-" opened may be too slow when the memory is low, because Python will need to
-" load lots of megabytes of modules/bindings/actual lib code from Qt, just to
-" render a window, and the kernel will have to make room for that by swapping
-" stuff out to the disk...  This is not optimal.  But this was the simplest
-" (since my skills in VimL are far from good, and I don't like it) way to get
-" it done.
-"
-" I see two possible solutions for this:
-"
-"   1. Use a daemon process (there's some outline in the Python module's doc
-"      about this).  The daemon should be the heaviest part of this fuzzy
-"      finder, so it'll load once and forever.  Further requests will only
-"      bring it up, which can be a bit slow if the code got swapped to disk,
-"      but still it's likely to be faster than the current implementation,
-"      since it may happen that just some of its pages got swapped, while
-"      others may be around in physical RAM.  Also, if many files are being
-"      constantly opened through this fuzzy finder, the kernel is likely to
-"      delay as much as possible the swapping of these pages.
-"   2. Don't use Qt, just reimplement all of this functionality in a Vim split
-"      window (just like CtrlP), but this requires some VimL skills and could
-"      be slow because the syntax highlighting of Vim would play a role then.
-
-" Find a file and pass it to cmd
-function! FuzzyFileOpen(cmd)
-    let dirname = resolve(expand('%:p:h'))
-    let gittoplevel = system('cd ' . dirname . ' && git rev-parse --show-toplevel 2>/dev/null')
-    let gittoplevel = substitute(gittoplevel, '\n$', '', '')
-
-    if empty(gittoplevel)
-        let initial = ''
-        let toplevel = dirname
-        let filescmd = 'cd ' .
-                    \ shellescape(toplevel) .
-                    \ ' && ag . -i --nocolor --nogroup --hidden '.
-                    \ '--ignore .git '.
-                    \ '--ignore .hg '.
-                    \ '--ignore .DS_Store '.
-                    \ '-g ""'
-    else
-        let toplevel = gittoplevel
-        let gittoplevel = s:regexescape(gittoplevel)
-        let initial = substitute(dirname, '^' . gittoplevel, '', '')
-        let initial = substitute(initial, '^/', '', '')
-
-        let filescmd = 'cd ' .
-            \ shellescape(toplevel) .
-            \ ' && git ls-files -co --exclude-standard | uniq'
-    endif
-
-    let menucmd = filescmd .
-        \ ' | python -u ~/.vim/python/menu.py --limit 20 ' .
-        \ '--completion-sep "/" ' .
-        \ '--history-key ' . shellescape(toplevel)
-
-    if !empty(initial)
-        let menucmd = menucmd . " --input " . shellescape(initial) . '/'
-    endif
-
-    let menucmd = menucmd . " 2>/dev/null"
-    let fname = s:chomp(system(menucmd))
+" Additionally, to avoid re-importing Qt modules everytime a file or a buffer
+" needs to be opened, a simple process is used, which only sends to the
+" daemonized process which has the Qt stuff the data it needs (the list of
+" files/buffers to select from, and some options).  This is specially useful in
+" low memory condition, when the kernel otherwise would have to make room in
+" RAM for lots of python bindings by swapping stuff to disk everytime the menu
+" were launched.  A daemon constantly used (the portion which has the heavy Qt
+" stuff) may take advantage of kernel heuristics and be kept in memory most of
+" the time, avoiding hitting disk/swap to present the menu.  The process which
+" communicates with the daemon is lighter (it just does UNIX socket stuff), and
+" should not cause anoying delays when launched.
+function! FuzzyFileOpen(cmd, dirname)
+    let info = s:project_root_info(a:dirname)
+    let fname = s:spawn_menu(info.filescmd, {
+        \ 'limit': 20,
+        \ 'completion_sep': '/',
+        \ 'input': info.initial,
+        \ 'history_key': info.toplevel
+    \ })
 
     if empty(fname)
         return
     endif
 
-    execute a:cmd . " " .  s:makepath(resolve(toplevel . '/' . fname))
+    if fname == '..'
+        return FuzzyFileOpen(a:cmd, s:getparent(a:dirname))
+    endif
+
+    execute a:cmd . " " .  s:makepath(resolve(info.toplevel . '/' . fname))
 endfunction
-map <C-f> :call FuzzyFileOpen('e')<CR>
+map <C-f> :call FuzzyFileOpen('edit', resolve(expand('%:p:h')))<CR>
+map <C-p> :call FuzzyFileOpen('read', resolve(expand('%:p:h')))<CR>
 
 function! FuzzyBufferReOpen(cmd)
     let tempfile = tempname()
@@ -162,12 +126,11 @@ function! FuzzyBufferReOpen(cmd)
     silent ls
     redir END
 
-    let menucmd = 'cat ' . tempfile .
-        \ ' | grep "." ' .
-        \ ' | sed "s/^.*\"\([^\"]*\)\".*\$/\\1/" ' .
-        \ ' | python -u ~/.vim/python/menu.py --limit 100 2>/dev/null'
+    let entriescmd = 'cat ' . tempfile .
+        \ ' | grep "."' .
+        \ ' | sed "s/^.*\"\([^\"]*\)\".*\$/\\1/"'
 
-    let fname = s:chomp(system(menucmd))
+    let fname = s:spawn_menu(entriescmd, { 'limit': 100, 'completion_sep': '/' })
 
     call system('rm ' . tempfile)
 
@@ -179,9 +142,69 @@ function! FuzzyBufferReOpen(cmd)
 endfunction
 map <C-b> :call FuzzyBufferReOpen('e')<CR>
 
+function! s:project_root_info(dirname)
+    let gittoplevel = s:chomp(system('cd ' . a:dirname . ' && git rev-parse --show-toplevel 2>/dev/null'))
+
+    if empty(gittoplevel)
+        let initial = ''
+        let toplevel = a:dirname
+        let filescmd = 'cd ' .
+                    \ shellescape(toplevel) .
+                    \ ' && ag . -i --nocolor --nogroup --hidden '.
+                    \ '--ignore .git '.
+                    \ '--ignore .hg '.
+                    \ '--ignore .DS_Store '.
+                    \ '--ignore *.swp '.
+                    \ '-g ""'
+    else
+        let initial = s:relativepath(gittoplevel, a:dirname)
+        let toplevel = gittoplevel
+        let filescmd = 'cd ' .
+                    \ shellescape(toplevel) .
+                    \ ' && git ls-files -co --exclude-standard | uniq'
+    endif
+
+    if !empty(initial)
+        let initial = initial . '/'
+    endif
+
+    return {
+        \ 'initial': initial,
+        \ 'toplevel': toplevel,
+        \ 'filescmd': filescmd
+    \ }
+endfunction
+
+function! s:spawn_menu(entriescmd, params)
+    let menucmd = 'python -u ~/.vim/python/menu.py --daemonize'
+
+    if has_key(a:params, 'limit')
+        let menucmd = menucmd . ' --limit ' . shellescape(a:params.limit)
+    endif
+
+    if has_key(a:params, 'completion_sep') && !empty(a:params.completion_sep)
+        let menucmd = menucmd . ' --completion-sep ' . shellescape(a:params.completion_sep)
+    endif
+
+    if has_key(a:params, 'history_key') && !empty(a:params.history_key)
+        let menucmd = menucmd . ' --history-key ' . shellescape(a:params.history_key)
+    endif
+
+    if has_key(a:params, 'input') && !empty(a:params.input)
+        let menucmd = menucmd . ' --input ' . shellescape(a:params.input)
+    endif
+
+    return s:chomp(system(a:entriescmd . ' | ' . menucmd . ' 2>/dev/null'))
+endfunction
+
 " Strip the newline from the end of a string
 function! s:chomp(str)
     return substitute(a:str, '\n$', '', '')
+endfunction
+
+function! s:relativepath(basepath, path)
+    let rel = substitute(a:path, '^' . s:regexescape(a:basepath), '', '')
+    return substitute(rel, '^/', '', '')
 endfunction
 
 function! s:makepath(file)
@@ -192,6 +215,17 @@ vim.bindeval('basedir').extend([os.path.dirname(vim.eval('a:file'))])
 EOP
     call system('mkdir -p ' . shellescape(basedir[0]))
     return a:file
+endfunction
+
+function! s:getparent(dirname)
+    let result = []
+python <<EOP
+import os.path as p, vim
+vim.bindeval('result').extend([
+    '/' + p.join(*vim.eval('a:dirname').split(p.sep)[:-1])
+])
+EOP
+    return result[0]
 endfunction
 
 " Borrowed from somewhere in Internet, lost reference...
