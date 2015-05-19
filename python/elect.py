@@ -385,12 +385,11 @@ class Contest(object):
     def __init__(self, *patterns):
         self.patterns = Patterns(list(patterns))
 
-    def elect(self, candidates, **kw):
+    def elect(self, terms, **kw):
         patterns = self.patterns
         limit = kw.get('limit', None)
         sort_limit = kw.get('sort_limit', None)
         key = operator.attrgetter('rank')
-        terms = (Term(i, c) for i, c in enumerate(candidates) if c)
         filtered_terms = (term for term in terms if term.match(patterns))
 
         if sort_limit is None:
@@ -431,10 +430,9 @@ class IncrementalCache(object):
     def clear(self):
         self._cache.clear()
 
-    def update(self, patterns, entries, debug=False):
+    def update(self, patterns, terms, debug=False):
         if len(set(type(p) for p in patterns)) == 1:
-            self._cache[type(patterns[0])].update(patterns, entries,
-                                                  debug=debug)
+            self._cache[type(patterns[0])].update(patterns, terms, debug=debug)
 
     def find(self, patterns, default=frozenset(), debug=False):
         for pattern in patterns:
@@ -442,10 +440,10 @@ class IncrementalCache(object):
 
         return functools.reduce(
             frozenset.union,
-            self._get_entries(patterns, default, debug)
+            self._get_terms(patterns, default, debug)
         )
 
-    def _get_entries(self, patterns, default, debug):
+    def _get_terms(self, patterns, default, debug):
         for pattern_type, patterns in self._group_types(patterns):
             yield self._cache[pattern_type].find(patterns, default=default,
                                                  debug=debug)
@@ -468,7 +466,7 @@ class PatternTypeCache(object):
     def __init__(self):
         self._cache = {}
 
-    def update(self, patterns, entries, debug=False):
+    def update(self, patterns, terms, debug=False):
         if debug:
             debug = lambda fn: sys.stderr.write(fn())
         else:
@@ -476,11 +474,11 @@ class PatternTypeCache(object):
 
         patterns = tuple(p.value for p in patterns)
         debug(lambda: "updating cache for patterns: {}\n".format(patterns))
-        self._cache[patterns] = frozenset(entries)
+        self._cache[patterns] = frozenset(terms)
 
     def find(self, patterns, default=frozenset(), debug=False):
         patterns = tuple(p.value for p in patterns)
-        entries = None
+        terms = None
         best_match = ()
 
         if debug:
@@ -495,20 +493,20 @@ class PatternTypeCache(object):
             if not from_cache:
                 continue
 
-            if entries is None or len(from_cache) < len(entries):
+            if terms is None or len(from_cache) < len(terms):
                 debug(lambda: "cache: hit on {}\n".format(expansion))
                 debug(lambda: "cache size: {}\n".format(len(from_cache)))
                 best_match = expansion
-                entries = from_cache
+                terms = from_cache
 
-        if entries is None:
+        if terms is None:
             debug(lambda: "cache: miss, patterns: {}\n".format(patterns))
             return frozenset(default)
 
         if best_match == patterns:
             debug(lambda: "using result directly from cache\n")
 
-        return entries
+        return terms
 
     def _exhaust(self, patterns):
         if len(patterns) == 1:
@@ -530,7 +528,7 @@ class PatternTypeCache(object):
             yield pattern[0:i + 1]
 
 
-def filter_entries(candidates, *patterns, **options):
+def filter_entries(terms, *patterns, **options):
     ignore_bad_patterns = options.pop('ignore_bad_patterns', False)
 
     patterns = [
@@ -546,23 +544,20 @@ def filter_entries(candidates, *patterns, **options):
     debug = options.get('debug', False)
 
     if incremental:
-        return incremental_filter(candidates, patterns, full_filter,
-                                  debug=debug)
-    return full_filter(candidates)
+        return incremental_filter(terms, patterns, full_filter, debug=debug)
+    return full_filter(terms)
 
 
-def incremental_filter(candidates, patterns, full_filter, debug=False):
+def incremental_filter(terms, patterns, full_filter, debug=False):
     non_incremental_patterns = [p for p in patterns if not p.incremental]
     if non_incremental_patterns or not patterns:
-        return full_filter(candidates)
+        return full_filter(terms)
 
     def candidates_from_cache(patterns):
-        return incremental_cache.find(patterns,
-                                      default=candidates, debug=debug)
+        return incremental_cache.find(patterns, default=terms, debug=debug)
 
     def update_candidates_from_cache(patterns, results):
-        incremental_cache.update(patterns, (r.value for r in results),
-                                 debug=debug)
+        incremental_cache.update(patterns, results, debug=debug)
         return results
 
     results = list(full_filter(candidates_from_cache(patterns)))
@@ -596,7 +591,8 @@ def main():
 
     strip = str.strip
     entries = (strip(line) for line in iter(sys.stdin.readline, ''))
-    results = filter_entries(entries, *patterns, **options)
+    terms = (Term(i, c) for i, c in enumerate(entries) if c)
+    results = filter_entries(terms, *patterns, **options)
 
     for result in results:
         if args['--json']:
