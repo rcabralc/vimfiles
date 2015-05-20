@@ -52,6 +52,9 @@ Options:
     --json
         Print lines as JSON objects.
 
+    --no-color
+        Turn off colored output.
+
     -h, --help
         Show this.
 
@@ -69,7 +72,6 @@ Patterns:
 from __future__ import print_function
 
 import functools
-import json
 import operator
 import re
 import sre_constants
@@ -564,8 +566,26 @@ def incremental_filter(terms, patterns, full_filter, debug=False):
     return update_candidates_from_cache(patterns, results)
 
 
+def build_line(result, highlight=True):
+    line = []
+
+    def colored(string):
+        if not highlight or not string:
+            return ''
+        return "\x1b[1m\x1b[31m%s\x1b[22m\x1b[39m" % string
+
+    line.append("\x1b[22m\x1b[39m")
+
+    for portion in result.matches():
+        line.append(portion['unmatched'])
+        line.append(colored(portion['matched']))
+
+    return ''.join(line)
+
+
 def main():
     from docopt import docopt
+    from json import dumps as dumpjson
 
     args = docopt(__doc__)
 
@@ -596,9 +616,9 @@ def main():
 
     for result in results:
         if args['--json']:
-            line = json.dumps(result.asdict())
+            line = dumpjson(result.asdict())
         else:
-            line = result.value
+            line = build_line(result, highlight=not args['--no-color'])
         print(line)
 
     return 0
