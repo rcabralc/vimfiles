@@ -52,6 +52,25 @@ Options:
     --output-json
         Print lines as JSON objects.
 
+        Each line is a JSON object representing the result of a matching entry
+        in the input, containing the following properties:
+
+        value   The raw entry.
+
+        id      The id associated with the entry.
+
+        partitions
+                An array of JSON objects, with properties "unmatched" and
+                "matched".  By concatenating these properties in this order,
+                and concatenating the result of doing the same for each element
+                in order, the entry (the value property) is recovered.
+
+        rank    An array of two elements representing the quality of the match.
+                Lower numbers are better.  The first number is the sum of
+                extents of matched portions of the string (this are not the
+                matched partitions, and there's one for each pattern used), and
+                the second is the length of the entry.
+
     --no-color
         Turn off colored output.
 
