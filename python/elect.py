@@ -611,7 +611,7 @@ def main():
 
     strip = str.strip
     entries = (strip(line) for line in iter(sys.stdin.readline, ''))
-    terms = (Term(i, c) for i, c in enumerate(entries) if c)
+    terms = (Term(i + 1, c) for i, c in enumerate(entries) if c)
     results = filter_entries(terms, *patterns, **options)
 
     for result in results:
