@@ -49,7 +49,7 @@ Options:
     -d --debug
         Print additional information to STDERR.
 
-    --json
+    --output-json
         Print lines as JSON objects.
 
     --no-color
@@ -59,7 +59,7 @@ Options:
         Show this.
 
 Patterns:
-    The interpretation of the pattern is done accordingly to its initial
+    The interpretation of the pattern is done according to its initial
     characters (which is not part of the pattern):
 
         @                   Regular expression.
@@ -615,7 +615,7 @@ def main():
     results = filter_entries(terms, *patterns, **options)
 
     for result in results:
-        if args['--json']:
+        if args['--output-json']:
             line = dumpjson(result.asdict())
         else:
             line = build_line(result, highlight=not args['--no-color'])
