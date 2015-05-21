@@ -79,7 +79,7 @@ import sys
 
 
 class UnhighlightedMatch(object):
-    length = 0
+    __slots__ = ('length',)
 
     def __init__(self, value):
         self.length = len(value)
@@ -96,6 +96,8 @@ class UnhighlightedMatch(object):
 
 
 class ExactMatch(object):
+    __slots__ = ('_value', '_pattern', 'length')
+
     def __init__(self, value, pattern):
         self._value = value
         self._pattern = pattern
@@ -117,6 +119,8 @@ class ExactMatch(object):
 
 
 class FuzzyMatch(object):
+    __slots__ = ('_match', '_pattern', 'length')
+
     def __init__(self, match, pattern):
         self._match = match
         self._pattern = pattern
@@ -147,6 +151,8 @@ class FuzzyMatch(object):
 
 
 class RegexMatch(object):
+    __slots__ = ('_match', 'length', 'indices')
+
     def __init__(self, match):
         self._match = match
         start, end = match.span()
@@ -156,7 +162,7 @@ class RegexMatch(object):
 
 class Streaks(object):
     def __init__(self, indices):
-        self.indices = set(indices)
+        self.indices = frozenset(indices)
 
     def __iter__(self):
         if not self.indices:
@@ -309,59 +315,45 @@ class RegexPattern(Pattern):
             return RegexMatch(match)
 
 
-class Patterns(object):
+class CompositePattern(object):
     def __init__(self, patterns):
-        self._pattern_match = patterns.pop(0).best_match
-        if patterns:
-            self._next_match = Patterns(patterns).match
-        else:
-            self._next_match = EmptyPatterns().match
+        self._patterns = patterns
 
-    def match(self, value):
-        match = self._pattern_match(value)
-        if match is None:
-            return
+    def match(self, term):
+        matches = []
 
-        next_matches = self._next_match(value)
-        if next_matches is None:
-            return
+        for pattern in self._patterns:
+            best_match = pattern.best_match(term.value)
 
-        return (match,) + next_matches
+            if not best_match:
+                return
+
+            matches.append(best_match)
+
+        return CompositeMatch(term, tuple(matches))
 
 
-class EmptyPatterns(object):
-    def match(self, value):
-        return ()
+class CompositeMatch(object):
+    __slots__ = ('id', 'value', 'rank', '_matches')
 
-
-class Term(object):
-    def __init__(self, index, value):
-        self.index = index
-        self.value = value
-
-    def match(self, patterns):
-        matches = patterns.match(self.value)
-
-        if matches is None:
-            return False
-
-        self._pattern_matches = matches
-        self.rank = (sum(m.length for m in matches), len(self.value))
-        return True
+    def __init__(self, term, matches):
+        self.id = term.id
+        self.value = term.value
+        self.rank = (sum(m.length for m in matches), len(term.value))
+        self._matches = matches
 
     def asdict(self):
-        return dict(value=self.value,
-                    index=self.index,
-                    rank=self.rank,
-                    matches=self.matches())
+        return dict(id=self.id, value=self.value,
+                    rank=self.rank, partitions=self.partitions)
 
-    def matches(self):
-        translation = []
+    @property
+    def partitions(self):
+        partitions = []
         last_end = 0
         value = self.value
 
         for start, end in sorted(self._spans()):
-            translation.append(dict(
+            partitions.append(dict(
                 unmatched=value[last_end:start],
                 matched=value[start:end]
             ))
@@ -370,46 +362,54 @@ class Term(object):
         remainder = value[last_end:]
 
         if remainder:
-            translation.append(dict(unmatched=remainder, matched=''))
+            partitions.append(dict(unmatched=remainder, matched=''))
 
-        return translation
+        return partitions
 
     def _spans(self):
         streaks = functools.reduce(
             lambda acc, streaks: acc.merge(streaks),
-            (Streaks(m.indices) for m in self._pattern_matches)
+            (Streaks(m.indices) for m in self._matches)
         )
         for start, end in streaks:
             yield (start, end)
 
 
+class Term(object):
+    __slots__ = ('id', 'value')
+
+    def __init__(self, id, value):
+        self.id = id
+        self.value = value
+
+
 class Contest(object):
     def __init__(self, *patterns):
-        self.patterns = Patterns(list(patterns))
+        self.pattern = CompositePattern(list(patterns))
 
     def elect(self, terms, **kw):
-        patterns = self.patterns
+        match = self.pattern.match
         limit = kw.get('limit', None)
         sort_limit = kw.get('sort_limit', None)
         key = operator.attrgetter('rank')
-        filtered_terms = (term for term in terms if term.match(patterns))
+        matches = (m for m in (match(t) for t in terms) if m)
 
         if sort_limit is None:
-            processed_terms = sorted(filtered_terms, key=key)
+            processed_matches = sorted(matches, key=key)
         elif sort_limit <= 0:
-            processed_terms = filtered_terms
+            processed_matches = matches
         else:
-            processed_terms = list(filtered_terms)
-            if len(processed_terms) < sort_limit:
-                processed_terms = sorted(processed_terms, key=key)
+            processed_matches = list(matches)
+            if len(processed_matches) < sort_limit:
+                processed_matches = sorted(processed_matches, key=key)
 
         if limit is not None:
-            processed_terms = list(processed_terms)[:limit]
+            processed_matches = list(processed_matches)[:limit]
 
         if kw.get('reverse', False):
-            processed_terms = reversed(list(processed_terms))
+            processed_matches = reversed(list(processed_matches))
 
-        return processed_terms
+        return processed_matches
 
 
 def make_pattern(pattern, ignore_bad_re_patterns=False):
@@ -576,9 +576,9 @@ def build_line(result, highlight=True):
 
     line.append("\x1b[22m\x1b[39m")
 
-    for portion in result.matches():
-        line.append(portion['unmatched'])
-        line.append(colored(portion['matched']))
+    for partition in result.partitions:
+        line.append(partition['unmatched'])
+        line.append(colored(partition['matched']))
 
     return ''.join(line)
 
