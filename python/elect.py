@@ -67,8 +67,7 @@ Options:
 
         rank    An array of two elements representing the quality of the match.
                 Lower numbers are better.  The first number is the sum of
-                extents of matched portions of the string (this are not the
-                matched partitions, and there's one for each pattern used), and
+                extents of matched portions of the string of all patterns, and
                 the second is the length of the entry.
 
     --no-color
