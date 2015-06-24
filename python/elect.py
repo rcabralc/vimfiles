@@ -523,7 +523,7 @@ class PatternTypeCache(object):
 
         if terms is None:
             debug(lambda: "cache: miss, patterns: {}\n".format(patterns))
-            return frozenset(default)
+            return default
 
         if best_match == patterns:
             debug(lambda: "using result directly from cache\n")
