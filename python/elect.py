@@ -519,6 +519,7 @@ class PatternTypeCache(object):
                 debug(lambda: "cache size: {}\n".format(len(from_cache)))
                 best_match = expansion
                 terms = from_cache
+                break
 
         if terms is None:
             debug(lambda: "cache: miss, patterns: {}\n".format(patterns))
