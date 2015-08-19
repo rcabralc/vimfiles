@@ -1,5 +1,6 @@
 set number
 set autoindent
+set noshowmode
 
 " Smart indent is crap.
 set nosmartindent
