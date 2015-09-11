@@ -85,7 +85,11 @@ map <A-b> :call <SID>softmotion('b')<CR>
 map <A-w> :call <SID>softmotion('w')<CR>
 map <A-e> :call <SID>softmotion('e')<CR>
 
-map <F6> :!git ls-files <bar> ctags -L -<CR>
+map <F6> "+p
+map <S-F6> "+P
+
+imap <F6> <C-o>"+p
+imap <S-F6> <C-o>"+P
 
 function! s:ToggleRelativeNumber()
     if &relativenumber

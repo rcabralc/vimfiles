@@ -5,6 +5,11 @@ set noshowmode
 " Smart indent is crap.
 set nosmartindent
 
+" Use * register for y/d/c/p operations, autoselect for becoming owner of
+" selection, but exclude clipboard operations for linux console (when there's
+" no X11).
+set clipboard=unnamed,autoselect,exclude:cons\\\|linux
+
 " Ensure backspace behavior is not alien.
 set backspace=indent,eol,start
 
