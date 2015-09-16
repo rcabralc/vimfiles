@@ -25,6 +25,8 @@ endif
 " Ctags for Git repos.  This requires .git/hooks/ctags available.  This can
 " be achieved following Tim Pope instructions at
 " http://tbaggery.com/2011/08/08/effortless-ctags-with-git.html
+"
+" Tags are stored in .git/tags, which is added to &tags by Fugitive.
 map <C-F6> :RegenerateCTagsForGitRepo<CR>
 
 function! s:regenerate_ctags_for_git_repo()
