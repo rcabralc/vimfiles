@@ -44,6 +44,7 @@ colorscheme rcabralc
 " Highlighting optimizations
 " ==========================
 
+hi! link rubyPseudoVariable Special
 
 autocmd BufWinEnter * if &modifiable | match TrailingSpace /\s\+$/ | endif
 autocmd InsertEnter * if &modifiable | match TrailingSpace /\s\+\%#\@<!$/ | endif
