@@ -42,7 +42,7 @@ Plug 'dag/vim-fish'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'tmux-plugins/vim-tmux'
 Plug 'Raimondi/delimitMate'
-Plug '~/devel/vim/monokai.vim'
+Plug 'rcabralc/monokai.vim'
 Plug '~/devel/vim/monokai-airline.vim/'
 
 call plug#end()
