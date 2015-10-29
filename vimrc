@@ -39,21 +39,11 @@ endfunction
 
 command! RegenerateCTagsForGitRepo call s:regenerate_ctags_for_git_repo()
 
-colorscheme monokai
+colorscheme rcabralc
 
 " Highlighting optimizations
 " ==========================
 
-hi! link rubyBlockParameter Special
-hi! link erubyDelimiter Operator
-hi! link rubyPseudoVariable Boolean
-
-hi! link javaScriptFuncExp Normal
-hi! link javaScriptGlobal Normal
-" Strangely enough, these JS identifiers are actually keywords.
-hi! link javaScriptIdentifier Keyword
-" I don't care that these be not highlighted in a special way.
-hi! link javaScriptHtmlElemProperties Normal
 
 autocmd BufWinEnter * if &modifiable | match TrailingSpace /\s\+$/ | endif
 autocmd InsertEnter * if &modifiable | match TrailingSpace /\s\+\%#\@<!$/ | endif
