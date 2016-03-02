@@ -17,7 +17,7 @@ place.  So, to use this as a stream filter, disable sorting, don't apply a
 limit and don't reverse the order of the candidates.
 
 Arguments:
-    PATTERNS   The pattern strings (there can be multiple ones).
+    PATTERNS   The pattern string (there can be multiple ones).
 
 Options:
     -l LIMIT, --limit=LIMIT
@@ -190,13 +190,26 @@ class ExactPattern(SmartCasePattern):
         return ExactMatch(value, self)
 
 
-class FuzzyPattern(SmartCasePattern):
-    incremental = True
+cdef class FuzzyPattern(object):
+    cdef readonly int ignore_case
+    cdef readonly int incremental
+    cdef readonly int length
+    cdef readonly object value
+    cdef readonly object _finditer
 
-    def __init__(self, pattern):
-        super(FuzzyPattern, self).__init__(pattern)
+    def __cinit__(self, pattern):
+        self.incremental = True
+        pattern_lower = pattern.lower()
 
-        if self.length > 0:
+        if pattern_lower != pattern:
+            self.value = pattern
+            self.ignore_case = False
+        else:
+            self.value = pattern_lower
+            self.ignore_case = True
+
+        if pattern:
+            self.length = len(pattern)
             input = self.value
 
             self._finditer = re.compile(
@@ -208,8 +221,16 @@ class FuzzyPattern(SmartCasePattern):
                     )
                 )
             ).finditer
+        else:
+            self.length = 0
 
-    def best_match(self, value):
+    cdef inline best_match(FuzzyPattern self, object value):
+        cdef int length
+        cdef FuzzyMatch shortest, match
+
+        if self.length == 0:
+            return UnhighlightedMatch(value)
+
         regexiter = self._finditer(value)
         shortest_re_match = next(regexiter, None)
 
@@ -232,6 +253,10 @@ class FuzzyPattern(SmartCasePattern):
 
         return shortest
 
+    def __bool__(self):
+        return self.length > 0
+
+    __nonzero__ = __bool__
 
 class InverseFuzzyPattern(FuzzyPattern):
     def best_match(self, value):
@@ -269,28 +294,34 @@ class RegexPattern(Pattern):
             return RegexMatch(match)
 
 
-class CompositePattern(object):
-    def __init__(self, patterns):
+cdef class CompositePattern(object):
+    cdef readonly object _patterns
+
+    def __cinit__(self, patterns):
         self._patterns = patterns
 
-    def match(self, term):
+    cpdef match(self, Term term):
         matches = []
 
         for pattern in self._patterns:
-            best_match = pattern.best_match(term.value)
+            if pattern.__class__ is FuzzyPattern:
+                best_match = FuzzyPattern.best_match(pattern, term.value)
+            else:
+                best_match = pattern.best_match(term.value)
 
             if not best_match:
-                return
+                return None
 
             matches.append(best_match)
 
         return CompositeMatch(term, tuple(matches))
 
 
-class UnhighlightedMatch(object):
+cdef class UnhighlightedMatch(object):
     __slots__ = ('length',)
+    cdef readonly int length
 
-    def __init__(self, value):
+    def __cinit__(self, value):
         self.length = len(value)
 
     def __bool__(self):
@@ -326,10 +357,13 @@ class ExactMatch(object):
         return frozenset(indices)
 
 
-class FuzzyMatch(object):
+cdef class FuzzyMatch(object):
     __slots__ = ('_match', '_pattern', 'length')
+    cdef readonly object _match
+    cdef readonly object _pattern
+    cdef readonly int length
 
-    def __init__(self, match, pattern):
+    def __cinit__(self, match, pattern):
         self._match = match
         self._pattern = pattern
         self.length = len(match.groups()[0])
@@ -395,12 +429,18 @@ class Streaks(object):
         return type(self)(self.indices.union(other.indices))
 
 
-class CompositeMatch(object):
-    __slots__ = ('id', 'value', 'rank', '_matches')
+cdef class CompositeMatch(object):
+    __slots__ = ('id', 'value', 'term', 'rank', '_matches')
+    cdef readonly object id
+    cdef readonly object value
+    cdef readonly object term
+    cdef readonly object rank
+    cdef readonly object _matches
 
-    def __init__(self, term, matches):
+    def __cinit__(self, term, matches):
         self.id = term.id
         self.value = term.value
+        self.term = term
         self.rank = (sum(m.length for m in matches), len(term.value))
         self._matches = matches
 
@@ -437,8 +477,10 @@ class CompositeMatch(object):
             yield (start, end)
 
 
-class Term(object):
+cdef class Term(object):
     __slots__ = ('id', 'value')
+    cdef readonly object id
+    cdef readonly object value
 
     def __init__(self, id, value):
         self.id = id

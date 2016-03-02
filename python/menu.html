@@ -28,7 +28,10 @@
         font-size: %(font-size)s;
 
         line-height: 1.5;
-        font-feature-settings: "kern" 1, "liga" 1;
+        -webkit-font-feature-settings: "kern" on, "liga" on, "clig" on, "onum" on;
+        font-feature-settings: "kern" on, "liga" on, "clig" on, "onum" on;
+        font-kerning: normal;
+        font-variant: common-ligatures oldstyle-nums;
         text-rendering: optimizeLegibility;
       }
 
@@ -38,19 +41,26 @@
         padding: 0;
       }
 
-      body > div {
+      #prompt-box {
         display: table;
+
+        font-size: inherit;
+        font-size: %(prompt-font-size)s;
+
         width: 100%;
       }
 
-      #prompt {
+      #prompt-box .prompt-line {
+        display: table-row;
+      }
+
+      #prompt-box .prompt {
         background-color: #999;
         background-color: %(prompt-background-color)s;
 
         color: black;
         color: %(prompt-color)s;
 
-        -webkit-box-sizing: border-box;
         box-sizing: border-box;
         display: table-cell;
         padding: 0 0 0 0.5em;
@@ -58,7 +68,7 @@
         white-space: nowrap;
       }
 
-      #prompt.over-limit {
+      #prompt-box.over-limit .prompt {
         background-color: inherit;
         background-color: %(prompt-over-limit-background-color)s;
 
@@ -66,24 +76,19 @@
         color: %(prompt-over-limit-color)s;
       }
 
-      .not-found #prompt {
-        background-color: %(input-not-found-background-color)s;
-
-        color: orange;
-        color: %(input-not-found-color)s;
+      .input-wrapper {
+        display: table-cell;
       }
 
-      #input {
+      .input {
         background-color: #666;
         background-color: %(input-background-color)s;
 
-        -webkit-box-sizing: border-box;
         box-sizing: border-box;
 
         color: white;
         color: %(input-color)s;
 
-        display: table-cell;
 
         font-family: inherit;
         font-family: %(input-font-family)s;
@@ -98,33 +103,29 @@
         width: 100%;
       }
 
-      #input.history-mode {
+      .input.history-mode {
         color: orange;
         color: %(input-history-color)s;
       }
 
-      .not-found #input {
+      #prompt-box.not-found .input {
         background-color: %(input-not-found-background-color)s;
 
         color: orange;
         color: %(input-not-found-color)s;
       }
 
-      #input:focus {
+      .input:focus {
         outline: none;
       }
 
-      #counters {
+      .counters {
         background-color: #666;
         background-color: %(input-background-color)s;
-
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
 
         color: white;
         color: %(counters-color)s;
 
-        -webkit-box-sizing: border-box;
         box-sizing: border-box;
         display: table-cell;
         padding: 0 0.5em 0 0;
@@ -132,11 +133,10 @@
         white-space: nowrap;
       }
 
-      .not-found #counters {
-        background-color: %(input-not-found-background-color)s;
-
-        color: orange;
-        color: %(input-not-found-color)s;
+      #entries-box {
+        display: block;
+        overflow: hidden;
+        position: relative;
       }
 
       #entries {
@@ -147,25 +147,18 @@
         font-family: %(entries-font-size)s;
 
         list-style-type: none;
+        height: 100%;
         margin: 0;
-        padding: 0;
-
-        bottom: 0;
-        left: 0;
         overflow-y: scroll;
-        position: fixed;
-        right: 0;
-        top: 2.5em;
+        padding: 0;
       }
 
       #scrollbar {
         box-sizing: border-box;
-        height: calc(100% - 2.5em);
-        overflow-y: scroll;
         padding: 3px;
-        position: fixed;
+        position: absolute;
         right: 0;
-        top: 2.5em;
+        top: 0;
         width: 12px;
       }
 
@@ -204,6 +197,7 @@
         background-color: %(entries-hl-background-color)s;
         color: lime;
         color: %(entries-hl-color)s;
+        font-weight: bold;
         transition: all 0.2s;
       }
 
@@ -216,7 +210,7 @@
         background-color: #444;
         background-color: %(selected-entry-background-color)s;
         color: white;
-        color: %(selected-entry-color);
+        color: %(selected-entry-color)s;
       }
 
       #entries li.selected .hl {
@@ -225,79 +219,97 @@
         color: lime;
         color: %(selected-entry-hl-color)s;
       }
+
+      #entries::after {
+        background-image:
+          linear-gradient(to bottom, %(entries-background-color-gradient-start)s 25%, %(entries-background-color-gradient-end)s);
+        bottom: 0;
+        content: "";
+        display: block;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
     </style>
   </head>
 
   <body>
-    <div>
-      <span id="prompt">&gt;&gt;&gt;</span>
-      <input type="text" id="input" value="%(initial-value)s" />
-      <span id="counters">100/1000</span>
+    <div id="prompt-box">
+      <div class="prompt-line">
+        <span id="prompt" class="prompt">&gt;</span>
+        <span class="input-wrapper">
+          <input type="text" class="input" value="%(initial-value)s" />
+        </span>
+        <span class="counters">100/1000</span>
+      </div>
     </div>
 
-    <ul id="entries" class="%(entries-class)s">
-      <li>Entry <span class="hl">highlight</span>ed</li>
-      <li class="selected">Other entry <span class="hl">highlight</span>ed</li>
-      <li class="selected">Other entry <span class="hl">highlight</span>ed</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-      <li>Normal entry</li>
-    </ul>
+    <div id="entries-box">
+      <ul id="entries">
+        <li>Entry <span class="hl">highlight</span>ed</li>
+        <li class="selected">Other entry <span class="hl">highlight</span>ed</li>
+        <li class="selected">Other entry <span class="hl">highlight</span>ed</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+        <li>Normal entry</li>
+      </ul>
 
-    <div id="scrollbar"><div class="track"><div class="thumb"></div></div></div>
+      <div id="scrollbar"><div class="track"><div class="thumb"></div></div></div>
+    </div>
   </body>
 </html>

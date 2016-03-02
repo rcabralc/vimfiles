@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 """
 Usage:
-    menud [--foreground | --kill]
+    menud [--foreground | --keep-stderr]
+    menud --kill
 
 Description:
     This program starts a menu as a daemon.
 
 Options:
-    --foreground  Run attached to the terminal (don't daemonize).
-    --kill        Kill the daemon if already running, return 1 otherwise.
-    -h, --help    Show this.
+    --foreground   Run attached to the terminal (don't daemonize).
+    --keep-stderr  Don't close the stderr stream in the daemon process.
+    --kill         Kill the daemon if already running, return 1 otherwise.
+    -h, --help     Show this.
 """
 
 from docopt import docopt
@@ -25,14 +27,6 @@ import sys
 
 
 socket_file = '/tmp/pythonmenu.sock'
-
-
-def unlink_socket():
-    try:
-        os.unlink(socket_file)
-    except OSError:
-        if os.path.exists(socket_file):
-            raise
 
 
 class Command:
@@ -124,7 +118,8 @@ class Menu(QObject):
         self._app.dismissed.connect(self._app.minimize)
 
     def exec_(self):
-        return self._app.exec_()
+        self._app.exec_()
+        return self.finished.emit()
 
     def prompt(self, request, command):
         self._current_request = request
@@ -178,7 +173,14 @@ class LinewiseSocket:
     def close(self):
         self._sock.close()
 
+    @classmethod
+    def context(cls, *args, **kw):
+        return ContextualLinewiseSocket(*args, **kw)
+
+
+class ContextualLinewiseSocket(LinewiseSocket):
     def __enter__(self):
+        self._unlink()
         self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self._sock.bind(self._socket_file)
         self._sock.listen(1)
@@ -186,12 +188,20 @@ class LinewiseSocket:
 
     def __exit__(self, type, value, traceback):
         self.close()
+        self._unlink()
+
+    def _unlink(self):
+        try:
+            os.unlink(self._socket_file)
+        except OSError:
+            if os.path.exists(self._socket_file):
+                raise
 
 
 class Server(QObject):
     dispatched = pyqtSignal(Command)
 
-    def __init__(self, requests, logger=None):
+    def __init__(self, requests, logger):
         super(Server, self).__init__()
         self._requests = requests
         self._logger = logger
@@ -199,8 +209,7 @@ class Server(QObject):
     def run(self):
         while True:
             command = self._requests.get().command
-            if self._logger:
-                self._logger.write('received command: %r\n' % command)
+            self._logger('received command: %r\n' % command)
             self.dispatched.emit(command)
 
 
@@ -216,16 +225,15 @@ class Listener(QObject):
             self._requests.put(Request(self._requests, sock))
 
 
-def run(logger=None):
+def run(logger):
     menu = Menu()
     requests = queue.Queue()
 
     def resolve(command):
         command.execute(menu)
 
-    with LinewiseSocket(socket_file) as sock:
-        if logger:
-            logger.write('listening on ' + socket_file + '\n')
+    with LinewiseSocket.context(socket_file) as sock:
+        logger('listening on ' + socket_file + '\n')
 
         server_thread = QThread()
         server = Server(requests, logger=logger)
@@ -240,15 +248,12 @@ def run(logger=None):
         server.dispatched.connect(resolve)
         menu.finished.connect(server_thread.exit)
         menu.finished.connect(listener_thread.exit)
-        menu.finished.connect(unlink_socket)
 
         server_thread.start()
-        if logger:
-            logger.write('started server thread\n')
+        logger('started server thread\n')
 
         listener_thread.start()
-        if logger:
-            logger.write('started receiver thread\n')
+        logger('started receiver thread\n')
 
         return menu.exec_()
 
@@ -266,15 +271,34 @@ def kill():
 
 
 def main(args):
-    if args['--foreground']:
-        return sys.exit(run(sys.stdout))
+    foreground = args['--foreground']
+    keep_stderr = args['--keep-stderr']
+
+    if keep_stderr:
+        stderr = sys.stderr
+        log_stream = stderr
+    elif foreground:
+        stderr = None
+        log_stream = sys.stdout
+    else:
+        stderr = None
+        log_stream = None
 
     if args['--kill']:
         return sys.exit(kill())
 
-    unlink_socket()
-    with daemon.DaemonContext():
-        run()
+    with daemon.DaemonContext(detach_process=not foreground,
+                              stderr=stderr):
+        run(make_logger(log_stream))
+
+
+def make_logger(stream=None):
+    if stream:
+        def log(message):
+            stream.write(message)
+        return log
+
+    return lambda message: None
 
 
 if __name__ == '__main__':

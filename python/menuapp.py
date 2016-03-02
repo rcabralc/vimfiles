@@ -10,8 +10,10 @@ import sys
 
 MAX_HISTORY_ENTRIES = 100
 
+Term = elect.Term
 
-def filter(items, pat, **options):
+
+def filter(terms, pat, **options):
     if ' ' not in pat and '\\' not in pat:
         # Optimization for the common case of a single pattern:  Don't parse
         # it, since it doesn't contain any special character.
@@ -59,7 +61,7 @@ def filter(items, pat, **options):
 
         patterns = [''.join(p) for p in patterns if p]
 
-    return elect.filter_entries(items, *patterns, **options)
+    return elect.filter_entries(terms, *patterns, **options)
 
 
 class Mode:
@@ -68,9 +70,8 @@ class Mode:
         self.prompt = prompt
 
 
-insert_mode = Mode('insert', '>>>')
-normal_mode = Mode('normal', '---')
-history_mode = Mode('history', '<<<')
+insert_mode = Mode('insert', '>')
+history_mode = Mode('history', '<')
 
 
 class Menu(QObject):
@@ -80,52 +81,62 @@ class Menu(QObject):
     def __init__(self):
         super(Menu, self).__init__()
 
-        self._all_items = []
-        self._input = ''
-        self._index = 0
-        self._results = []
+        self.clear()
         self._mode_handler = ModeHandler(self)
         self._history_path = os.path.join(os.path.dirname(__file__),
                                           'history.json')
-        self._limit = None
-        self._total_items = 0
-        self._debug = False
 
     def setup(self, items,
-              input='', limit=None, sep=None, history_key=None, debug=False):
+              input='', limit=None, sep=None, history_key=None,
+              delimiters=[], accept_input=False, debug=False):
         elect.incremental_cache.clear()
 
+        self._all_terms = [Term(i, c) for i, c in enumerate(items) if c]
         self._index = 0
         self._history = History(self._history_path, history_key)
-        self._all_items = items
         self._total_items = len(items)
         self._limit = limit
-        self._sep = sep
+        self.completion_sep = sep
+        self.word_delimiters = delimiters
+        self._accept_input = accept_input
         self._debug = debug
         self._mode_handler.switch(insert_mode)
         self._frontend.set_input(input)
+        self._input = None
         self.input = input
 
         return self
+
+    def clear(self):
+        elect.incremental_cache.clear()
+
+        self._all_terms = []
+        self._index = 0
+        self._history = None
+        self._total_items = 0
+        self._limit = None
+        self.completion_sep = None
+        self.word_delimiters = []
+        self._accept_input = False
+        self._debug = False
+
+        self._input = None
+        self._results = []
 
     def connect(self, frontend):
         self._frontend = frontend
         self._mode_handler.frontend = frontend
 
     def accept(self):
-        selected = self._get_selected()
+        selected = self.get_selected()
         if selected:
             self._history.add(self.input)
             self.selected.emit(selected)
 
-    def copy(self):
-        selected = self._get_selected()
-        if selected:
-            self._frontend.set_input(selected)
-
     def accept_input(self):
-        self._history.add(self.input)
-        self.selected.emit(self.input)
+        if self._accept_input:
+            self._history.add(self.input)
+            self.selected.emit(self.input)
 
     def enter(self, input):
         self.input = input
@@ -169,17 +180,20 @@ class Menu(QObject):
         return self.input
 
     def dismiss(self):
+        self.clear()
         self.dismissed.emit()
 
     @property
     def input(self):
-        return self._input
+        return self._input or ''
 
     @input.setter
     def input(self, value):
-        self._input = value or ''
-        self.results = filter(self._all_items, self._input, incremental=True,
-                              debug=self._debug)
+        value = value or ''
+        if self._input != value:
+            self._input = value
+            self.results = filter(self._all_terms, value,
+                                  incremental=True, debug=self._debug)
 
     @property
     def results(self):
@@ -216,7 +230,7 @@ class Menu(QObject):
     def _render_counters(self):
         self._frontend.update_counters(self._selected_count, self._total_items)
 
-    def _get_selected(self):
+    def get_selected(self):
         items = [r.value for r in self.results]
 
         if items:
@@ -225,18 +239,18 @@ class Menu(QObject):
     def _candidates_for_completion(self):
         values = self._values_for_completion()
 
-        if self._sep:
+        if self.completion_sep:
             return self._values_until_next_sep(values, len(self.input))
         return list(values)
 
     def _values_for_completion(self):
-        items = self._all_items
+        items = (t.value for t in self._all_terms)
         sw = str.startswith
         input = self.input
         return (c for c in items if sw(c, input))
 
     def _values_until_next_sep(self, values, from_index):
-        sep = self._sep
+        sep = self.completion_sep
         find = str.find
         return {
             string[:result + 1]
@@ -339,7 +353,7 @@ class Frontend:
         backend = Backend(menu, self.view)
         self.frame.addToJavaScriptWindowObject('backend', backend)
 
-    def show(self):
+    def show(self, title=None):
         self.view.show()
 
     def set_input(self, input):
@@ -403,9 +417,12 @@ class Backend(QObject):
     def acceptSelected(self):
         self.menu.accept()
 
-    @pyqtSlot()
-    def copySelected(self):
-        self.menu.copy()
+    @pyqtSlot(result=str)
+    def getSelected(self):
+        selected = self.menu.get_selected()
+        if not selected:
+            return ''
+        return selected
 
     @pyqtSlot()
     def acceptInput(self):
@@ -436,8 +453,11 @@ class Backend(QObject):
         self.menu.dismiss()
 
     @pyqtSlot(result=str)
-    def id(self):
-        return 'foo'
+    def wordDelimiters(self):
+        delimiters = [' ']
+        if self.menu.word_delimiters:
+            delimiters.extend(self.menu.word_delimiters)
+        return ''.join(delimiters)
 
 
 class MainView(QWebView):
@@ -446,8 +466,12 @@ class MainView(QWebView):
         self.setFocusPolicy(Qt.StrongFocus)
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
-    def show(self):
+    def show(self, title=None):
         r = super(MainView, self).show()
+
+        if title is not None:
+            self.setWindowTitle(title)
+
         screensize = QApplication.desktop().screenGeometry()
         size = self.geometry()
         hpos = (screensize.width() - size.width()) // 2
@@ -463,20 +487,11 @@ def interpolate_html(template, config):
         replace('%(initial-value)s', '').replace('%(entries-class)s', '')
 
 
-def build():
-    app = QApplication(sys.argv)
-    menu = Menu()
-    frontend = Frontend(menu)
-    menu.connect(frontend)
-    frontend.show()
-    return app, frontend.view, menu
-
-
 class MenuApp(QObject):
     selected = pyqtSignal(str)
     dismissed = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, title=None):
         super(MenuApp, self).__init__()
 
         self.app = QApplication(sys.argv)
@@ -488,17 +503,16 @@ class MenuApp(QObject):
         self.menu.selected.connect(self.selected.emit)
         self.menu.dismissed.connect(self.dismissed.emit)
 
-        self.frontend.show()
-
     def setup(self, *args, **kw):
+        title = kw.pop('title', None)
         self.menu.setup(*args, **kw)
-        self.restore()
+        self.restore(title=title)
 
     def minimize(self):
         self.frontend.view.hide()
 
-    def restore(self):
-        self.frontend.view.show()
+    def restore(self, title=None):
+        self.frontend.view.show(title=title)
 
     def exec_(self):
         return self.app.exec_()

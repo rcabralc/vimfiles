@@ -17,6 +17,9 @@ Options:
         directories in a list of files, for instance: use '/' (or OS path
         separator) for this.
 
+    --word-delimiters DELIMITERS
+        Delimiters used for words.
+
     --history-key KEY
         A key which must be unique to store/retrieve history.  Any string can
         be used.  History is enabled only if this option is provided and is not
@@ -26,6 +29,13 @@ Options:
         directory as the key.  Next time this program is used for this
         directory, it'll remember the previous input, allowing the user to
         reuse it.
+
+    --accept-input
+        Allow any text typed in the search input to be accepted through
+        Ctrl-Enter.
+
+    --title TITLE
+        Set the window title to TITLE.
 
     -d, --daemonize
         Create a daemon process if none exists, bring its window to the top and
@@ -60,16 +70,13 @@ Key bindings:
     Ctrl+Y:     Copy selected entry to the input box.
 """
 
-# TODO:
-#
-#     - Implement fuzzy completion
-
 from docopt import docopt
 
 import json
 import os
 import socket
 import sys
+import subprocess
 import time
 
 
@@ -91,7 +98,10 @@ def main(args):
         input=args['--input'],
         limit=limit,
         sep=args['--completion-sep'],
+        delimiters=list((args['--word-delimiters'] or '')),
         history_key=args['--history-key'],
+        accept_input=args['--accept-input'],
+        title=args['--title'],
         debug=args['--debug']
     )
 
@@ -112,7 +122,7 @@ def spawn_daemon(max_attempts=10):
             return sock
 
     if not os.path.exists(daemon_socket_file):
-        os.system(os.path.join(basedir, 'menud.py'))
+        subprocess.call([os.path.join(basedir, 'menud.py'), '--keep-stderr'])
 
     for i in range(max_attempts):
         yield Attempt()
