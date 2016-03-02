@@ -4,41 +4,48 @@ nmap Y y$
 " Toggle highlight for searched terms.
 nmap <C-C> :set hlsearch!<CR>
 
-" Navigate between buffers (only normal mode)
-nnoremap <A-h> :bp<CR>
-nnoremap <A-l> :bn<CR>
-
-" <Leader>b prompts for displaying an open file in the current buffer
-nnoremap <Leader>b :buffer<Space>
+" Navigate between tabs (only normal mode)
+nnoremap <A-h> :tabp<CR>
+nnoremap <A-l> :tabn<CR>
 
 nnoremap <Leader>k :BW<CR>
 nnoremap <Leader>K :bw!<CR>
 
 " navigate between windows without pressing C-W
-if has("gui_running")
-    let g:tmux_navigator_no_mappings = 1
-    nnoremap <C-h> <C-W><C-h>
-    nnoremap <C-j> <C-W><C-j>
-    nnoremap <C-k> <C-W><C-k>
-    nnoremap <C-l> <C-W><C-l>
-end
+if has('nvim')
+    tnoremap <C-]> <C-\><C-n>
 
-" Mappings for breaking lines on every white space or cursor
-nnoremap <Leader>j f<Space>xi<CR><ESC>_
-nnoremap <Leader>J F<Space>xi<CR><ESC>_
-nnoremap <A-j> i<CR><ESC>_
+    nnoremap <C-h> <C-w>h
+    nnoremap <C-j> <C-w>j
+    nnoremap <C-k> <C-w>k
+    nnoremap <C-l> <C-w>l
+
+    " Due to a bug in NeoVim (related to external lib), <C-h> will not work.
+    " This is a workaround.
+    if has('nvim')
+        nnoremap <BS> <C-W>h
+    endif
+else
+    nnoremap <C-h> <C-W>h
+    nnoremap <C-j> <C-W>j
+    nnoremap <C-k> <C-W>k
+    nnoremap <C-l> <C-W>l
+endif
 
 " Mappings for breaking lines at 72 chars
 nmap <Leader>w 073l<A-j>
 
 " Search in current git tree.
-nmap <C-S> :Ggrep -I  <bar> copen<CR>
+nmap <C-S> <A-8>:Ggrep -I  <bar> copen<CR>
 
-" Just highlight pattern under cursor (hlsearch must be on).
-nmap <A-8> *<S-n>
+" Just highlight pattern under cursor.
+nmap <A-8> :set hlsearch<CR>*<S-n>
 
-nmap <Leader>r :OverCommandLine<CR>%s///gc
-vnoremap <Leader>r :OverCommandLine<CR>s//gc
+" Ensure highlight is on during searches
+nnoremap / :set hlsearch<CR>/
+nnoremap ? :set hlsearch<CR>?
+nnoremap n :set hlsearch<CR>n
+nnoremap <S-n> :set hlsearch<CR><S-n>
 
 " For Emacs-style editing on the command-line:
 " start of line
@@ -60,21 +67,13 @@ cnoremap <Esc>b <S-Left>
 " forward one word
 cnoremap <Esc>f <S-Right>
 
-" Open URL under cursor.
-nnoremap <Leader>o :silent !xdg-open <C-R>=escape("<C-R><C-F>", "#?&;\|%")<CR><CR>
-
 " vim-gitgutter: enable/disable line hightlighting
 nmap <Leader>H <Plug>GitGutterLineHighlightsToggle
 " vim-gitgutter: next/previous hunks
 nmap <Leader>[ <Plug>GitGutterPrevHunk
 nmap <Leader>] <Plug>GitGutterNextHunk
 
-nmap <Leader>n :call <SID>ToggleRelativeNumber()<CR>
-
-" Load a session in the current directory.
-map <F3> :so Session.vim<CR>
-" Save the session in the current directory.
-nmap <F2> :wa<Bar>mksession!<CR>
+nmap <C-n> :call <SID>ToggleRelativeNumber()<CR>
 
 " Make the Q key format the entire paragraph.  This makes the Ex mode go away,
 " but I don't use that, and I can enter in Ex mode (in a way more like typing

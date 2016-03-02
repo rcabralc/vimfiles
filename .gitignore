@@ -5,3 +5,5 @@ Session.vim
 bundle/
 autoload/plug*
 python/history.json
+spell/
+.init.vim*

@@ -2,13 +2,17 @@ set number
 set autoindent
 set noshowmode
 
+" Assume a capable terminal.
+if has('nvim')
+    let $NVIM_TUI_ENABLE_TRUE_COLOR = '1'
+    let $NVIM_TUI_ENABLE_CURSOR_SHAPE = '1'
+endif
+
 " Smart indent is crap.
 set nosmartindent
 
-" Use * register for y/d/c/p operations, autoselect for becoming owner of
-" selection, but exclude clipboard operations for linux console (when there's
-" no X11).
-set clipboard=unnamed,autoselect,exclude:cons\\\|linux
+" The world is not prepared for deviations
+set shell=/bin/bash
 
 " Ensure backspace behavior is not alien.
 set backspace=indent,eol,start
@@ -23,7 +27,7 @@ set wildmenu
 " first complete to longest common string, then list the available options and
 " complete the first optiont, then have further <Tab>s cycle through the
 " possibilities:
-set wildmode=list:longest,list:full
+set wildmode=longest,list:longest,list:full
 
 " Leave the cursor where it was.
 set nostartofline
@@ -70,14 +74,11 @@ set incsearch
 
 set fillchars=vert:│,fold:-
 
-" Set the number of colors to 256.  This requires a capable terminal.
-set t_Co=256
-
 " Mark text width column.
 set colorcolumn=+1
 
-" Use indents of 4 spaces, and have them copied down lines.
-set shiftwidth=4
+" Use indents of 2 spaces, and have them copied down lines.
+set shiftwidth=2
 set shiftround
 set expandtab
 set smarttab
@@ -88,3 +89,5 @@ set textwidth=79
 " Reduce the maximum column in which syntax is applied.  Following lines may
 " have syntax highlighting compromised.  (defaults to 3000)
 set synmaxcol=200
+
+set backupdir=~/.vim/backup

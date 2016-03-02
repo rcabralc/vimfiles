@@ -1,73 +1,73 @@
-" Airline
-" =======
+let g:polyglot_disabled = ['javascript']
 
-if !exists('g:configured_airline')
-    let g:airline_powerline_fonts = 0
+function! s:fishrun(command)
+    let previous_shell = &shell
+    set shell=/usr/bin/fish
 
-    let g:airline_symbols = {}
-    let g:airline_left_sep = ''
-    let g:airline_left_alt_sep = '|'
-    let g:airline_right_sep = ''
-    let g:airline_right_alt_sep = '|'
-    let g:airline_symbols.linenr = ''
-    let g:airline_symbols.branch = ''
-    let g:airline_symbols.paste = '∥'
-    let g:airline_symbols.readonly = '⭤'
-    let g:airline_symbols.whitespace = 'Ξ'
+    let output = system(a:command)
 
-    " Airline theme.
-    let g:airline_mode_map = {
-        \ '__' : '-',
-        \ 'n'  : 'N',
-        \ 'i'  : 'I',
-        \ 'R'  : 'R',
-        \ 'c'  : 'C',
-        \ 'v'  : 'V',
-        \ 'V'  : 'V',
-        \ '' : 'V',
-        \ 's'  : 'S',
-        \ 'S'  : 'S',
-        \ '' : 'S',
-        \ }
-
-    let g:airline#extensions#tabline#enabled = 1
-    let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
-    let g:airline#extensions#tabline#left_sep = ''
-    let g:airline#extensions#tabline#left_alt_sep = ''
-    let g:airline#extensions#tabline#right_sep = ''
-    let g:airline#extensions#tabline#right_alt_sep = ''
-
-    let g:airline#extensions#whitespace#enabled = 1
-    let g:airline#extensions#hunks#enabled = 1
-
-    let g:airline_theme = 'monokai'
-
-    let g:configured_airline = 1
-end
-
-
-" Fugitive
-if exists('*fugitive#statusline')
-    set statusline=%{fugitive#statusline()}%*%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
-endif
-
-
-" riv.vim
-" =======
-
-let g:riv_disable_folding = 1
-let g:riv_highlight_code = 'lua,python,cpp,javascript,vim,sh,ruby'
+    exe 'set shell=' . previous_shell
+    return output
+endfunction
 
 
 " Colorscheme
 " ===========
 
-" if has('gui_running')
-"   let g:indent_guides_auto_colors = 0
-" endif
-if !has('gui_running')
-  let g:monokai_transparent_background = 1
-endif
+set background=dark
+let g:indent_guides_auto_colors = 0
+let g:rcabralc= {
+    \ 'use_default_term_colors': 1,
+    \ 'transparent_background': 1,
+\ }
+let g:monokai_colorscheme#use_default_term_colors = 1
+let g:monokai_colorscheme#transparent_background = 1
+colorscheme rcabralc
+
+
+let g:lightline = { }
+let g:lightline.colorscheme = 'rcabralc'
+let g:lightline.active = {
+    \ 'left': [ [ 'mode', 'paste' ],
+    \           [ 'fugitive' ],
+    \           [ 'syntastic' ],
+    \           [ 'readonly', 'filename', 'modified' ] ],
+    \ 'right': [ [ 'lineinfo' ],
+    \            [ 'percent' ],
+    \            [ 'filetype' ] ]
+\ }
+let g:lightline.inactive = {
+    \ 'left': [ [ 'filename' ] ],
+    \ 'right': [ [ 'lineinfo', 'percent' ] ]
+\ }
+let g:lightline.tabline = {
+    \ 'left': [ [ 'tabs' ] ],
+    \ 'right': [ [ 'close' ] ]
+\ }
+let g:lightline.component_function = {
+    \ 'readonly': 'LightLineReadonly',
+    \ 'fugitive': 'LightLineFugitive',
+\ }
+let g:lightline.component_expand = {
+    \ 'syntastic': 'SyntasticStatuslineFlag',
+\ }
+let g:lightline.component_type = {
+    \ 'syntastic': 'error',
+\ }
+
+function! LightLineReadonly()
+    return &readonly ? '!' : ''
+endfunction
+
+function! LightLineFugitive()
+    if !exists('*fugitive#head')
+        return ''
+    endif
+
+    let _ = fugitive#head()
+    return strlen(_) ? _ : ''
+endfunction
+
 
 " Homebrewed fuzzy finder in Qt
 " =============================
@@ -408,18 +408,17 @@ endfu
 " Syntastic
 " =========
 
-if !exists('g:configured_syntastic') && exists('*SyntasticStatuslineFlag')
-    set statusline+=%#warningmsg#
-    set statusline+=%{SyntasticStatuslineFlag()}
-    set statusline+=%*
-    let g:syntastic_auto_loc_list = 1
-    let g:syntastic_enable_signs = 1
-    let g:syntastic_python_checkers = ['flake8']
-    let g:syntastic_ruby_checkers = ['rubocop']
-    let g:syntastic_ruby_rubocop_args = '-D'
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
 
-    let g:configured_syntastic = 1
-end
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+
+let g:syntastic_javascript_checkers = ['jshint', 'jscs']
+let g:syntastic_python_checkers = ['flake8']
+let g:syntastic_ruby_checkers = ['rubocop']
+let g:syntastic_ruby_rubocop_args = '-D'
 
 
 " Filetypes

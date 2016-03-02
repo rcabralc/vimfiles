@@ -1,7 +1,7 @@
-if match($VIM, 'nvim') == -1
+if has('nvim')
     let vimdir = '~/.vim/'
 else
-    let vimdir = '~/.nvim/'
+    let vimdir = '~/.config/nvim/'
 endif
 
 let was_installed = 1
@@ -15,40 +15,29 @@ endif
 
 call plug#begin(vimdir . 'bundle')
 
-Plug 'Rykka/riv.vim'
-"Plug 'vim-scripts/VST'
+Plug 'mhinz/vim-startify'
 Plug 'editorconfig/editorconfig-vim'
-Plug 'othree/html5.vim'
-Plug 'bling/vim-airline'
+Plug 'sheerun/vim-polyglot'
+Plug 'itchyny/lightline.vim'
 Plug 'airblade/vim-gitgutter'
-Plug 'cakebaker/scss-syntax.vim'
-Plug 'msanders/snipmate.vim'
 Plug 'scrooloose/syntastic'
 Plug 'tomtom/tcomment_vim'
-Plug 'kchmck/vim-coffee-script'
-Plug 'hail2u/vim-css3-syntax'
-Plug 'tpope/vim-endwise'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-git'
+Plug 'tpope/vim-eunuch'
+Plug 'tpope/vim-surround'
 Plug 'nathanaelkane/vim-indent-guides'
-Plug 'othree/yajs.vim'
-Plug 'othree/es.next.syntax.vim'
-Plug 'osyo-manga/vim-over'
 Plug 'edsono/vim-matchit'
-Plug 'nvie/vim-rst-tables'
-Plug 'vim-ruby/vim-ruby'
 Plug 'vim-scripts/bufkill.vim'
 Plug 'dag/vim-fish'
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'tmux-plugins/vim-tmux'
-Plug 'Raimondi/delimitMate'
+Plug 'morhetz/gruvbox'
 Plug 'rcabralc/monokai.vim'
+Plug '~/devel/vim/rcabralc-colorscheme.vim'
 Plug '~/devel/vim/monokai-airline.vim/'
+Plug '~/devel/vim/rcabralc-airline.vim/'
 
 call plug#end()
 
 if !was_installed
-    execute "PlugInstall"
+    PlugInstall
 endif
-
-runtime! pluginconf.vim
