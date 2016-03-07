@@ -16,12 +16,8 @@ endfunction
 
 set background=dark
 let g:indent_guides_auto_colors = 0
-let g:rcabralc= {
-    \ 'use_default_term_colors': 1,
-    \ 'transparent_background': 1,
-\ }
+let g:rcabralc= { 'use_default_term_colors': 1 }
 let g:monokai_colorscheme#use_default_term_colors = 1
-let g:monokai_colorscheme#transparent_background = 1
 colorscheme rcabralc
 
 

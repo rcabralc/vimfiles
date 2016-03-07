@@ -11,20 +11,29 @@ nnoremap <A-l> :tabn<CR>
 nnoremap <Leader>k :BW<CR>
 nnoremap <Leader>K :bw!<CR>
 
-" navigate between windows without pressing C-W
+" Navigation and terminal splitting mappings
+inoremap <C-a><C-a> <Esc>
 if has('nvim')
-    tnoremap <C-]> <C-\><C-n>
+    tnoremap <C-a><C-a> <C-\><C-n>
 
     nnoremap <C-h> <C-w>h
     nnoremap <C-j> <C-w>j
     nnoremap <C-k> <C-w>k
     nnoremap <C-l> <C-w>l
 
-    " Due to a bug in NeoVim (related to external lib), <C-h> will not work.
+    " Due to a bug in Neovim (related to external lib), <C-h> will not work.
     " This is a workaround.
     if has('nvim')
         nnoremap <BS> <C-W>h
     endif
+
+    nnoremap <Leader>t :term fish<CR>
+
+    " This kinda mimics Tmux.
+    nnoremap <C-a>s :split<CR><C-w>j:set nospell <Bar> term fish<CR>
+    nnoremap <C-a>v :vsplit<CR><C-w>l:set nospell <Bar> term fish<CR>
+    tmap <C-a>s <C-\><C-n><C-a>s
+    tmap <C-a>v <C-\><C-n><C-a>v
 else
     nnoremap <C-h> <C-W>h
     nnoremap <C-j> <C-W>j

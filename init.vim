@@ -1,6 +1,9 @@
 " vim et sw=4
 
-set nocompatible " Be iMproved
+if !has('nvim')
+    set nocompatible " Be iMproved
+    set t_Co=256
+endif
 
 runtime! defaults.vim
 runtime! plugins.vim
@@ -42,7 +45,7 @@ set list
 
 
 " Move between logical lines rather than physical lines on wrap mode.
-function! <SID>add_line_motions()
+function! s:add_line_motions()
     if &ft == 'qf'
         silent! nunmap j
         silent! nunmap k
@@ -52,11 +55,22 @@ function! <SID>add_line_motions()
     endif
 endfunction
 
+function! s:show_cursor_position()
+    if &buftype == 'terminal'
+        return
+    endif
+
+    set cursorline cursorcolumn
+endfunction
+
 augroup CursorHighlight
     autocmd!
-    autocmd VimEnter * set cursorline cursorcolumn
+    autocmd WinEnter,VimEnter * call s:show_cursor_position()
+    if has('nvim')
+    autocmd WinLeave,TermOpen * set nocursorline nocursorcolumn
+    else
     autocmd WinLeave * set nocursorline nocursorcolumn
-    autocmd WinEnter * set cursorline cursorcolumn
+    endif
     " autocmd FileType * call <SID>add_line_motions()
 augroup END
 
