@@ -396,9 +396,10 @@ class Streaks(object):
 
 
 class CompositeMatch(object):
-    __slots__ = ('id', 'value', 'rank', '_matches')
+    __slots__ = ('term', 'id', 'value', 'rank', '_matches')
 
     def __init__(self, term, matches):
+        self.term = term
         self.id = term.id
         self.value = term.value
         self.rank = (sum(m.length for m in matches), len(term.value))
