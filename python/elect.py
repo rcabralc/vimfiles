@@ -498,7 +498,8 @@ class IncrementalCache(object):
 
     def update(self, patterns, matches, debug=False):
         if len(set(type(p) for p in patterns)) == 1:
-            self._cache[type(patterns[0])].update(patterns, matches, debug=debug)
+            self._cache[type(patterns[0])].update(patterns, matches,
+                                                  debug=debug)
 
     def find(self, patterns, default=frozenset(), debug=False):
         for pattern in patterns:
@@ -539,9 +540,9 @@ class PatternTypeCache(object):
 
     def update(self, patterns, matches, debug=False):
         if debug:
-            debug = lambda fn: sys.stderr.write(fn())
+            def debug(fn): sys.stderr.write(fn())
         else:
-            debug = lambda fn: None
+            def debug(fn): return
 
         patterns = tuple(p.value for p in patterns)
         debug(lambda: "updating cache for patterns: {}\n".format(patterns))
@@ -553,9 +554,9 @@ class PatternTypeCache(object):
         best_pattern = ()
 
         if debug:
-            debug = lambda fn: sys.stderr.write(fn())
+            def debug(fn): sys.stderr.write(fn())
         else:
-            debug = lambda fn: None
+            def debug(fn): return
 
         for expansion in self._exhaust(patterns):
             debug(lambda: "attempting expansion: {}\n".format(expansion))
