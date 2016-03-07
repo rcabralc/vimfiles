@@ -468,7 +468,7 @@ class MainView(QWebView):
 
     def show(self, title=None):
         r = super(MainView, self).show()
-        self.setFocus(True)
+        self.activateWindow()
 
         if title is not None:
             self.setWindowTitle(title)
