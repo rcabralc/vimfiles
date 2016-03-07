@@ -122,7 +122,9 @@ def spawn_daemon(max_attempts=10):
             return sock
 
     if not os.path.exists(daemon_socket_file):
-        subprocess.call([os.path.join(basedir, 'menud.py'), '--keep-stderr'])
+        exe = sys.executable
+        subprocess.call([exe, os.path.join(basedir, 'menud.py'),
+                         '--keep-stderr'])
 
     for i in range(max_attempts):
         yield Attempt()
