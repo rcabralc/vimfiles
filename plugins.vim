@@ -1,7 +1,7 @@
 if has('nvim')
-    let vimdir = '~/.vim/'
-else
     let vimdir = '~/.config/nvim/'
+else
+    let vimdir = '~/.vim/'
 endif
 
 let was_installed = 1
