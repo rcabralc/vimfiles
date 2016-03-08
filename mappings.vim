@@ -16,14 +16,15 @@ inoremap <C-a><C-a> <Esc>
 if has('nvim')
     tnoremap <C-a><C-a> <C-\><C-n>
 
-    nnoremap <C-h> <C-w>h
-    nnoremap <C-j> <C-w>j
-    nnoremap <C-k> <C-w>k
-    nnoremap <C-l> <C-w>l
+    tnoremap <C-w><C-h> <C-\><C-n><C-w>h
+    tnoremap <C-w><C-j> <C-\><C-n><C-w>j
+    tnoremap <C-w><C-k> <C-\><C-n><C-w>k
+    tnoremap <C-w><C-l> <C-\><C-n><C-w>l
 
     " Due to a bug in Neovim (related to external lib), <C-h> will not work.
     " This is a workaround.
     if has('nvim')
+        tnoremap <C-w><BS> <C-\><C-n><C-W>h
         nnoremap <BS> <C-W>h
     endif
 
