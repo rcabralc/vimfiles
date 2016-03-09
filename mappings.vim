@@ -41,9 +41,13 @@ if has('nvim')
 
     " This kinda mimics Tmux.
     nnoremap <C-a>s :split<CR><C-w>j:set nospell <Bar>call OpenTermInDir(expand('%:p:h'))<CR>
+    nnoremap <C-a><C-s> :split<CR><C-w>j:set nospell <Bar>call OpenTermInDir(expand('%:p:h'))<CR>
     nnoremap <C-a>v :vsplit<CR><C-w>l:set nospell <Bar>call OpenTermInDir(expand('%:p:h'))<CR>
+    nnoremap <C-a><C-v> :vsplit<CR><C-w>l:set nospell <Bar>call OpenTermInDir(expand('%:p:h'))<CR>
     tmap <C-a>s <C-\><C-n><C-a>s
+    tmap <C-a><C-s> <C-\><C-n><C-a>s
     tmap <C-a>v <C-\><C-n><C-a>v
+    tmap <C-a><C-v> <C-\><C-n><C-a>v
 else
     nnoremap <C-h> <C-W>h
     nnoremap <C-j> <C-W>j
