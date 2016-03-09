@@ -25,7 +25,6 @@ if has('nvim')
     " This is a workaround.
     if has('nvim')
         tnoremap <C-w><BS> <C-\><C-n><C-W>h
-        nnoremap <BS> <C-W>h
     endif
 
     function! OpenTermInDir(dir)
