@@ -28,11 +28,20 @@ if has('nvim')
         nnoremap <BS> <C-W>h
     endif
 
-    nnoremap <Leader>t :term fish<CR>
+    function! OpenTermInDir(dir)
+        if a:dir !~ '^term://'
+            let info = g:ProjectRootInfo(a:dir)
+            execute "lcd " . info.toplevel
+        endif
+
+        term fish
+    endfunction
+
+    nnoremap <Leader>t :call OpenTermInDir(expand('%:p:h'))<CR>
 
     " This kinda mimics Tmux.
-    nnoremap <C-a>s :split<CR><C-w>j:set nospell <Bar> term fish<CR>
-    nnoremap <C-a>v :vsplit<CR><C-w>l:set nospell <Bar> term fish<CR>
+    nnoremap <C-a>s :split<CR><C-w>j:set nospell <Bar>call OpenTermInDir(expand('%:p:h'))<CR>
+    nnoremap <C-a>v :vsplit<CR><C-w>l:set nospell <Bar>call OpenTermInDir(expand('%:p:h'))<CR>
     tmap <C-a>s <C-\><C-n><C-a>s
     tmap <C-a>v <C-\><C-n><C-a>v
 else

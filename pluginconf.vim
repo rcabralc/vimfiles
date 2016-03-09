@@ -266,6 +266,7 @@ function! s:project_root_info(dirname)
         \ 'filescmd': filescmd
     \ }
 endfunction
+let g:ProjectRootInfo = function('s:project_root_info')
 
 function! s:gather_files(dirname)
     return 'cd ' . shellescape(a:dirname) .
