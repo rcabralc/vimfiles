@@ -116,7 +116,7 @@ function! s:improve_highlights(p)
     hi! link rubyPseudoVariable Special
 
     call rcabralc#hl('GitGutterAdd',           a:p.lime,    a:p.none)
-    call rcabralc#hl('GitGutterChange',        a:p.purple,  a:p.none)
+    call rcabralc#hl('GitGutterChange',        a:p.cyan,    a:p.none)
     call rcabralc#hl('GitGutterDelete',        a:p.magenta, a:p.none)
     call rcabralc#hl('GitGutterChangeDelete',  a:p.magenta, a:p.none)
 
