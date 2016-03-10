@@ -4,22 +4,26 @@ nmap Y y$
 " Toggle highlight for searched terms.
 nmap <C-C> :set hlsearch!<CR>
 
-" Navigate between tabs (only normal mode)
-nnoremap <A-h> :tabp<CR>
-nnoremap <A-l> :tabn<CR>
-
 nnoremap <Leader>k :BW<CR>
 nnoremap <Leader>K :bw!<CR>
-
-" Navigation and splitting mappings
 inoremap <C-a><C-a> <Esc>
 if has('nvim')
     tnoremap <C-a><C-a> <C-\><C-n>
+endif
 
+" Navigation and splitting mappings
+
+nnoremap <A-h> :tabp<CR>
+nnoremap <A-l> :tabn<CR>
+
+if has('nvim')
     tnoremap <C-w><C-h> <C-\><C-n><C-w>h
     tnoremap <C-w><C-j> <C-\><C-n><C-w>j
     tnoremap <C-w><C-k> <C-\><C-n><C-w>k
     tnoremap <C-w><C-l> <C-\><C-n><C-w>l
+
+    tnoremap <A-h> <C-\><C-n>:tabp<CR>
+    tnoremap <A-l> <C-\><C-n>:tabn<CR>
 
     " Due to a bug in Neovim (related to external lib), <C-h> will not work.
     " This is a workaround.
