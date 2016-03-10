@@ -22,14 +22,18 @@ if has('nvim')
     tnoremap <C-w><C-k> <C-\><C-n><C-w>k
     tnoremap <C-w><C-l> <C-\><C-n><C-w>l
 
+    inoremap <C-w><C-h> <ESC><C-w>h
+    inoremap <C-w><C-j> <ESC><C-w>j
+    inoremap <C-w><C-k> <ESC><C-w>k
+    inoremap <C-w><C-l> <ESC><C-w>l
+
     tnoremap <A-h> <C-\><C-n>:tabp<CR>
     tnoremap <A-l> <C-\><C-n>:tabn<CR>
 
     " Due to a bug in Neovim (related to external lib), <C-h> will not work.
     " This is a workaround.
-    if has('nvim')
-        tnoremap <C-w><BS> <C-\><C-n><C-W>h
-    endif
+    tnoremap <C-w><BS> <C-\><C-n><C-W>h
+    inoremap <C-w><BS> <ESC><C-W>h
 
     function! OpenTermInDir(dir)
         if a:dir !~ '^term://'
@@ -56,6 +60,11 @@ else
     nnoremap <C-j> <C-W>j
     nnoremap <C-k> <C-W>k
     nnoremap <C-l> <C-W>l
+
+    inoremap <C-h> <ESC><C-W>h
+    inoremap <C-j> <ESC><C-W>j
+    inoremap <C-k> <ESC><C-W>k
+    inoremap <C-l> <ESC><C-W>l
 endif
 
 " This mimics Tmux behavior on splitting: jump to the right/bottom.
