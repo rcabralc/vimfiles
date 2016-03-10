@@ -11,7 +11,7 @@ nnoremap <A-l> :tabn<CR>
 nnoremap <Leader>k :BW<CR>
 nnoremap <Leader>K :bw!<CR>
 
-" Navigation and terminal splitting mappings
+" Navigation and splitting mappings
 inoremap <C-a><C-a> <Esc>
 if has('nvim')
     tnoremap <C-a><C-a> <C-\><C-n>
@@ -53,6 +53,12 @@ else
     nnoremap <C-k> <C-W>k
     nnoremap <C-l> <C-W>l
 endif
+
+" This mimics Tmux behavior on splitting: jump to the right/bottom.
+nnoremap <C-w>s <C-w>s<C-w>j
+nnoremap <C-w><C-s> <C-w>s<C-w>j
+nnoremap <C-w>v <C-w>v<C-w>l
+nnoremap <C-w><C-v> <C-w>v<C-w>l
 
 " Mappings for breaking lines at 72 chars
 nmap <Leader>w 073l<A-j>
