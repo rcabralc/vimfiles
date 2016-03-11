@@ -117,10 +117,10 @@ function! s:improve_highlights(p)
 
     hi! link rubyPseudoVariable Special
 
-    call rcabralc#hl('GitGutterAdd',           a:p.lime,    a:p.none)
-    call rcabralc#hl('GitGutterChange',        a:p.cyan,    a:p.none)
-    call rcabralc#hl('GitGutterDelete',        a:p.magenta, a:p.none)
-    call rcabralc#hl('GitGutterChangeDelete',  a:p.magenta, a:p.none)
+    call rcabralc#hl('GitGutterAdd',           a:p.lime,    a:p.none, 'bold')
+    call rcabralc#hl('GitGutterChange',        a:p.cyan,    a:p.none, 'bold')
+    call rcabralc#hl('GitGutterDelete',        a:p.magenta, a:p.none, 'bold')
+    call rcabralc#hl('GitGutterChangeDelete',  a:p.magenta, a:p.none, 'bold')
 
     if !exists('g:indent_guides_auto_colors')
       let g:indent_guides_auto_colors = 0
