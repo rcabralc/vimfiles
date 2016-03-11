@@ -115,6 +115,12 @@ nmap <Leader>] <Plug>GitGutterNextHunk
 
 nmap <C-n> :call <SID>ToggleRelativeNumber()<CR>
 
+" Fuzzy file opening
+map <Leader>f :call g:fuzzy.open('edit', expand('%:p:h'), 1, '')<CR>
+map <Leader>p :call g:fuzzy.open('read', expand('%:p:h'), 0, '')<CR>
+map <Leader>b :call g:fuzzy.reopen('e')<CR>
+map <Leader>o :call g:fuzzy.openold('e')<CR>
+
 " Make the Q key format the entire paragraph.  This makes the Ex mode go away,
 " but I don't use that, and I can enter in Ex mode (in a way more like typing
 " ":") by using gQ.
