@@ -1,16 +1,5 @@
 let g:polyglot_disabled = ['javascript']
 
-function! s:fishrun(command)
-    let previous_shell = &shell
-    set shell=/usr/bin/fish
-
-    let output = system(a:command)
-
-    exe 'set shell=' . previous_shell
-    return output
-endfunction
-
-
 " Colorscheme
 " ===========
 
@@ -50,6 +39,8 @@ let g:lightline.component_expand = {
 let g:lightline.component_type = {
     \ 'syntastic': 'error',
 \ }
+let g:lightline.separator = { 'left': '⮀', 'right': '⮂' }
+let g:lightline.subseparator = { 'left': '⮁', 'right': '⮃' }
 
 function! LightLineReadonly()
     return &readonly ? '!' : ''
@@ -123,7 +114,7 @@ function! FuzzyFileOpen(cmd, dirname, accept_input, info)
         return FuzzyDirectorySelection(a:cmd, info.toplevel, info.toplevel)
     endif
 
-    execute a:cmd . " " .  s:makepath(resolve(info.toplevel . '/' . fname))
+    execute a:cmd . " " .  g:utils.makepath(resolve(info.toplevel . '/' . fname))
 endfunction
 map <C-f> :call FuzzyFileOpen('edit', expand('%:p:h'), 1, '')<CR>
 map <C-p> :call FuzzyFileOpen('read', expand('%:p:h'), 0, '')<CR>
@@ -145,7 +136,7 @@ function! FuzzyBufferReOpen(cmd)
         \ 'title': 'Select buffer'
     \ })
 
-    call s:fishrun('rm ' . tempfile)
+    call g:utils.fish('rm ' . tempfile)
 
     if empty(fname)
         return
@@ -174,7 +165,7 @@ function! FuzzyOldFileReOpen(cmd)
         \ 'title': 'Select old file'
     \ })
 
-    call s:fishrun('rm ' . tempfile)
+    call g:utils.fish('rm ' . tempfile)
 
     if empty(fname)
         return
@@ -191,7 +182,7 @@ function! FuzzyDirectorySelection(cmd, root, dirname)
     if empty(a:dirname)
         let initial = ''
     else
-        let initial = s:relativepath(root, a:dirname)
+        let initial = g:utils.relativepath(root, a:dirname)
     endif
 
     if !empty(initial)
@@ -235,26 +226,16 @@ function! FuzzyGemDirectorySelection(cmd, root)
     return FuzzyFileOpen(a:cmd, choice, 1, {
         \ 'initial': '',
         \ 'toplevel': choice,
-        \ 'filescmd': s:gather_files(choice)
+        \ 'filescmd': g:utils.project_files_cmd(choice)
     \ })
 endfunction
 
 map <Leader>g :call FuzzyGemDirectorySelection('e', expand('%:p:h'))<CR>
 
 function! s:project_root_info(dirname)
-    let gittoplevel = s:chomp(s:fishrun('cd ' . a:dirname . '; and git rev-parse --show-toplevel 2>/dev/null'))
-
-    if empty(gittoplevel)
-        let initial = ''
-        let toplevel = a:dirname
-        let filescmd = s:gather_files(toplevel)
-    else
-        let initial = s:relativepath(gittoplevel, a:dirname)
-        let toplevel = gittoplevel
-        let filescmd = 'cd ' .
-                    \ shellescape(toplevel) .
-                    \ '; and git ls-files -co --exclude-standard | sort | uniq'
-    endif
+    let toplevel = g:utils.project_root(a:dirname)
+    let filescmd = g:utils.project_files_cmd(a:dirname)
+    let initial = g:utils.relativepath(toplevel, a:dirname)
 
     if !empty(initial)
         let initial = initial . '/'
@@ -265,17 +246,6 @@ function! s:project_root_info(dirname)
         \ 'toplevel': toplevel,
         \ 'filescmd': filescmd
     \ }
-endfunction
-let g:ProjectRootInfo = function('s:project_root_info')
-
-function! s:gather_files(dirname)
-    return 'cd ' . shellescape(a:dirname) .
-        \ '; and ag . -i --nocolor --nogroup --hidden '.
-        \ '--ignore .git '.
-        \ '--ignore .hg '.
-        \ '--ignore .DS_Store '.
-        \ '--ignore *.swp '.
-        \ '-g "" 2>/dev/null'
 endfunction
 
 function! s:gather_dirs(root, maxdepth)
@@ -319,9 +289,13 @@ function! s:gather_dirs(root, maxdepth)
 endfunction
 
 function! s:rubygems_path(dirname)
-    return s:chomp(s:fishrun('cd ' . shellescape(a:dirname) . '; and ' .
+    return g:utils.fish(
         \ 'rbenv exec gem environment | ' .
-        \ 'grep INSTALLATION | cut -d : -f 2 | xargs'))
+        \ 'grep INSTALLATION | cut -d : -f 2 | xargs', {
+        \ 'cwd': a:dirname,
+        \ 'chomp': 1
+        \ }
+    \)
 endfunction
 
 function! s:spawn_menu(entriescmd, params)
@@ -356,50 +330,13 @@ function! s:spawn_menu(entriescmd, params)
     endif
 
     let cmd = a:entriescmd . ' | ' . menucmd
-    return s:chomp(s:fishrun(cmd . ' 2>/tmp/debug.log'))
-endfunction
-
-" Strip the newline from the end of a string
-function! s:chomp(str)
-    return substitute(a:str, '\n$', '', '')
-endfunction
-
-function! s:relativepath(basepath, path)
-    let basepath = substitute(resolve(a:basepath), '/$', '', '')
-    let basepath = substitute(basepath, '^/files/rcabralc', '/home/rcabralc', '')
-    let path = substitute(resolve(a:path), '/$', '', '')
-    let path = substitute(path, '^/files/rcabralc', '/home/rcabralc', '')
-    let rel = substitute(path, '^' . s:regexescape(basepath), '', '')
-    return substitute(rel, '^/', '', '')
-endfunction
-
-function! s:makepath(file)
-    let dir = fnamemodify(a:file, ":p:h")
-    if !isdirectory(dir)
-        call mkdir(dir, "p")
-    endif
-    return a:file
+    return g:utils.fish(cmd . ' 2>/tmp/debug.log', { 'chomp': 1 })
 endfunction
 
 function! s:getparent(dirname)
     py import os.path, vim
     return '/' . pyeval("os.path.join(*vim.eval('a:dirname').split(os.path.sep)[:-1])")
 endfunction
-
-" Borrowed from somewhere in Internet, lost reference...
-fu! s:regexescape(str)
-  let str = a:str
-
-  if exists('+ssl') && !&ssl
-    let str = escape(str, '\')
-  en
-
-  for each in ['^', '$', '.']
-    let str = escape(str, each)
-  endfo
-
-  return str
-endfu
 
 
 " Syntastic

@@ -5,9 +5,10 @@ if !has('nvim')
     set t_Co=256
 endif
 
-runtime! defaults.vim
-runtime! plugins.vim
-runtime! mappings.vim
+execute 'source ' . fnamemodify($MYVIMRC, ':p:h') . '/utils.vim'
+call utils.vimsource('defaults.vim')
+call utils.vimsource('plugins.vim')
+call utils.vimsource('mappings.vim')
 
 syntax enable
 filetype plugin indent on
@@ -135,4 +136,4 @@ augroup Colors
     autocmd ColorScheme rcabralc call s:improve_highlights(g:rcabralc#palette)
 augroup END
 
-runtime! pluginconf.vim
+call utils.vimsource('pluginconf.vim')

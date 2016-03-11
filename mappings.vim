@@ -37,8 +37,7 @@ if has('nvim')
 
     function! OpenTermInDir(dir)
         if a:dir !~ '^term://'
-            let info = g:ProjectRootInfo(a:dir)
-            execute "lcd " . info.toplevel
+            execute "lcd " .  g:utils.project_root(a:dir)
         endif
 
         term fish
