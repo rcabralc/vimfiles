@@ -93,3 +93,5 @@ set textwidth=79
 " Reduce the maximum column in which syntax is applied.  Following lines may
 " have syntax highlighting compromised.  (defaults to 3000)
 set synmaxcol=200
+
+set cursorline

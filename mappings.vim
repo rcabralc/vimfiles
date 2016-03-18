@@ -1,9 +1,6 @@
 " This seems more logical
 nmap Y y$
 
-" Toggle highlight for searched terms.
-nmap <C-C> :set hlsearch!<CR>
-
 nnoremap <Leader>k :BW<CR>
 nnoremap <Leader>K :bw!<CR>
 inoremap <C-a><C-a> <Esc>
@@ -16,61 +13,52 @@ endif
 nnoremap <A-h> :tabp<CR>
 nnoremap <A-l> :tabn<CR>
 
-if has('nvim')
-    tnoremap <C-w><C-h> <C-\><C-n><C-w>h
-    tnoremap <C-w><C-j> <C-\><C-n><C-w>j
-    tnoremap <C-w><C-k> <C-\><C-n><C-w>k
-    tnoremap <C-w><C-l> <C-\><C-n><C-w>l
+nnoremap <C-h> <C-W>h
+nnoremap <C-j> <C-W>j
+nnoremap <C-k> <C-W>k
+nnoremap <C-l> <C-W>l
 
-    inoremap <C-w><C-h> <ESC><C-w>h
-    inoremap <C-w><C-j> <ESC><C-w>j
-    inoremap <C-w><C-k> <ESC><C-w>k
-    inoremap <C-w><C-l> <ESC><C-w>l
+inoremap <C-h> <ESC><C-W>h
+inoremap <C-j> <ESC><C-W>j
+inoremap <C-k> <ESC><C-W>k
+inoremap <C-l> <ESC><C-W>l
+
+if has('nvim')
+    tnoremap <C-h> <C-\><C-n><C-w>h
+    tnoremap <C-j> <C-\><C-n><C-w>j
+    tnoremap <C-k> <C-\><C-n><C-w>k
+    tnoremap <C-l> <C-\><C-n><C-w>l
 
     tnoremap <A-h> <C-\><C-n>:tabp<CR>
     tnoremap <A-l> <C-\><C-n>:tabn<CR>
 
     " Due to a bug in Neovim (related to external lib), <C-h> will not work.
     " This is a workaround.
-    tnoremap <C-w><BS> <C-\><C-n><C-W>h
-    inoremap <C-w><BS> <ESC><C-W>h
+    " tnoremap <C-w><BS> <C-\><C-n><C-W>h
+    " inoremap <C-w><BS> <ESC><C-W>h
 
     function! OpenTermInDir(dir)
         if a:dir !~ '^term://'
             execute "lcd " .  g:utils.project_root(a:dir)
         endif
 
-        term fish
+        set nospell
+        edit term://fish
+        startinsert
     endfunction
 
     nnoremap <Leader>t :call OpenTermInDir(expand('%:p:h'))<CR>
 
     " This kinda mimics Tmux.
-    nnoremap <C-a>s :split<CR><C-w>j:set nospell <Bar>call OpenTermInDir(expand('%:p:h'))<CR>
-    nnoremap <C-a><C-s> :split<CR><C-w>j:set nospell <Bar>call OpenTermInDir(expand('%:p:h'))<CR>
-    nnoremap <C-a>v :vsplit<CR><C-w>l:set nospell <Bar>call OpenTermInDir(expand('%:p:h'))<CR>
-    nnoremap <C-a><C-v> :vsplit<CR><C-w>l:set nospell <Bar>call OpenTermInDir(expand('%:p:h'))<CR>
+    nnoremap <C-a>s :split<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
+    nnoremap <C-a><C-s> :split<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
+    nnoremap <C-a>v :vsplit<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
+    nnoremap <C-a><C-v> :vsplit<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
     tmap <C-a>s <C-\><C-n><C-a>s
     tmap <C-a><C-s> <C-\><C-n><C-a>s
     tmap <C-a>v <C-\><C-n><C-a>v
     tmap <C-a><C-v> <C-\><C-n><C-a>v
-else
-    nnoremap <C-h> <C-W>h
-    nnoremap <C-j> <C-W>j
-    nnoremap <C-k> <C-W>k
-    nnoremap <C-l> <C-W>l
-
-    inoremap <C-h> <ESC><C-W>h
-    inoremap <C-j> <ESC><C-W>j
-    inoremap <C-k> <ESC><C-W>k
-    inoremap <C-l> <ESC><C-W>l
 endif
-
-" This mimics Tmux behavior on splitting: jump to the right/bottom.
-nnoremap <C-w>s <C-w>s<C-w>j
-nnoremap <C-w><C-s> <C-w>s<C-w>j
-nnoremap <C-w>v <C-w>v<C-w>l
-nnoremap <C-w><C-v> <C-w>v<C-w>l
 
 " Mappings for breaking lines at 72 chars
 nmap <Leader>w 073l<A-j>
@@ -108,12 +96,10 @@ cnoremap <Esc>b <S-Left>
 cnoremap <Esc>f <S-Right>
 
 " vim-gitgutter: enable/disable line hightlighting
-nmap <Leader>H <Plug>GitGutterLineHighlightsToggle
+nmap <Leader>h <Plug>GitGutterLineHighlightsToggle
 " vim-gitgutter: next/previous hunks
 nmap <Leader>[ <Plug>GitGutterPrevHunk
 nmap <Leader>] <Plug>GitGutterNextHunk
-
-nmap <C-n> :call <SID>ToggleRelativeNumber()<CR>
 
 " Fuzzy file opening
 map <Leader>f :call g:fuzzy.open('edit', expand('%:p:h'), 1, '')<CR>
@@ -126,23 +112,15 @@ map <Leader>o :call g:fuzzy.openold('e')<CR>
 " ":") by using gQ.
 nnoremap Q gqap
 
-map <A-b> :call <SID>softmotion('b')<CR>
-map <A-w> :call <SID>softmotion('w')<CR>
-map <A-e> :call <SID>softmotion('e')<CR>
-
 map <F6> "+p
 map <S-F6> "+P
 
 imap <F6> <C-o>"+p
 imap <S-F6> <C-o>"+P
 
-function! s:ToggleRelativeNumber()
-    if &relativenumber
-        set norelativenumber
-    else
-        set relativenumber
-    endif
-endfunction
+map <A-b> :call <SID>softmotion('b')<CR>
+map <A-w> :call <SID>softmotion('w')<CR>
+map <A-e> :call <SID>softmotion('e')<CR>
 
 function! <SID>softmotion(motion)
     let oldisk = &isk
@@ -150,3 +128,7 @@ function! <SID>softmotion(motion)
     execute "normal ".a:motion
     execute "setlocal isk=".oldisk
 endfunction
+
+nmap <Leader>s :set hlsearch!<CR>
+nmap <Leader>n :set relativenumber!<CR>
+nmap <Leader>c :set cursorcolumn!<CR>

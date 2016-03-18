@@ -15,9 +15,8 @@ let g:lightline.colorscheme = 'rcabralc'
 let g:lightline.active = {
     \ 'left': [ [ 'mode', 'paste' ],
     \           [ 'fugitive' ],
-    \           [ 'syntastic' ],
     \           [ 'readonly', 'filename', 'modified' ] ],
-    \ 'right': [ [ 'lineinfo' ],
+    \ 'right': [ [ 'syntastic', 'lineinfo' ],
     \            [ 'percent' ],
     \            [ 'filetype' ] ]
 \ }

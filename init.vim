@@ -45,37 +45,6 @@ command! RegenerateCTagsForGitRepo call s:regenerate_ctags_for_git_repo()
 set listchars=tab:»»,trail:•
 set list
 
-
-" Move between logical lines rather than physical lines on wrap mode.
-function! s:add_line_motions()
-    if &ft == 'qf'
-        silent! nunmap j
-        silent! nunmap k
-    else
-        nnoremap <buffer> j gj
-        nnoremap <buffer> k gk
-    endif
-endfunction
-
-function! s:show_cursor_position()
-    if &buftype == 'terminal'
-        return
-    endif
-
-    set cursorline cursorcolumn
-endfunction
-
-augroup CursorHighlight
-    autocmd!
-    autocmd WinEnter,VimEnter * call s:show_cursor_position()
-    if has('nvim')
-    autocmd WinLeave,TermOpen * set nocursorline nocursorcolumn
-    else
-    autocmd WinLeave * set nocursorline nocursorcolumn
-    endif
-    " autocmd FileType * call <SID>add_line_motions()
-augroup END
-
 augroup Text
     autocmd!
     autocmd BufNewFile,BufRead *.txt setfiletype human
