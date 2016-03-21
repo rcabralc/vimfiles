@@ -185,6 +185,12 @@
         transition: all 0.2s;
       }
 
+      #entries li:nth-child(2n + 1) {
+        background-color: #333;
+        background-color: %(entries-background-color)s;
+        background-color: %(entries-alternate-background-color)s;
+      }
+
       #entries.preformatted li {
         font-family: monospace;
         font-family: %(entries-preformatted-font-family)s;
@@ -201,19 +207,20 @@
         transition: all 0.2s;
       }
 
-      #entries li:nth-child(2n + 1),
       #entries li:nth-child(2n + 1) .hl {
-        background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1))
+        background-color: #555;
+        background-color: %(entries-hl-background-color)s;
+        background-color: %(entries-alternate-hl-background-color)s;
       }
 
-      #entries li.selected {
+      #entries li.selected.selected {
         background-color: #444;
         background-color: %(selected-entry-background-color)s;
         color: white;
         color: %(selected-entry-color)s;
       }
 
-      #entries li.selected .hl {
+      #entries li.selected.selected .hl {
         background-color: #666;
         background-color: %(selected-entry-hl-background-color)s;
         color: lime;
