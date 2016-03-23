@@ -14,17 +14,6 @@ call utils.vimsource('mappings.vim')
 syntax enable
 filetype plugin indent on
 
-" Calculator using python
-" =======================
-
-if has('python3')
-    command! -nargs=+ Calc :py3 print <args>
-    py3 import math
-elseif has('python')
-    command! -nargs=+ Calc :py print <args>
-    py import math
-endif
-
 " Ctags for Git repos.  This requires .git/hooks/ctags available.  This can
 " be achieved following Tim Pope instructions at
 " http://tbaggery.com/2011/08/08/effortless-ctags-with-git.html
