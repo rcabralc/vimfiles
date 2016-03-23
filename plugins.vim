@@ -15,26 +15,48 @@ endif
 
 call plug#begin(vimdir . 'bundle')
 
-Plug 'mhinz/vim-startify'
-Plug 'editorconfig/editorconfig-vim'
-Plug 'sheerun/vim-polyglot'
-Plug 'itchyny/lightline.vim'
-Plug 'airblade/vim-gitgutter'
+" Filetypes/linters
 Plug 'scrooloose/syntastic'
-Plug 'tomtom/tcomment_vim'
-Plug 'tpope/vim-fugitive'
+Plug 'sheerun/vim-polyglot'
 Plug 'tpope/vim-git'
-Plug 'tpope/vim-eunuch'
-Plug 'tpope/vim-surround'
-Plug 'nathanaelkane/vim-indent-guides'
-Plug 'edsono/vim-matchit'
-Plug 'vim-scripts/bufkill.vim'
 Plug 'dag/vim-fish'
+
+" Colorschemes/themes
 Plug 'morhetz/gruvbox'
 Plug 'rcabralc/monokai.vim'
 Plug '~/devel/vim/rcabralc-colorscheme.vim'
 Plug '~/devel/vim/monokai-airline.vim/'
 Plug '~/devel/vim/rcabralc-airline.vim/'
+
+" Git
+Plug 'tpope/vim-fugitive'
+
+" EditorConfig
+Plug 'editorconfig/editorconfig-vim'
+
+" Better status/tab line
+Plug 'itchyny/lightline.vim'
+
+" Show lines changed
+Plug 'airblade/vim-gitgutter'
+
+" Toggle displaying indent steps
+Plug 'nathanaelkane/vim-indent-guides'
+
+" Comment in/out stuff easily
+Plug 'tomtom/tcomment_vim'
+
+" Edit things with sudo
+Plug 'tpope/vim-eunuch'
+
+" Easily change delimiters
+Plug 'tpope/vim-surround'
+
+" Keep layout when deleting/wiping buffers
+Plug 'qpkorr/vim-bufkill'
+
+" Nice start screen
+Plug 'mhinz/vim-startify'
 
 call plug#end()
 
