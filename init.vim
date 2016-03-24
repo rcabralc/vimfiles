@@ -70,6 +70,8 @@ function! s:improve_highlights(p)
 
     hi! link rubyPseudoVariable Special
 
+    hi! link erubyDelimiter Delimiter
+
     call rcabralc#hl('GitGutterAdd',           a:p.lime,    a:p.none, 'bold')
     call rcabralc#hl('GitGutterChange',        a:p.cyan,    a:p.none, 'bold')
     call rcabralc#hl('GitGutterDelete',        a:p.magenta, a:p.none, 'bold')
