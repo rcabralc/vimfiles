@@ -20,6 +20,7 @@ Plug 'scrooloose/syntastic'
 Plug 'sheerun/vim-polyglot'
 Plug 'tpope/vim-git'
 Plug 'dag/vim-fish'
+Plug 'plasticboy/vim-markdown'
 
 " Colorschemes/themes
 Plug 'morhetz/gruvbox'
@@ -57,6 +58,9 @@ Plug 'qpkorr/vim-bufkill'
 
 " Nice start screen
 Plug 'mhinz/vim-startify'
+
+" Highlight colors
+Plug 'ap/vim-css-color'
 
 call plug#end()
 

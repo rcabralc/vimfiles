@@ -66,11 +66,6 @@ function! s:improve_highlights(p)
     hi! link cssFunctionName Function
     hi! link cssIdentifier Identifier
 
-    hi! link markdownCode Function
-    hi! link markdownCodeBlock Function
-    hi! link markdownItalic Type
-    hi! link markdownBold Statement
-
     hi! link javaScriptParens Delimiter
 
     hi! link rubyPseudoVariable Special
