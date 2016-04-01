@@ -64,7 +64,7 @@ endif
 nmap <Leader>w 073l<A-j>
 
 " Search in current git tree.
-nmap <C-S> <A-8>:Ggrep -I  <bar> copen<CR>
+nmap <C-S> <A-8>:Ggrep -I  <bar> copen
 
 " Just highlight pattern under cursor.
 nmap <A-8> :set hlsearch<CR>*<S-n>
