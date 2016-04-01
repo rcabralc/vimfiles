@@ -50,6 +50,9 @@ Plug 'tomtom/tcomment_vim'
 " Edit things with sudo
 Plug 'tpope/vim-eunuch'
 
+" Add end to ruby blocks automatically
+Plug 'tpope/vim-endwise'
+
 " Easily change delimiters
 Plug 'tpope/vim-surround'
 
