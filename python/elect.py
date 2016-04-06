@@ -279,15 +279,10 @@ class CompositePattern(object):
 
 
 class UnhighlightedMatch(object):
-    __slots__ = ('length',)
+    length = 0
 
     def __init__(self, value):
-        self.length = len(value)
-
-    def __bool__(self):
-        return self.length > 0
-
-    __nonzero__ = __bool__
+        pass
 
     @property
     def indices(self):
@@ -452,17 +447,17 @@ class Contest(object):
         if sort_limit is None:
             processed_matches = sorted(matches, key=key)
         elif sort_limit <= 0:
-            processed_matches = matches
+            processed_matches = list(matches)
         else:
             processed_matches = list(matches)
             if len(processed_matches) < sort_limit:
                 processed_matches = sorted(processed_matches, key=key)
 
         if limit is not None:
-            processed_matches = list(processed_matches)[:limit]
+            processed_matches = processed_matches[:limit]
 
         if kw.get('reverse', False):
-            processed_matches = reversed(list(processed_matches))
+            processed_matches = list(reversed(processed_matches))
 
         return processed_matches
 
