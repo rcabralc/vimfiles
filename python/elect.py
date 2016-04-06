@@ -143,8 +143,6 @@ import sys
 
 
 class Pattern(object):
-    incremental = False
-
     def __init__(self, pattern):
         self.value = pattern
 
@@ -178,8 +176,6 @@ class SmartCasePattern(Pattern):
 
 
 class ExactPattern(SmartCasePattern):
-    incremental = True
-
     def best_match(self, value):
         if self.ignore_case:
             value = value.lower()
@@ -191,8 +187,6 @@ class ExactPattern(SmartCasePattern):
 
 
 class FuzzyPattern(SmartCasePattern):
-    incremental = True
-
     def __init__(self, pattern):
         super(FuzzyPattern, self).__init__(pattern)
 
@@ -252,7 +246,7 @@ class InverseExactPattern(ExactPattern):
 
 
 class RegexPattern(Pattern):
-    def __init__(self, pattern, ignore_bad_patterns=False):
+    def __init__(self, pattern, ignore_bad_patterns=True):
         if not pattern:
             self.best_match = UnhighlightedMatch
         else:
@@ -476,7 +470,7 @@ class Contest(object):
         return processed_matches
 
 
-def make_pattern(pattern, ignore_bad_re_patterns=False):
+def make_pattern(pattern):
     if pattern.startswith("!="):
         return InverseExactPattern(pattern[2:])
     elif pattern.startswith('!'):
@@ -484,181 +478,13 @@ def make_pattern(pattern, ignore_bad_re_patterns=False):
     elif pattern.startswith("="):
         return ExactPattern(pattern[1:])
     elif pattern.startswith("@"):
-        return RegexPattern(pattern[1:],
-                            ignore_bad_patterns=ignore_bad_re_patterns)
+        return RegexPattern(pattern[1:])
     return FuzzyPattern(pattern)
 
 
-class IncrementalCache(object):
-    def __init__(self):
-        self._cache = {}
-
-    def clear(self):
-        self._cache.clear()
-
-    def update(self, patterns, matches, debug=False):
-        if len(set(type(p) for p in patterns)) == 1:
-            self._cache[type(patterns[0])].update(patterns, matches,
-                                                  debug=debug)
-
-    def find(self, patterns, default=frozenset(), debug=False):
-        for pattern in patterns:
-            self._cache.setdefault(type(pattern), PatternTypeCache())
-
-        best_patterns = set()
-        matches = set()
-        for t, best, cached in self._get_terms(patterns, default, debug):
-            best_patterns.add((t, best))
-            matches.update(cached)
-
-        return (best_patterns, matches)
-
-    def _get_terms(self, patterns, default, debug):
-        for pattern_type, patterns in self._group_types(patterns):
-            best_pattern, cached = self._cache[pattern_type].find(
-                patterns, default=default, debug=debug
-            )
-            yield (pattern_type, best_pattern, cached)
-
-    def _group_types(self, patterns):
-        groups = {}
-
-        for pattern in patterns:
-            group = groups.setdefault(type(pattern), [])
-            group.append(pattern)
-
-        for t, patterns in groups.items():
-            yield (t, patterns)
-
-
-incremental_cache = IncrementalCache()
-
-
-class PatternTypeCache(object):
-    def __init__(self):
-        self._cache = {}
-
-    def update(self, patterns, matches, debug=False):
-        if debug:
-            def debug(fn): sys.stderr.write(fn())
-        else:
-            def debug(fn): return
-
-        patterns = tuple(p.value for p in patterns)
-        debug(lambda: "updating cache for patterns: {}\n".format(patterns))
-        self._cache[patterns] = frozenset(matches)
-
-    def find(self, patterns, default=frozenset(), debug=False):
-        patterns = tuple(p.value for p in patterns)
-        cached = None
-        best_pattern = ()
-
-        if debug:
-            def debug(fn): sys.stderr.write(fn())
-        else:
-            def debug(fn): return
-
-        for expansion in self._exhaust(patterns):
-            debug(lambda: "attempting expansion: {}\n".format(expansion))
-            from_cache = self._cache.get(expansion, None)
-
-            if not from_cache:
-                continue
-
-            if cached is None or len(from_cache) < len(cached):
-                debug(lambda: "cache: hit on {}\n".format(expansion))
-                debug(lambda: "cache size: {}\n".format(len(from_cache)))
-                best_pattern = expansion
-                cached = from_cache
-                break
-
-        if cached is None:
-            debug(lambda: "cache: miss, patterns: {}\n".format(patterns))
-            return (frozenset(), default)
-
-        if best_pattern == patterns:
-            debug(lambda: "using result directly from cache\n")
-
-        return (frozenset(best_pattern), cached)
-
-    def _exhaust(self, patterns):
-        if len(patterns) == 1:
-            for exhaustion in self._exhaust_pattern(patterns[0]):
-                yield (exhaustion,)
-            return
-
-        for i in range(len(patterns) - 1, -1, -1):
-            pattern = patterns[i]
-            lpatterns = patterns[:i]
-            rpatterns = patterns[i + 1:]
-
-            for exhaustion in self._exhaust_pattern(pattern):
-                for subexhaustion in self._exhaust(rpatterns):
-                    yield lpatterns + (exhaustion,) + subexhaustion
-
-    def _exhaust_pattern(self, pattern):
-        for i in range(len(pattern) - 1, -1, -1):
-            yield pattern[0:i + 1]
-
-
 def filter_entries(terms, *patterns, **options):
-    ignore_bad_patterns = options.pop('ignore_bad_patterns', False)
-
-    patterns = [
-        make_pattern(''.join(p), ignore_bad_re_patterns=ignore_bad_patterns)
-        for p in patterns
-    ]
-    contest = Contest(*patterns)
-
-    def full_filter(items):
-        return contest.elect(items, **options)
-
-    incremental = options.pop('incremental', False)
-    debug = options.get('debug', False)
-
-    if incremental:
-        return incremental_filter(terms, patterns, full_filter, debug=debug)
-    return full_filter(terms)
-
-
-def incremental_filter(terms, patterns, full_filter, debug=False):
-    non_incremental_patterns = [p for p in patterns if not p.incremental]
-    if non_incremental_patterns or not patterns:
-        return full_filter(terms)
-
-    def candidates_from_cache(patterns):
-        def best_possible_patterns(patterns):
-            groups = {}
-
-            for pattern in patterns:
-                group = groups.setdefault(type(pattern), [])
-                group.append(pattern)
-
-            for t, patterns in groups.items():
-                yield (t, frozenset(p.value for p in patterns))
-
-        find = incremental_cache.find
-        best_patterns, cached = find(patterns, debug=debug)
-
-        if best_patterns == best_possible_patterns(patterns):
-            return cached
-
-        for type, best in best_patterns:
-            if best:
-                # There was at least one partial hit for one pattern, so
-                # cached, even if empty, is the result of some previous
-                # filtering.
-                return full_filter(r.term for r in cached)
-
-        # No hit for these patterns.
-        return full_filter(terms)
-
-    def update_candidates_from_cache(patterns, matches):
-        incremental_cache.update(patterns, matches, debug=debug)
-        return matches
-
-    matches = candidates_from_cache(patterns)
-    return update_candidates_from_cache(patterns, matches)
+    patterns = [make_pattern(''.join(p)) for p in patterns]
+    return Contest(*patterns).elect(terms, **options)
 
 
 def build_line(result, highlight=True):
