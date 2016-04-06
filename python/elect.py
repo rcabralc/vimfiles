@@ -47,9 +47,6 @@ Options:
     --ignore-bad-patterns
         If a regular expression pattern is not valid, silently ignore it.
 
-    -d --debug
-        Print additional information to STDERR.
-
     --output-json
         Print lines as JSON objects.
 
@@ -523,9 +520,6 @@ def main():
 
     if args['--ignore-bad-patterns']:
         options['ignore_bad_patterns'] = True
-
-    if args['--debug']:
-        options['debug'] = True
 
     if args['--reverse']:
         options['reverse'] = True
