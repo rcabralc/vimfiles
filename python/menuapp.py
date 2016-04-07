@@ -1,4 +1,5 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, Qt
+from PyQt5.QtGui import QPalette
 from PyQt5.QtWebKitWidgets import QWebView
 from PyQt5.QtWidgets import QApplication
 
@@ -429,7 +430,7 @@ class Frontend:
             frontend_source = f.read()
 
         self.view = MainView()
-        self.view.setHtml(interpolate_html(html, config))
+        self.view.setHtml(interpolate_html(html, self.view, config))
 
         frame = self.view.page().mainFrame()
         frame.evaluateJavaScript(jquery_source)
@@ -568,8 +569,60 @@ class MainView(QWebView):
         return r
 
 
-def interpolate_html(template, config):
-    for key, value in config.get('theme', {}).items():
+def default_colors(view):
+    palette = view.palette()
+
+    def color(role_name, a=1.0):
+        role = getattr(QPalette, role_name)
+        c = palette.color(role)
+        return "rgba(%d,%d,%d,%f)" % (c.red(), c.green(), c.blue(), float(a))
+
+    def disabled(role_name, a=1.0):
+        role = getattr(QPalette, role_name)
+        c = palette.color(QPalette.Disabled, role)
+        return "rgba(%d,%d,%d,%f)" % (c.red(), c.green(), c.blue(), float(a))
+
+    def inactive(role_name, a=1.0):
+        role = getattr(QPalette, role_name)
+        c = palette.color(QPalette.Inactive, role)
+        return "rgba(%d,%d,%d,%f)" % (c.red(), c.green(), c.blue(), float(a))
+
+    return {
+        "background-color": color('Base'),
+        "color": color('Text'),
+        "prompt-background-color": color('Base'),
+        "prompt-color": color('Link'),
+        "prompt-over-limit-color": color('LinkVisited'),
+        "input-background-color": color('Base'),
+        "input-color": color('Text'),
+        "input-not-found-color": disabled('Text'),
+        "input-history-color": color('Text'),
+        "counters-color": inactive('Text'),
+        "entries-background-color-gradient-start": color('Base', 0),
+        "entries-background-color-gradient-end": color('Base', 0),
+        "entries-background-color": color('Base'),
+        "entries-alternate-background-color": color('AlternateBase'),
+        "entries-color": inactive('Text'),
+        "entries-alternate-color": inactive('Text'),
+        "entries-hl-background-color": color('Highlight'),
+        "entries-alternate-hl-background-color": color('Highlight'),
+        "entries-hl-color": color('HighlightedText'),
+        "entries-alternate-hl-color": color('HighlightedText'),
+        "selected-entry-background-color": color('Highlight'),
+        "selected-entry-color": color('HighlightedText'),
+    }
+
+
+def apply_default_colors(view, theme):
+    colors = default_colors(view)
+    colors.update(theme)
+    return colors
+
+
+def interpolate_html(template, view, config):
+    theme = apply_default_colors(view, config.get('theme', {}))
+
+    for key, value in theme.items():
         template = template.replace('%(' + key + ')s', value)
     return template.\
         replace('%(initial-value)s', '').replace('%(entries-class)s', '')

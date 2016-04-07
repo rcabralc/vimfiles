@@ -70,6 +70,7 @@
 
       #prompt-box.over-limit .prompt {
         background-color: inherit;
+        background-color: %(prompt-background-color)s;
         background-color: %(prompt-over-limit-background-color)s;
 
         color: orange;
@@ -124,6 +125,7 @@
         background-color: %(input-background-color)s;
 
         color: white;
+        color: %(input-color)s;
         color: %(counters-color)s;
 
         box-sizing: border-box;
@@ -186,9 +188,12 @@
       }
 
       #entries li:nth-child(2n + 1) {
-        background-color: #333;
+        background-color: #3f3f3f;
         background-color: %(entries-background-color)s;
         background-color: %(entries-alternate-background-color)s;
+        color: #ddd;
+        color: %(entries-color)s;
+        color: %(entries-alternate-color)s;
       }
 
       #entries.preformatted li {
@@ -211,6 +216,9 @@
         background-color: #555;
         background-color: %(entries-hl-background-color)s;
         background-color: %(entries-alternate-hl-background-color)s;
+        color: lime;
+        color: %(entries-hl-color)s;
+        color: %(entries-alternate-hl-color)s;
       }
 
       #entries li.selected.selected {
@@ -221,9 +229,9 @@
       }
 
       #entries li.selected.selected .hl {
-        background-color: #666;
+        background-color: inherit;
         background-color: %(selected-entry-hl-background-color)s;
-        color: lime;
+        color: inherit;
         color: %(selected-entry-hl-color)s;
       }
 
