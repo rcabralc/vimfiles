@@ -27,7 +27,7 @@ function! utils.project_files_cmd(file)
         \ '--ignore .git '.
         \ '--ignore .hg '.
         \ '--ignore .DS_Store '.
-        \ '--ignore *.swp '.
+        \ '--ignore "*.swp" '.
         \ '-g "" ', {
         \ 'error': '/dev/null',
         \ 'cwd': g:utils.project_root(a:file),
