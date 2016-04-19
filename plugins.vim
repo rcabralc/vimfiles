@@ -59,9 +59,6 @@ Plug 'tpope/vim-surround'
 " Keep layout when deleting/wiping buffers
 Plug 'qpkorr/vim-bufkill'
 
-" Nice start screen
-Plug 'mhinz/vim-startify'
-
 " Highlight colors
 Plug 'ap/vim-css-color'
 
