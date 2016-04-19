@@ -78,9 +78,14 @@ function! utils.fish(command, ...)
         let output = l:command
     else
         let previous_shell = &shell
+
         set shell=/usr/bin/fish
         let output = system(l:command)
         exe 'set shell=' . previous_shell
+
+        if v:shell_error
+            return ''
+        end
     end
 
     if has_key(options, 'chomp') && options.chomp
