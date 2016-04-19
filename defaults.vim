@@ -95,3 +95,4 @@ set textwidth=79
 set synmaxcol=200
 
 set cursorline
+set nofoldenable
