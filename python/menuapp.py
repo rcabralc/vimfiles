@@ -2,6 +2,7 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, Qt
 from PyQt5.QtGui import QPalette
 from PyQt5.QtWebKitWidgets import QWebView
 from PyQt5.QtWidgets import QApplication
+from itertools import takewhile, zip_longest
 
 import elect
 import json
@@ -250,22 +251,14 @@ class Menu(QObject):
 
     def complete(self):
         self._mode_handler.switch(insert_mode)
-        candidates = self._candidates_for_completion()
 
-        if len(candidates) == 0:
-            return self.input
+        def allsame(chars_at_same_position):
+            return len(set(chars_at_same_position)) == 1
 
-        if len(candidates) == 1:
-            return candidates.pop()
-
-        possible_candidates = candidates
-        minlen = min(len(i) for i in candidates)
-        for l in reversed(range(minlen)):
-            possible_candidates = {i[:l + 1] for i in possible_candidates}
-            if len(possible_candidates) == 1:
-                return possible_candidates.pop()[:l + 1]
-
-        return self.input
+        return ''.join(c for c, *_ in takewhile(
+            allsame,
+            zip_longest(*self._candidates_for_completion())
+        )) or self.input
 
     def dismiss(self):
         self.clear()
@@ -332,10 +325,9 @@ class Menu(QObject):
         return list(values)
 
     def _values_for_completion(self):
-        items = (t.value for t in self._all_terms)
         sw = str.startswith
         input = self.input
-        return (c for c in items if sw(c, input))
+        return (t.value for t in self._all_terms if sw(t.value, input))
 
     def _values_until_next_sep(self, values, from_index):
         sep = self.completion_sep
