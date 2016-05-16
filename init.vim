@@ -66,8 +66,6 @@ function! s:improve_highlights(p)
     hi! link cssFunctionName Function
     hi! link cssIdentifier Identifier
 
-    hi! link javaScriptParens Delimiter
-
     hi! link rubyPseudoVariable Special
 
     hi! link erubyDelimiter Delimiter

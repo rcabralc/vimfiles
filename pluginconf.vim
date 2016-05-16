@@ -1,4 +1,4 @@
-let g:polyglot_disabled = ['javascript', 'markdown']
+let g:polyglot_disabled = ['markdown']
 
 " Colorscheme
 " ===========
