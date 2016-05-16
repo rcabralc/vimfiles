@@ -58,6 +58,12 @@ if has('nvim')
     tmap <C-a><C-s> <C-\><C-n><C-a>s
     tmap <C-a>v <C-\><C-n><C-a>v
     tmap <C-a><C-v> <C-\><C-n><C-a>v
+
+    " Split windows when in term mode just like normal
+    tmap <C-w>s <C-\><C-n><C-w>s
+    tmap <C-w><C-s> <C-\><C-n><C-w>s
+    tmap <C-w>v <C-\><C-n><C-w>v
+    tmap <C-w><C-v> <C-\><C-n><C-w>v
 endif
 
 " Mappings for breaking lines at 72 chars
