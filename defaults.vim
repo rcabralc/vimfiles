@@ -5,7 +5,7 @@ set noshowmode
 
 " Assume a capable terminal.
 if has('nvim')
-    let $NVIM_TUI_ENABLE_TRUE_COLOR = '1'
+    set termguicolors
     let $NVIM_TUI_ENABLE_CURSOR_SHAPE = '1'
 endif
 
