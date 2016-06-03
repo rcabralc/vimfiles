@@ -24,6 +24,7 @@ function! utils.project_files_cmd(file)
 
     return g:utils.fish(
         \ 'ag . -i --nocolor --nogroup --hidden '.
+        \ '--depth 3'.
         \ '--ignore .git '.
         \ '--ignore .hg '.
         \ '--ignore .DS_Store '.
