@@ -22,8 +22,10 @@ filetype plugin indent on
 map <C-F6> :RegenerateCTagsForGitRepo<CR>
 
 function! s:regenerate_ctags_for_git_repo()
-    if filereadable('.git/hooks/ctags')
-        !.git/hooks/ctags
+    let dir = g:utils.gitroot(expand('%'))
+    echo dir
+    if !empty(dir) && filereadable(dir.'/.git/hooks/ctags')
+        exe '!cd '.dir.' && ./.git/hooks/ctags'
     else
         echo "Not available. Are you inside a Git repo with .git/hooks/ctags?"
     endif
