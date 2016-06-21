@@ -46,7 +46,7 @@ augroup Text
     autocmd FileType mail,human,gitcommit setlocal tw=72
     autocmd FileType markdown,rst setlocal tw=78
 
-    autocmd FileType markdown,rst,human,mail,gitcommit setlocal ai fo=tcroqn et sw=2 ts=2 sts=2
+    autocmd FileType markdown,rst,human,mail,gitcommit setlocal ai et sw=2 ts=2 sts=2
     autocmd FileType yaml setlocal et ts=2 sw=2 sts=2 tw=79
 
     " Make text wrap.
