@@ -117,7 +117,7 @@ endfunction
 
 function! g:fuzzy.select_dir(cmd, root, dirname)
     let root = substitute(resolve(a:root), '/$', '', '')
-    let entriescmd = s:gather_dirs(root, 5)
+    let entriescmd = s:gather_dirs(root, 1)
 
     if empty(a:dirname)
         let initial = ''
@@ -170,8 +170,6 @@ function! g:fuzzy.select_gem_dir(cmd, root)
     \ })
 endfunction
 
-map <Leader>g :call g:fuzzy.select_gem_dir('e', expand('%:p:h'))<CR>
-
 function! s:project_root_info(dirname)
     let toplevel = g:utils.project_root(a:dirname)
     let filescmd = g:utils.project_files_cmd(a:dirname)
@@ -191,17 +189,13 @@ endfunction
 function! s:gather_dirs(root, maxdepth)
     let root = substitute(resolve(a:root), '/$', '', '')
 
-    if root == '/files/rcabralc'
-        let root = $HOME
-    end
-
     let entriescmd = 'cd ' . shellescape(root) . '; and find -L . '
 
     if a:maxdepth >= 0
         let entriescmd = entriescmd . '-maxdepth ' . a:maxdepth . ' '
     endif
 
-    let entriescmd = entriescmd .
+    return entriescmd .
         \ '-type d \! -empty \( ' .
         \ '\( ' .
         \    '-path "./.wine" ' .
@@ -218,14 +212,6 @@ function! s:gather_dirs(root, maxdepth)
         \ '-prune -o -print \) ' .
         \ '2>/dev/null | ' .
         \ 'sed "s/^\.\///" | sed "s/\$/\//"'
-
-    if root == $HOME
-        " For $HOME it'll be too much files to list, so avoid the selection of
-        " its own.
-        let entriescmd = entriescmd . ' | grep -v "^\./\$"'
-    endif
-
-    return entriescmd
 endfunction
 
 function! s:rubygems_path(dirname)
