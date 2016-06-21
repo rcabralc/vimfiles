@@ -60,6 +60,9 @@ Plug 'qpkorr/vim-bufkill'
 " Highlight colors
 Plug 'ap/vim-css-color'
 
+" Automatically change dir when opening files
+Plug 'airblade/vim-rooter'
+
 call plug#end()
 
 if !was_installed
