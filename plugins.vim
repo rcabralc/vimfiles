@@ -18,7 +18,6 @@ call plug#begin(vimdir . 'bundle')
 " Filetypes/linters
 Plug 'scrooloose/syntastic'
 Plug 'sheerun/vim-polyglot'
-Plug 'plasticboy/vim-markdown'
 
 " Colorschemes/themes
 Plug 'morhetz/gruvbox'
