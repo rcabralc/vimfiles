@@ -44,7 +44,7 @@ Plug 'nathanaelkane/vim-indent-guides'
 " Comment in/out stuff easily
 Plug 'tomtom/tcomment_vim'
 
-" Edit things with sudo
+" Unix stuff, including editing things with sudo
 Plug 'tpope/vim-eunuch'
 
 " Add end to ruby blocks automatically
