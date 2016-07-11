@@ -15,7 +15,7 @@ function! utils.project_files_cmd(file)
 
     if !empty(gitroot)
         return g:utils.fish(
-            \ 'git ls-files -co --exclude-standard | sort | uniq', {
+            \ 'git ls-files -co --exclude-standard | sort -u', {
             \ 'cwd': gitroot,
             \ 'cmd': 1
             \ }
