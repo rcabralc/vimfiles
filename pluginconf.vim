@@ -1,3 +1,8 @@
+" Editorconfig
+" ============
+
+let g:EditorConfig_exclude_patterns = ['scp://.*']
+
 " Colorscheme
 " ===========
 
