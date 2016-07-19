@@ -7,8 +7,7 @@ endif
 let was_installed = 1
 
 if !filereadable(expand(vimdir . "autoload/plug.vim"))
-    call system('mkdir -p ' . vimdir . 'autoload')
-    call system('curl -fLo ' . vimdir . 'autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim')
+    call system('curl -fLo ' . vimdir . 'autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim')
     execute 'source ' . vimdir . 'autoload/plug.vim'
     let was_installed = 0
 endif
