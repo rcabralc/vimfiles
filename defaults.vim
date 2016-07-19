@@ -61,11 +61,6 @@ set nrformats-=octal
 
 set shiftround
 
-" Don't wait forever on key codes.
-set ttimeout
-set ttimeoutlen=100
-set noesckeys
-
 " Don't wait too much on mapped keys
 set timeoutlen=200
 
