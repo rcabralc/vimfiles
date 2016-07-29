@@ -10,28 +10,44 @@ function! utils.gitroot(file)
     \ })
 endfunction
 
-function! utils.project_files_cmd(file)
-    let gitroot = g:utils.gitroot(a:file)
+function! utils.project_files_cmd(file, ...)
+    if a:0
+        let options = a:1
+    else
+        let options = {}
+    endif
 
-    if !empty(gitroot)
-        return g:utils.fish(
-            \ 'git ls-files -co --exclude-standard | sort -u', {
-            \ 'cwd': gitroot,
-            \ 'cmd': 1
-            \ }
-        \ )
+    if has_key(options, 'is_root') && options.is_root
+        let root = fnamemodify(a:file, ':p:h')
+    else
+        let gitroot = g:utils.gitroot(a:file)
+
+        if !empty(gitroot)
+            return g:utils.fish(
+                \ 'git ls-files -co --exclude-standard | sort -u', {
+                \ 'cwd': gitroot,
+                \ 'cmd': 1
+                \ }
+            \ )
+        endif
+
+        let root = g:utils.project_root(a:file)
+    endif
+
+    if !has_key(options, 'depth')
+        let options.depth = 3
     endif
 
     return g:utils.fish(
         \ 'ag . -i --nocolor --nogroup --hidden '.
-        \ '--depth 3'.
+        \ '--depth '.options['depth'].
         \ '--ignore .git '.
         \ '--ignore .hg '.
         \ '--ignore .DS_Store '.
         \ '--ignore "*.swp" '.
         \ '-g "" ', {
         \ 'error': '/dev/null',
-        \ 'cwd': g:utils.project_root(a:file),
+        \ 'cwd': root,
         \ 'cmd': 1
         \ }
     \ )

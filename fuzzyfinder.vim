@@ -166,7 +166,10 @@ function! g:fuzzy.select_gem_dir(cmd, root)
     return g:fuzzy.open(a:cmd, choice, 1, {
         \ 'initial': '',
         \ 'toplevel': choice,
-        \ 'filescmd': g:utils.project_files_cmd(choice)
+        \ 'filescmd': g:utils.project_files_cmd(choice, {
+            \ 'is_root': 1,
+            \ 'depth': -1
+        \ })
     \ })
 endfunction
 
