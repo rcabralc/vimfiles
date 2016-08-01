@@ -51,11 +51,11 @@ function! g:fuzzy.open(cmd, dirname, accept_input, info)
     endif
 
     if fname == '..'
-        return g:fuzzy.select_dir(a:cmd, s:getparent(info.toplevel), dirname)
+        return g:fuzzy.select_dir(a:cmd, s:getparent(info.toplevel), dirname, 1)
     endif
 
     if fname == '.'
-        return g:fuzzy.select_dir(a:cmd, info.toplevel, info.toplevel)
+        return g:fuzzy.select_dir(a:cmd, info.toplevel, info.toplevel, 1)
     endif
 
     execute a:cmd . " " .  g:utils.makepath(resolve(info.toplevel . '/' . fname))
@@ -115,9 +115,9 @@ function! g:fuzzy.openold(cmd)
     execute a:cmd . " " .  fname
 endfunction
 
-function! g:fuzzy.select_dir(cmd, root, dirname)
+function! g:fuzzy.select_dir(cmd, root, dirname, depth)
     let root = substitute(resolve(a:root), '/$', '', '')
-    let entriescmd = s:gather_dirs(root, 1)
+    let entriescmd = s:gather_dirs(root, a:depth)
 
     if empty(a:dirname)
         let initial = ''
