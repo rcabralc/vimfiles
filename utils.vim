@@ -20,18 +20,23 @@ function! utils.project_files_cmd(file, ...)
     if has_key(options, 'is_root') && options.is_root
         let root = fnamemodify(a:file, ':p:h')
     else
-        let gitroot = g:utils.gitroot(a:file)
+        let gemroot = s:gemroot(a:file)
+        if !empty(gemroot)
+            let root = gemroot
+        else
+            let gitroot = g:utils.gitroot(a:file)
 
-        if !empty(gitroot)
-            return g:utils.fish(
-                \ 'git ls-files -co --exclude-standard | sort -u', {
-                \ 'cwd': gitroot,
-                \ 'cmd': 1
-                \ }
-            \ )
+            if !empty(gitroot)
+                return g:utils.fish(
+                    \ 'git ls-files -co --exclude-standard | sort -u', {
+                    \ 'cwd': gitroot,
+                    \ 'cmd': 1
+                    \ }
+                \ )
+            else
+                let root = g:utils.project_root(a:file)
+            endif
         endif
-
-        let root = g:utils.project_root(a:file)
     endif
 
     if !has_key(options, 'depth')
@@ -55,13 +60,37 @@ endfunction
 
 " Give the "project root" of the given file/dir (use a full path).
 function utils.project_root(file)
-    let gitroot = g:utils.gitroot(a:file)
-
-    if empty(gitroot)
-        return fnamemodify(a:file, ':p:h')
+    let gemroot = s:gemroot(a:file)
+    if !empty(gemroot)
+        return gemroot
     endif
 
-    return gitroot
+    let gitroot = g:utils.gitroot(a:file)
+    if !empty(gitroot)
+        return gitroot
+    endif
+
+    return fnamemodify(a:file, ':p:h')
+endfunction
+
+function! s:gemroot(file)
+    let dirname = fnamemodify(a:file, ':p:h')
+
+    while dirname != '/'
+        let tail = split(dirname, '/')[-1]
+
+        if filereadable(dirname . '/' . tail . '.gemspec')
+            return dirname
+        endif
+
+        if filereadable(dirname . '/README') && filereadable(dirname . '/install.rb') && filereadable(dirname . '/CHANGELOG')
+            return dirname
+        endif
+
+        let dirname = fnamemodify(dirname . '-as-if-not-dir', ':p:h')
+    endwhile
+
+    return ''
 endfunction
 
 function! utils.vimsource(filename)
