@@ -79,6 +79,10 @@ function! s:gemroot(file)
     while dirname != '/'
         let tail = split(dirname, '/')[-1]
 
+        if match(tail, "-")
+            let tail = join(split(tail, '-')[0:-2], '-')
+        endif
+
         if filereadable(dirname . '/' . tail . '.gemspec')
             return dirname
         endif
