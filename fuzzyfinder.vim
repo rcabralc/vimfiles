@@ -220,7 +220,7 @@ endfunction
 function! s:rubygems_path(dirname)
     return g:utils.fish(
         \ 'rbenv exec gem environment | ' .
-        \ 'grep INSTALLATION | cut -d : -f 2 | xargs', {
+        \ 'grep -e "- INSTALLATION DIRECTORY" | cut -d : -f 2 | xargs', {
         \ 'cwd': a:dirname,
         \ 'chomp': 1
         \ }
