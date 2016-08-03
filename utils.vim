@@ -23,6 +23,7 @@ function! utils.project_files_cmd(file, ...)
         let gemroot = s:gemroot(a:file)
         if !empty(gemroot)
             let root = gemroot
+            let options.depth = -1
         else
             let gitroot = g:utils.gitroot(a:file)
 
