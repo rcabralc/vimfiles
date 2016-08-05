@@ -120,6 +120,9 @@ map <Leader>g :call g:fuzzy.select_gem_dir('e', expand('%:p:h'))<CR>
 " ":") by using gQ.
 nnoremap Q gqap
 
+map <S-l> :bn<CR>
+map <S-h> :bp<CR>
+
 map <C-S-v> "*p
 imap <C-S-v> <C-o>"*p
 
