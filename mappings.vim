@@ -120,11 +120,8 @@ map <Leader>g :call g:fuzzy.select_gem_dir('e', expand('%:p:h'))<CR>
 " ":") by using gQ.
 nnoremap Q gqap
 
-map <F6> "+p
-map <S-F6> "+P
-
-imap <F6> <C-o>"+p
-imap <S-F6> <C-o>"+P
+map <C-S-v> "*p
+imap <C-S-v> <C-o>"*p
 
 map <A-b> :call <SID>softmotion('b')<CR>
 map <A-w> :call <SID>softmotion('w')<CR>
