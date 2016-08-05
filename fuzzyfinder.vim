@@ -96,6 +96,7 @@ function! g:fuzzy.openold(cmd)
 
     let entriescmd = 'cat ' . tempfile .
         \ ' | grep "."' .
+        \ ' | grep -v "term://"' .
         \ ' | grep -v ".git/"' .
         \ ' | grep -v "/tmp/nvim"' .
         \ ' | cut -d":" -f2- | sed "s/^\s\+//"'
