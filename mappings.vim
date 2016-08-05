@@ -13,6 +13,9 @@ endif
 nnoremap <A-h> :tabp<CR>
 nnoremap <A-l> :tabn<CR>
 
+noremap <S-l> :bn<CR>
+noremap <S-h> :bp<CR>
+
 nnoremap <C-h> <C-W>h
 nnoremap <C-j> <C-W>j
 nnoremap <C-k> <C-W>k
@@ -119,9 +122,6 @@ map <Leader>g :call g:fuzzy.select_gem_dir('e', expand('%:p:h'))<CR>
 " but I don't use that, and I can enter in Ex mode (in a way more like typing
 " ":") by using gQ.
 nnoremap Q gqap
-
-map <S-l> :bn<CR>
-map <S-h> :bp<CR>
 
 map <C-S-v> "*p
 imap <C-S-v> <C-o>"*p
