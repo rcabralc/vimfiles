@@ -8,6 +8,7 @@
         "prompt-background-color": "#26231d",
         "prompt-color": "#73e1b3",
         "prompt-over-limit-color": "#b482ff",
+        "input-color": "#f5e2bc",
         "input-not-found-color": "#f60461",
         "input-history-color": "#f66d04",
         "counters-color": "#9fd304",
