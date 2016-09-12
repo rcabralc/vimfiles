@@ -97,3 +97,8 @@ let g:ruby_minlines = 200
 
 " Ruby filetype options.
 let g:ruby_indent_access_modifier_style = 'outdent'
+
+" Rest console
+" ============
+
+let g:vrc_trigger = '<Leader>r'
