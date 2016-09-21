@@ -547,7 +547,6 @@ class MainView(QWebView):
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
     def show(self, title=None):
-        r = super(MainView, self).show()
         self.activateWindow()
 
         if title is not None:
@@ -558,7 +557,7 @@ class MainView(QWebView):
         hpos = (screensize.width() - size.width()) // 2
         vpos = (screensize.height() - size.height()) // 2
         self.move(hpos, vpos)
-        return r
+        return super(MainView, self).show()
 
 
 def default_colors(view):
