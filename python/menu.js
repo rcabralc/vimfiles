@@ -107,6 +107,8 @@
         // should not start with any item on right of it.
         patternTypes = ['@', '!', '=', '!='];
 
+    $(window).on('focus', function() { $el().focus(); });
+
     return (self = {
       setup: function(callback) { callback($el()); },
       set: function(value) { $el().val(value).change(); },
