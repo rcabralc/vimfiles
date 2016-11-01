@@ -73,6 +73,8 @@ let g:syntastic_javascript_checkers = ['jshint', 'jscs']
 let g:syntastic_python_checkers = ['flake8']
 let g:syntastic_ruby_checkers = ['rubocop']
 let g:syntastic_ruby_rubocop_args = '-D'
+let g:syntastic_eruby_ruby_quiet_messages =
+    \ {'regex': 'possibly useless use of \(a variable\|+\) in void context'}
 
 
 " Filetypes
