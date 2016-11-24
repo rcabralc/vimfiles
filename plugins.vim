@@ -64,6 +64,9 @@ Plug 'airblade/vim-rooter'
 " HTTP client
 Plug 'diepm/vim-rest-console'
 
+" Autocompletion
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+
 call plug#end()
 
 if !was_installed
