@@ -110,3 +110,10 @@ let g:vrc_trigger = '<Leader>r'
 " ========
 
 let g:deoplete#enable_at_startup = 1
+
+
+" dbext
+" =====
+
+let g:dbext_default_window_use_horiz = 0
+let g:dbext_default_window_width = ''

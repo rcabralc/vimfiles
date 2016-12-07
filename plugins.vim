@@ -64,6 +64,9 @@ Plug 'airblade/vim-rooter'
 " HTTP client
 Plug 'diepm/vim-rest-console'
 
+" SQL from within VIM
+Plug 'vim-scripts/dbext.vim'
+
 " Autocompletion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 
