@@ -110,3 +110,13 @@ let g:vrc_trigger = '<Leader>r'
 " ========
 
 let g:deoplete#enable_at_startup = 1
+
+
+" dbext
+" =====
+
+let g:dbext_default_window_use_horiz = 0
+let g:dbext_default_window_width = ''
+
+let g:dbext_default_profile_biva_dev = 'type=PGSQL:user=rafael.coutinho:dbname=Biva_development'
+let g:dbext_default_profile_biva_prd = 'type=PGSQL:user=rafael.coutinho:host=biva-prd.cqn9p6dhfew8.us-east-1.rds.amazonaws.com:dbname=biva'
