@@ -64,6 +64,9 @@ Plug 'airblade/vim-rooter'
 " HTTP client
 Plug 'diepm/vim-rest-console'
 
+" Multiple cursors, a la Sublime
+Plug 'terryma/vim-multiple-cursors'
+
 " SQL from within VIM
 Plug 'vim-scripts/dbext.vim'
 
