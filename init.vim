@@ -55,7 +55,7 @@ augroup END
 
 augroup Prog
     autocmd!
-    autocmd FileType ruby,html,eruby,javascript,coffee,css,scss,sass set ts=2 sw=2 sts=2
+    autocmd FileType ruby,html,eruby,javascript,coffee,css,scss,sass set ts=2 sw=2 sts=2 indentkeys-=*<Return>
     autocmd FileType python,vim set ts=4 sw=4 sts=4
 augroup END
 
