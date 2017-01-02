@@ -2,7 +2,6 @@
 
 if !has('nvim')
     set nocompatible " Be iMproved
-    set t_Co=256
 endif
 
 execute 'source ' . fnamemodify($MYVIMRC, ':p:h') . '/utils.vim'
@@ -72,7 +71,7 @@ function! s:improve_highlights(p)
 
     hi! link erubyDelimiter Delimiter
 
-    call rcabralc#hl('GitGutterAdd',           a:p.lime,    a:p.none, 'bold')
+    call rcabralc#hl('GitGutterAdd',           a:p.green,   a:p.none, 'bold')
     call rcabralc#hl('GitGutterChange',        a:p.cyan,    a:p.none, 'bold')
     call rcabralc#hl('GitGutterDelete',        a:p.magenta, a:p.none, 'bold')
     call rcabralc#hl('GitGutterChangeDelete',  a:p.magenta, a:p.none, 'bold')
