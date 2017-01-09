@@ -71,10 +71,10 @@ function! s:improve_highlights(p)
 
     hi! link erubyDelimiter Delimiter
 
-    call rcabralc#hl('GitGutterAdd',           a:p.green,   a:p.none, 'bold')
-    call rcabralc#hl('GitGutterChange',        a:p.cyan,    a:p.none, 'bold')
-    call rcabralc#hl('GitGutterDelete',        a:p.magenta, a:p.none, 'bold')
-    call rcabralc#hl('GitGutterChangeDelete',  a:p.magenta, a:p.none, 'bold')
+    call rcabralc#hl('GitGutterAdd',           a:p.green,  a:p.none, 'bold')
+    call rcabralc#hl('GitGutterChange',        a:p.yellow, a:p.none, 'bold')
+    call rcabralc#hl('GitGutterDelete',        a:p.red,    a:p.none, 'bold')
+    call rcabralc#hl('GitGutterChangeDelete',  a:p.red,    a:p.none, 'bold')
 
     if !exists('g:indent_guides_auto_colors')
       let g:indent_guides_auto_colors = 0
