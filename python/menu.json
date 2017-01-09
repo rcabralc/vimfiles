@@ -9,7 +9,7 @@
         "prompt-color": "#addfde",
         "prompt-over-limit-color": "#a74d78",
         "input-color": "#f5c9a2",
-        "input-not-found-color": "#da0050",
+        "input-not-found-color": "#ce173c",
         "input-history-color": "#ff5f02",
         "counters-color": "#88ad0c",
         "input-background-color": "#2c241d",
@@ -22,10 +22,10 @@
         "entries-hl-background-color": "#2c241d",
         "entries-alternate-hl-background-color": "#362c24",
         "selected-entry-color": "#f5c9a2",
-        "selected-entry-background-color": "#544538",
-        "selected-entry-hl-background-color": "#544538",
-        "entries-hl-color": "#da0050",
-        "entries-alternate-hl-color": "#da0050",
-        "selected-entry-hl-color": "#da0050"
+        "selected-entry-background-color": "#4a3d31",
+        "selected-entry-hl-background-color": "#4a3d31",
+        "entries-hl-color": "#ce173c",
+        "entries-alternate-hl-color": "#ce173c",
+        "selected-entry-hl-color": "#ce173c"
     }
 }
