@@ -434,7 +434,10 @@ class Frontend:
         self.frame.addToJavaScriptWindowObject('backend', backend)
 
     def show(self, title=None):
-        self.view.show()
+        self.view.show(title=title)
+
+    def hide(self):
+        self.view.hide()
 
     def set_input(self, input):
         self._evaluate("frontend.setInput(%s)" % json.dumps(input))
@@ -641,10 +644,10 @@ class MenuApp(QObject):
         self.restore(title=title)
 
     def minimize(self):
-        self.frontend.view.hide()
+        self.frontend.hide()
 
     def restore(self, title=None):
-        self.frontend.view.show(title=title)
+        self.frontend.show(title=title)
 
     def exec_(self):
         return self.app.exec_()
