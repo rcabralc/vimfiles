@@ -99,7 +99,11 @@ function! s:gemroot(file)
 endfunction
 
 function! utils.vimsource(filename)
-    execute 'source ' . fnamemodify($MYVIMRC, ':p:h') . '/' . a:filename
+    try
+        execute 'source ' . fnamemodify($MYVIMRC, ':p:h') . '/' . a:filename
+    catch /^Vim\%((\a\+)\)\=:E484/ " E484 is Can't open <file>
+        return
+    endtry
 endfunction
 
 " Strip the newline from the end of a string

@@ -8,3 +8,4 @@ python/history.json
 python/elect.so
 spell/
 .init.vim*
+site.vim
