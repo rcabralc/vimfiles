@@ -92,3 +92,4 @@ augroup Colors
 augroup END
 
 call utils.vimsource('pluginconf.vim')
+call utils.vimsource('site.vim')
