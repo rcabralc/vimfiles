@@ -20,33 +20,27 @@ function! utils.project_files_cmd(file, ...)
     if has_key(options, 'is_root') && options.is_root
         let root = fnamemodify(a:file, ':p:h')
     else
-        let gemroot = s:gemroot(a:file)
-        if !empty(gemroot)
-            let root = gemroot
-            let options.depth = -1
-        else
-            let gitroot = g:utils.gitroot(a:file)
-
-            if !empty(gitroot)
-                return g:utils.fish(
-                    \ 'git ls-files -co --exclude-standard | sort -u', {
-                    \ 'cwd': gitroot,
-                    \ 'cmd': 1
-                    \ }
-                \ )
-            else
-                let root = g:utils.project_root(a:file)
-            endif
-        endif
+        let root = g:utils.project_root(a:file)
     endif
 
-    if !has_key(options, 'depth')
+    if s:looks_like_gitroot(root)
+        return g:utils.fish(
+            \ 'git ls-files -co --exclude-standard | sort -u', {
+            \ 'cwd': root,
+            \ 'cmd': 1
+            \ }
+        \ )
+    endif
+
+    if s:looks_like_gemroot(root)
+        let options.depth = -1
+    elseif !has_key(options, 'depth')
         let options.depth = 3
     endif
 
     return g:utils.fish(
         \ 'ag . -i --nocolor --nogroup --hidden '.
-        \ '--depth '.options['depth'].
+        \ '--depth '. options.depth.
         \ '--ignore .git '.
         \ '--ignore .hg '.
         \ '--ignore .DS_Store '.
@@ -78,17 +72,7 @@ function! s:gemroot(file)
     let dirname = fnamemodify(a:file, ':p:h')
 
     while dirname != '/'
-        let tail = split(dirname, '/')[-1]
-
-        if match(tail, "-")
-            let tail = join(split(tail, '-')[0:-2], '-')
-        endif
-
-        if filereadable(dirname . '/' . tail . '.gemspec')
-            return dirname
-        endif
-
-        if filereadable(dirname . '/README') && filereadable(dirname . '/install.rb') && filereadable(dirname . '/CHANGELOG')
+        if s:looks_like_gemroot(dirname)
             return dirname
         endif
 
@@ -96,6 +80,23 @@ function! s:gemroot(file)
     endwhile
 
     return ''
+endfunction
+
+function! s:looks_like_gemroot(dirname)
+    let tail = split(a:dirname, '/')[-1]
+
+    if match(tail, "-")
+        let tail = join(split(tail, '-')[0:-2], '-')
+    endif
+
+    return filereadable(a:dirname . '/' . tail . '.gemspec') ||
+                \ filereadable(a:dirname . '/README') ||
+                \ filereadable(a:dirname . '/README.md') ||
+                \ filereadable(a:dirname . '/README.rdoc')
+endfunction
+
+function! s:looks_like_gitroot(dirname)
+    return filereadable(a:dirname . '/.git/config') || filereadable(a:dirname . '/.git')
 endfunction
 
 function! utils.vimsource(filename)
