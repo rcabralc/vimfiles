@@ -229,7 +229,13 @@ function! s:rubygems_path(dirname)
 endfunction
 
 function! s:spawn_menu(entriescmd, params)
-    let menucmd = 'python -u ' . g:vimdir . '/python/menu.py --daemonize'
+    if exists('g:python3_executable')
+        let executable = g:python3_executable
+    else
+        let executable = 'python'
+    endif
+
+    let menucmd = executable . ' -u ' . g:vimdir . '/python/menu.py --daemonize'
 
     if has_key(a:params, 'limit')
         let menucmd = menucmd . ' --limit ' . shellescape(a:params.limit)
