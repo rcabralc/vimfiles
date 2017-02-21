@@ -104,12 +104,6 @@ cnoremap <Esc>b <S-Left>
 " forward one word
 cnoremap <Esc>f <S-Right>
 
-" vim-gitgutter: enable/disable line hightlighting
-nmap <Leader>h <Plug>GitGutterLineHighlightsToggle
-" vim-gitgutter: next/previous hunks
-nmap <Leader>[ <Plug>GitGutterPrevHunk
-nmap <Leader>] <Plug>GitGutterNextHunk
-
 " Fuzzy file opening
 map <Leader>f :call g:fuzzy.open('edit', expand('%:p:h'), 1, '')<CR>
 map <Leader>p :call g:fuzzy.open('read', expand('%:p:h'), 0, '')<CR>
