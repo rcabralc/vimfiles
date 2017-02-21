@@ -100,6 +100,17 @@ let g:ruby_minlines = 200
 " Ruby filetype options.
 let g:ruby_indent_access_modifier_style = 'outdent'
 
+
+" Git Gutter
+" ==========
+
+" vim-gitgutter: enable/disable line hightlighting
+nmap <Leader>h <Plug>GitGutterLineHighlightsToggle
+" vim-gitgutter: next/previous hunks
+nmap <Leader>[ <Plug>GitGutterPrevHunk
+nmap <Leader>] <Plug>GitGutterNextHunk
+
+
 " Rest console
 " ============
 
