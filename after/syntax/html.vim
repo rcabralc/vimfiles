@@ -1,3 +1,0 @@
-" Disable those anoying hilite links to Special...
-hi link javaScript NONE
-hi link htmlCssDefinition NONE
