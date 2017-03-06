@@ -41,7 +41,8 @@ function! g:fuzzy.open(cmd, dirname, accept_input, info)
         \ 'limit': 20,
         \ 'input': info.initial,
         \ 'history_key': 'file:' . info.toplevel,
-        \ 'word_delimiters': "/",
+        \ 'word_delimiters': '/',
+        \ 'completion_sep': '/',
         \ 'accept_input': a:accept_input,
         \ 'title': 'Select file from ' . info.toplevel
     \ })
@@ -74,7 +75,8 @@ function! g:fuzzy.reopen(cmd)
 
     let fname = s:spawn_menu(entriescmd, {
         \ 'limit': 100,
-        \ 'word_delimiters': "/",
+        \ 'word_delimiters': '/',
+        \ 'completion_sep': '/',
         \ 'title': 'Select buffer'
     \ })
 
@@ -103,7 +105,8 @@ function! g:fuzzy.openold(cmd)
 
     let fname = s:spawn_menu(entriescmd, {
         \ 'limit': 100,
-        \ 'word_delimiters': "/",
+        \ 'word_delimiters': '/',
+        \ 'completion_sep': '/',
         \ 'title': 'Select old file'
     \ })
 
@@ -132,7 +135,8 @@ function! g:fuzzy.select_dir(cmd, root, dirname, depth)
 
     let choice = s:spawn_menu(entriescmd, {
         \ 'limit': 20,
-        \ 'word_delimiters': "/",
+        \ 'word_delimiters': '/',
+        \ 'completion_sep': '/',
         \ 'title': 'Select directory from ' . root,
         \ 'history_key': 'dir:' . root,
         \ 'input': initial
@@ -153,7 +157,8 @@ function! g:fuzzy.select_gem_dir(cmd, root)
 
     let choice = s:spawn_menu(entriescmd, {
         \ 'limit': 20,
-        \ 'word_delimiters': "/",
+        \ 'word_delimiters': '/',
+        \ 'completion_sep': '/',
         \ 'title': 'Select gem from ' . root,
         \ 'history_key': 'gem:' . root
     \ })
@@ -168,7 +173,6 @@ function! g:fuzzy.select_gem_dir(cmd, root)
         \ 'initial': '',
         \ 'toplevel': choice,
         \ 'filescmd': g:utils.project_files_cmd(choice, {
-            \ 'is_root': 1,
             \ 'depth': -1
         \ })
     \ })
