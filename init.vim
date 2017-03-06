@@ -75,15 +75,6 @@ function! s:improve_highlights(p)
     call rcabralc#hl('GitGutterChange',        a:p.yellow, a:p.none, 'bold')
     call rcabralc#hl('GitGutterDelete',        a:p.red,    a:p.none, 'bold')
     call rcabralc#hl('GitGutterChangeDelete',  a:p.red,    a:p.none, 'bold')
-
-    if !exists('g:indent_guides_auto_colors')
-      let g:indent_guides_auto_colors = 0
-    endif
-
-    if g:indent_guides_auto_colors == 0
-      call rcabralc#hl('IndentGuidesOdd',  a:p.none, a:p.gray0)
-      call rcabralc#hl('IndentGuidesEven', a:p.none, a:p.gray1)
-    endif
 endfunction
 
 augroup Colors

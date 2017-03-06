@@ -7,7 +7,6 @@ let g:EditorConfig_exclude_patterns = ['scp://.*']
 " ===========
 
 set background=dark
-let g:indent_guides_auto_colors = 0
 let g:rcabralc= { 'use_default_term_colors': 1 }
 let g:monokai_colorscheme#use_default_term_colors = 1
 colorscheme rcabralc
@@ -133,3 +132,10 @@ let g:dbext_default_window_width = ''
 
 let g:dbext_default_profile_biva_dev = 'type=PGSQL:user=rafael.coutinho:dbname=Biva_development'
 let g:dbext_default_profile_biva_prd = 'type=PGSQL:user=rafael.coutinho:host=biva-prd.cqn9p6dhfew8.us-east-1.rds.amazonaws.com:dbname=biva'
+
+
+" Indent line
+" ===========
+
+let g:indentLine_char = '│'
+let g:indentLine_setColors = 0
