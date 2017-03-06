@@ -7,7 +7,6 @@ let g:EditorConfig_exclude_patterns = ['scp://.*']
 " ===========
 
 set background=dark
-let g:indent_guides_auto_colors = 0
 let g:rcabralc= { 'use_default_term_colors': 1 }
 let g:monokai_colorscheme#use_default_term_colors = 1
 colorscheme rcabralc
@@ -130,3 +129,10 @@ let g:deoplete#enable_at_startup = 1
 
 let g:dbext_default_window_use_horiz = 0
 let g:dbext_default_window_width = ''
+
+
+" Indent line
+" ===========
+
+let g:indentLine_char = '│'
+let g:indentLine_setColors = 0

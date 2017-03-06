@@ -38,8 +38,8 @@ Plug 'itchyny/lightline.vim'
 " Show lines changed
 Plug 'airblade/vim-gitgutter'
 
-" Toggle displaying indent steps
-Plug 'nathanaelkane/vim-indent-guides'
+" Display indent steps
+Plug 'Yggdroot/indentLine'
 
 " Comment in/out stuff easily
 Plug 'tomtom/tcomment_vim'
