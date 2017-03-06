@@ -61,9 +61,6 @@ set nrformats-=octal
 
 set shiftround
 
-" Don't wait too much on mapped keys
-set timeoutlen=200
-
 " The colorscheme is not too invasive, so highlight searched terms.
 set hlsearch
 
