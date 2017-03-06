@@ -62,12 +62,6 @@ nmap <C-S> <A-8>:Ggrep -I  <bar> copen
 " Just highlight pattern under cursor.
 nmap <A-8> :set hlsearch<CR>*<S-n>
 
-" Ensure highlight is on during searches
-nnoremap / :set hlsearch<CR>/
-nnoremap ? :set hlsearch<CR>?
-nnoremap n :set hlsearch<CR>n
-nnoremap <S-n> :set hlsearch<CR><S-n>
-
 " For Emacs-style editing on the command-line:
 " start of line
 cnoremap <C-A> <Home>

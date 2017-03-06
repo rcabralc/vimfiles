@@ -65,8 +65,10 @@ Plug 'airblade/vim-rooter'
 " HTTP client
 Plug 'diepm/vim-rest-console'
 
-" Multiple cursors, a la Sublime
-Plug 'terryma/vim-multiple-cursors'
+" Highlight all matches when incsearching
+Plug 'haya14busa/incsearch.vim'
+Plug 'haya14busa/incsearch-fuzzy.vim'
+Plug 'haya14busa/vim-asterisk'
 
 " SQL from within VIM
 Plug 'vim-scripts/dbext.vim'

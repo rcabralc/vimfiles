@@ -140,3 +140,42 @@ let g:dbext_default_profile_biva_prd = 'type=PGSQL:user=rafael.coutinho:host=biv
 
 let g:indentLine_char = '│'
 let g:indentLine_setColors = 0
+
+
+" Incsearch and asterisk
+" ======================
+
+map /  <Plug>(incsearch-forward)
+map ?  <Plug>(incsearch-backward)
+map g/ <Plug>(incsearch-stay)
+
+let g:incsearch#auto_nohlsearch = 1
+let g:asterisk#keeppos = 1
+map n  <Plug>(incsearch-nohl-n)
+map N  <Plug>(incsearch-nohl-N)
+map *  <Plug>(incsearch-nohl)<Plug>(asterisk-z*)
+map #  <Plug>(incsearch-nohl)<Plug>(asterisk-z#)
+map g* <Plug>(incsearch-nohl)<Plug>(asterisk-gz*)
+map g# <Plug>(incsearch-nohl)<Plug>(asterisk-gz#)
+
+map z/ <Plug>(incsearch-fuzzy-/)
+map z? <Plug>(incsearch-fuzzy-?)
+map zg/ <Plug>(incsearch-fuzzy-stay)
+
+
+" Table mode
+" ==========
+
+function! s:isAtStartOfLine(mapping)
+  let text_before_cursor = getline('.')[0 : col('.')-1]
+  let mapping_pattern = '\V' . escape(a:mapping, '\')
+  let comment_pattern = '\V' . escape(substitute(&l:commentstring, '%s.*$', '', ''), '\')
+  return (text_before_cursor =~? '^' . ('\v(' . comment_pattern . '\v)?') . '\s*\v' . mapping_pattern . '\v$')
+endfunction
+
+inoreabbrev <expr> <bar><bar>
+          \ <SID>isAtStartOfLine('\|\|') ?
+          \ '<c-o>:TableModeEnable<cr><bar><space><bar><left><left>' : '<bar><bar>'
+inoreabbrev <expr> __
+          \ <SID>isAtStartOfLine('__') ?
+          \ '<c-o>:silent! TableModeDisable<cr>' : '__'
