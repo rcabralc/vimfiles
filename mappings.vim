@@ -21,11 +21,6 @@ nnoremap <C-j> <C-W>j
 nnoremap <C-k> <C-W>k
 nnoremap <C-l> <C-W>l
 
-inoremap <C-h> <ESC><C-W>h
-inoremap <C-j> <ESC><C-W>j
-inoremap <C-k> <ESC><C-W>k
-inoremap <C-l> <ESC><C-W>l
-
 if has('nvim')
     tnoremap <C-h> <C-\><C-n><C-w>h
     tnoremap <C-j> <C-\><C-n><C-w>j
@@ -34,11 +29,6 @@ if has('nvim')
 
     tnoremap <A-h> <C-\><C-n>:tabp<CR>
     tnoremap <A-l> <C-\><C-n>:tabn<CR>
-
-    " Due to a bug in Neovim (related to external lib), <C-h> will not work.
-    " This is a workaround.
-    " tnoremap <C-w><BS> <C-\><C-n><C-W>h
-    " inoremap <C-w><BS> <ESC><C-W>h
 
     function! OpenTermInDir(dir)
         if a:dir !~ '^term://'
@@ -61,12 +51,6 @@ if has('nvim')
     tmap <C-a><C-s> <C-\><C-n><C-a>s
     tmap <C-a>v <C-\><C-n><C-a>v
     tmap <C-a><C-v> <C-\><C-n><C-a>v
-
-    " Split windows when in term mode just like normal
-    tmap <C-w>s <C-\><C-n><C-w>s
-    tmap <C-w><C-s> <C-\><C-n><C-w>s
-    tmap <C-w>v <C-\><C-n><C-w>v
-    tmap <C-w><C-v> <C-\><C-n><C-w>v
 endif
 
 " Mappings for breaking lines at 72 chars
