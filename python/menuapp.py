@@ -555,7 +555,7 @@ class MainView(QWebView):
         if title is not None:
             self.setWindowTitle(title)
 
-        screensize = QApplication.desktop().screenGeometry()
+        screensize = QApplication.desktop().screenGeometry(self)
         size = self.geometry()
         hpos = (screensize.width() - size.width()) // 2
         vpos = (screensize.height() - size.height()) // 2
