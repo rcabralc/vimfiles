@@ -83,6 +83,10 @@ function! s:gemroot(file)
 endfunction
 
 function! s:looks_like_gemroot(dirname)
+    if match(a:dirname, 'lib\/ruby\/gems\/\d\.\d\.\d\/gems\/' . fnamemodify(a:dirname, ':t') . '$') >= 0
+        return 1
+    endif
+
     let tail = split(a:dirname, '/')[-1]
 
     if match(tail, "-")
