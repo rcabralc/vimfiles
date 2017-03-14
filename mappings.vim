@@ -89,6 +89,7 @@ map <Leader>b :call g:fuzzy.reopen('e')<CR>
 map <Leader>o :call g:fuzzy.openold('e')<CR>
 map <Leader>d :call g:fuzzy.select_dir('e', $HOME, expand('%:p:h'), 5)<CR>
 map <Leader>g :call g:fuzzy.select_gem_dir('e', expand('%:p:h'))<CR>
+map <Leader>G :call g:fuzzy.open_from_branch(expand('%:p'))<CR>
 
 " Make the Q key format the entire paragraph.  This makes the Ex mode go away,
 " but I don't use that, and I can enter in Ex mode (in a way more like typing

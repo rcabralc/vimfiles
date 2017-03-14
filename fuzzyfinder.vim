@@ -62,6 +62,43 @@ function! g:fuzzy.open(cmd, dirname, accept_input, info)
     execute a:cmd . " " .  g:utils.makepath(resolve(info.toplevel . '/' . fname))
 endfunction
 
+function! g:fuzzy.open_from_branch(filename)
+    let root = g:utils.gitroot(a:filename)
+    if empty(root)
+        return
+    endif
+
+    let entriescmd = g:utils.fish('git branch', { 'cwd': root, 'cmd': 1 })
+    let branch = s:spawn_menu(entriescmd, {
+        \ 'limit': 100,
+        \ 'word_delimiters': '/',
+        \ 'completion_sep': '/',
+        \ 'title': 'Select Git branch'
+    \ })
+
+    if empty(branch)
+        return
+    endif
+
+    let entriescmd = g:utils.fish('git ls-tree -r --name-only ' . branch, {
+        \ 'cwd': root,
+        \ 'cmd': 1
+    \ })
+    let fname = s:spawn_menu(entriescmd, {
+        \ 'limit': 100,
+        \ 'input': g:utils.relativepath(root, a:filename),
+        \ 'word_delimiters': '/',
+        \ 'completion_sep': '/',
+        \ 'title': 'Select file from Git branch ' . branch
+    \ })
+
+    if empty(fname)
+        return
+    endif
+
+    execute 'Gedit ' . branch . ':' . fname
+endfunction
+
 function! g:fuzzy.reopen(cmd)
     let tempfile = tempname()
 
