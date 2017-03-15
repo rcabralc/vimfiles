@@ -29,7 +29,12 @@
 let g:fuzzy = {}
 
 function! g:fuzzy.open(cmd, dirname, accept_input, info)
-    let dirname = resolve(a:dirname)
+    " resolve() mangles fugitive:// paths.
+    if match(a:dirname, '^fugitive:\/\/') == 0
+        let dirname = a:dirname
+    else
+        let dirname = resolve(a:dirname)
+    endif
 
     if empty(a:info)
         let info = s:project_root_info(dirname)
@@ -218,9 +223,15 @@ function! g:fuzzy.select_gem_dir(cmd, root)
 endfunction
 
 function! s:project_root_info(dirname)
-    let toplevel = g:utils.project_root(a:dirname)
-    let filescmd = g:utils.project_files_cmd(a:dirname)
-    let initial = g:utils.relativepath(toplevel, a:dirname)
+    let dirname = substitute(a:dirname, '\.git\/\/', '.git/', '')
+    let toplevel = g:utils.project_root(dirname)
+    let filescmd = g:utils.project_files_cmd(dirname)
+
+    if match(a:dirname, '^fugitive:\/\/') == 0
+        let initial = split(dirname, '\/\.git\/\?[a-fA-F0-9]\{40\}\/')[-1]
+    else
+        let initial = g:utils.relativepath(toplevel, dirname)
+    end
 
     if !empty(initial)
         let initial = initial . '/'
