@@ -3,6 +3,10 @@
 let g:utils = {}
 
 function! utils.gitroot(file)
+    if match(a:file, '^fugitive:\/\/') == 0
+        return substitute(split(a:file, '/\.git/')[0], '^fugitive:\/\/', '', '')
+    endif
+
     return g:utils.fish('git rev-parse --show-toplevel', {
         \ 'cwd': fnamemodify(a:file, ':p:h'),
         \ 'error': '/dev/null',
