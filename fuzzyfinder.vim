@@ -68,7 +68,9 @@ function! g:fuzzy.open_from_branch(filename)
         return
     endif
 
-    let entriescmd = g:utils.fish('git branch', { 'cwd': root, 'cmd': 1 })
+    let branchescmd = 'git branch --list -a --no-color | ' .
+        \ "grep -v HEAD | grep -v '\*'"
+    let entriescmd = g:utils.fish(branchescmd, { 'cwd': root, 'cmd': 1 })
     let branch = s:spawn_menu(entriescmd, {
         \ 'limit': 100,
         \ 'word_delimiters': '/',
