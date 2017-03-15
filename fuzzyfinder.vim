@@ -72,7 +72,7 @@ function! g:fuzzy.open_from_branch(filename)
         \ "grep -v HEAD | grep -v '\*'"
     let entriescmd = g:utils.fish(branchescmd, { 'cwd': root, 'cmd': 1 })
     let branch = s:spawn_menu(entriescmd, {
-        \ 'limit': 100,
+        \ 'limit': 20,
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
         \ 'title': 'Select Git branch'
@@ -87,7 +87,7 @@ function! g:fuzzy.open_from_branch(filename)
         \ 'cmd': 1
     \ })
     let fname = s:spawn_menu(entriescmd, {
-        \ 'limit': 100,
+        \ 'limit': 20,
         \ 'input': g:utils.relativepath(root, a:filename),
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
