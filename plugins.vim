@@ -74,7 +74,10 @@ Plug 'haya14busa/vim-asterisk'
 Plug 'vim-scripts/dbext.vim'
 
 " Autocompletion
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
+
+" Many handy text objects
+Plug 'wellle/targets.vim'
 
 call plug#end()
 

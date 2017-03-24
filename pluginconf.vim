@@ -119,12 +119,6 @@ nmap ]c <Plug>GitGutterNextHunk
 let g:vrc_trigger = '<Leader>r'
 
 
-" Deoplete
-" ========
-
-let g:deoplete#enable_at_startup = 1
-
-
 " dbext
 " =====
 
