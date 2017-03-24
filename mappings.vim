@@ -89,23 +89,24 @@ map <Leader>b :call g:fuzzy.reopen('e')<CR>
 map <Leader>o :call g:fuzzy.openold('e')<CR>
 map <Leader>d :call g:fuzzy.select_dir('e', $HOME, expand('%:p:h'), 5)<CR>
 map <Leader>g :call g:fuzzy.select_gem_dir('e', expand('%:p:h'))<CR>
-map <Leader>G :call g:fuzzy.open_from_branch(expand('%:p'))<CR>
+map <A-b> :call g:fuzzy.open_from_branch()<CR>
+map <A-c> :call g:gitcommand.checkout()<CR>
 
 " Make the Q key format the entire paragraph.  This makes the Ex mode go away,
 " but I don't use that, and I can enter in Ex mode (in a way more like typing
 " ":") by using gQ.
 nnoremap Q gqap
 
-map <A-b> :call <SID>softmotion('b')<CR>
-map <A-w> :call <SID>softmotion('w')<CR>
-map <A-e> :call <SID>softmotion('e')<CR>
-
-function! <SID>softmotion(motion)
-    let oldisk = &isk
-    execute "setlocal isk=".substitute(oldisk, '_,', '', 'g')
-    execute "normal ".a:motion
-    execute "setlocal isk=".oldisk
-endfunction
+" map <A-b> :call <SID>softmotion('b')<CR>
+" map <A-w> :call <SID>softmotion('w')<CR>
+" map <A-e> :call <SID>softmotion('e')<CR>
+"
+" function! <SID>softmotion(motion)
+"     let oldisk = &isk
+"     let &isk = substitute(substitute(substitute(oldisk.',', '[-_],', '', 'g'), ',\+', ',', 'g'), ',$', '', '')
+"     execute "normal ".a:motion
+"     let &isk = oldisk
+" endfunction
 
 nmap <Leader>s :set hlsearch!<CR>
 nmap <Leader>n :set relativenumber!<CR>

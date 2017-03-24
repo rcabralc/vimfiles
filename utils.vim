@@ -145,7 +145,7 @@ function! utils.fish(command, ...)
 
         set shell=/usr/bin/fish
         let output = system(l:command)
-        exe 'set shell=' . previous_shell
+        let &shell = previous_shell
 
         if v:shell_error
             return ''
@@ -189,4 +189,45 @@ function! utils.regexescape(str)
   endfo
 
   return str
+endfunction
+
+function! utils.spawn_menu(entriescmd, params)
+    if exists('g:python3_executable')
+        let executable = g:python3_executable
+    else
+        let executable = 'python'
+    endif
+
+    let menucmd = executable . ' -u ' . g:vimdir . '/python/menu.py --daemonize'
+
+    if has_key(a:params, 'limit')
+        let menucmd = menucmd . ' --limit ' . shellescape(a:params.limit)
+    endif
+
+    if has_key(a:params, 'completion_sep') && !empty(a:params.completion_sep)
+        let menucmd = menucmd . ' --completion-sep ' . shellescape(a:params.completion_sep)
+    endif
+
+    if has_key(a:params, 'word_delimiters') && !empty(a:params.word_delimiters)
+        let menucmd = menucmd . ' --word-delimiters ' . shellescape(a:params.word_delimiters)
+    endif
+
+    if has_key(a:params, 'history_key') && !empty(a:params.history_key)
+        let menucmd = menucmd . ' --history-key ' . shellescape(a:params.history_key)
+    endif
+
+    if has_key(a:params, 'accept_input') && a:params.accept_input
+        let menucmd = menucmd . ' --accept-input'
+    endif
+
+    if has_key(a:params, 'title') && !empty(a:params.title)
+        let menucmd = menucmd . ' --title ' . shellescape(a:params.title)
+    endif
+
+    if has_key(a:params, 'input') && !empty(a:params.input)
+        let menucmd = menucmd . ' --input ' . shellescape(a:params.input)
+    endif
+
+    let cmd = a:entriescmd . ' | ' . menucmd
+    return g:utils.fish(cmd . ' 2>/tmp/debug.log', { 'chomp': 1 })
 endfunction

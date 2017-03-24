@@ -42,7 +42,7 @@ function! g:fuzzy.open(cmd, dirname, accept_input, info)
         let info = a:info
     endif
 
-    let fname = s:spawn_menu(info.filescmd, {
+    let fname = g:utils.spawn_menu(info.filescmd, {
         \ 'limit': 20,
         \ 'input': info.initial,
         \ 'history_key': 'file:' . info.toplevel,
@@ -67,21 +67,14 @@ function! g:fuzzy.open(cmd, dirname, accept_input, info)
     execute a:cmd . " " .  g:utils.makepath(resolve(info.toplevel . '/' . fname))
 endfunction
 
-function! g:fuzzy.open_from_branch(filename)
-    let root = g:utils.gitroot(a:filename)
+function! g:fuzzy.open_from_branch()
+    let filename = expand('%:p')
+    let root = g:utils.gitroot(filename)
     if empty(root)
         return
     endif
 
-    let branchescmd = 'git branch --list -a --no-color | ' .
-        \ "grep -v HEAD | grep -v '\*'"
-    let entriescmd = g:utils.fish(branchescmd, { 'cwd': root, 'cmd': 1 })
-    let branch = s:spawn_menu(entriescmd, {
-        \ 'limit': 20,
-        \ 'word_delimiters': '/',
-        \ 'completion_sep': '/',
-        \ 'title': 'Select Git branch'
-    \ })
+    let branch = g:gitcommand.select_branch(root)
 
     if empty(branch)
         return
@@ -91,9 +84,9 @@ function! g:fuzzy.open_from_branch(filename)
         \ 'cwd': root,
         \ 'cmd': 1
     \ })
-    let fname = s:spawn_menu(entriescmd, {
+    let fname = g:utils.spawn_menu(entriescmd, {
         \ 'limit': 20,
-        \ 'input': g:utils.relativepath(root, a:filename),
+        \ 'input': g:utils.relativepath(root, filename),
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
         \ 'title': 'Select file from Git branch ' . branch
@@ -117,7 +110,7 @@ function! g:fuzzy.reopen(cmd)
         \ ' | grep "."' .
         \ ' | sed "s/^.*\"\([^\"]*\)\".*\$/\\1/"'
 
-    let fname = s:spawn_menu(entriescmd, {
+    let fname = g:utils.spawn_menu(entriescmd, {
         \ 'limit': 100,
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
@@ -147,7 +140,7 @@ function! g:fuzzy.openold(cmd)
         \ ' | grep -v "/tmp/nvim"' .
         \ ' | cut -d":" -f2- | sed "s/^\s\+//"'
 
-    let fname = s:spawn_menu(entriescmd, {
+    let fname = g:utils.spawn_menu(entriescmd, {
         \ 'limit': 100,
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
@@ -177,7 +170,7 @@ function! g:fuzzy.select_dir(cmd, root, dirname, depth)
         let initial = initial + '/'
     endif
 
-    let choice = s:spawn_menu(entriescmd, {
+    let choice = g:utils.spawn_menu(entriescmd, {
         \ 'limit': 20,
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
@@ -199,7 +192,7 @@ function! g:fuzzy.select_gem_dir(cmd, root)
     let root = s:rubygems_path(a:root)
     let entriescmd = s:gather_dirs(root, -1)
 
-    let choice = s:spawn_menu(entriescmd, {
+    let choice = g:utils.spawn_menu(entriescmd, {
         \ 'limit': 20,
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
@@ -227,7 +220,7 @@ function! s:project_root_info(dirname)
     let toplevel = g:utils.project_root(dirname)
     let filescmd = g:utils.project_files_cmd(dirname)
 
-    if match(a:dirname, '^fugitive:\/\/') == 0
+    if match(dirname, '^fugitive:\/\/') == 0
         let initial = split(dirname, '\/\.git\/\?[a-fA-F0-9]\{40\}\/')[-1]
     else
         let initial = g:utils.relativepath(toplevel, dirname)
@@ -280,47 +273,6 @@ function! s:rubygems_path(dirname)
         \ 'chomp': 1
         \ }
     \)
-endfunction
-
-function! s:spawn_menu(entriescmd, params)
-    if exists('g:python3_executable')
-        let executable = g:python3_executable
-    else
-        let executable = 'python'
-    endif
-
-    let menucmd = executable . ' -u ' . g:vimdir . '/python/menu.py --daemonize'
-
-    if has_key(a:params, 'limit')
-        let menucmd = menucmd . ' --limit ' . shellescape(a:params.limit)
-    endif
-
-    if has_key(a:params, 'completion_sep') && !empty(a:params.completion_sep)
-        let menucmd = menucmd . ' --completion-sep ' . shellescape(a:params.completion_sep)
-    endif
-
-    if has_key(a:params, 'word_delimiters') && !empty(a:params.word_delimiters)
-        let menucmd = menucmd . ' --word-delimiters ' . shellescape(a:params.word_delimiters)
-    endif
-
-    if has_key(a:params, 'history_key') && !empty(a:params.history_key)
-        let menucmd = menucmd . ' --history-key ' . shellescape(a:params.history_key)
-    endif
-
-    if has_key(a:params, 'accept_input') && a:params.accept_input
-        let menucmd = menucmd . ' --accept-input'
-    endif
-
-    if has_key(a:params, 'title') && !empty(a:params.title)
-        let menucmd = menucmd . ' --title ' . shellescape(a:params.title)
-    endif
-
-    if has_key(a:params, 'input') && !empty(a:params.input)
-        let menucmd = menucmd . ' --input ' . shellescape(a:params.input)
-    endif
-
-    let cmd = a:entriescmd . ' | ' . menucmd
-    return g:utils.fish(cmd . ' 2>/tmp/debug.log', { 'chomp': 1 })
 endfunction
 
 function! s:getparent(dirname)
