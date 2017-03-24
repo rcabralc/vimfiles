@@ -73,6 +73,8 @@ function! s:improve_highlights(p)
 
     hi! link erubyDelimiter Delimiter
 
+    hi! link xmlEndTag xmlTag
+
     call rcabralc#hl('GitGutterAdd',           a:p.green,  a:p.none, 'bold')
     call rcabralc#hl('GitGutterChange',        a:p.yellow, a:p.none, 'bold')
     call rcabralc#hl('GitGutterDelete',        a:p.red,    a:p.none, 'bold')
