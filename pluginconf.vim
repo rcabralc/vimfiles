@@ -109,8 +109,8 @@ let g:polyglot_disabled = ['ruby']
 " vim-gitgutter: enable/disable line hightlighting
 nmap <Leader>h <Plug>GitGutterLineHighlightsToggle
 " vim-gitgutter: next/previous hunks
-nmap <Leader>[ <Plug>GitGutterPrevHunk
-nmap <Leader>] <Plug>GitGutterNextHunk
+nmap [c <Plug>GitGutterPrevHunk
+nmap ]c <Plug>GitGutterNextHunk
 
 
 " Rest console
