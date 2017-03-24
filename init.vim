@@ -6,6 +6,7 @@ endif
 
 execute 'source ' . fnamemodify($MYVIMRC, ':p:h') . '/utils.vim'
 call utils.vimsource('fuzzyfinder.vim')
+call utils.vimsource('git.vim')
 call utils.vimsource('defaults.vim')
 call utils.vimsource('plugins.vim')
 call utils.vimsource('mappings.vim')
