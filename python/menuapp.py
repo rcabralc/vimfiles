@@ -433,8 +433,8 @@ class Frontend:
         backend = Backend(menu, self.view)
         self.frame.addToJavaScriptWindowObject('backend', backend)
 
-    def show(self, title=None):
-        self.view.show(title=title)
+    def restore(self, app, title=None):
+        self.view.restore(app, title=title)
 
     def hide(self):
         self.view.hide()
@@ -549,18 +549,21 @@ class MainView(QWebView):
         self.setFocusPolicy(Qt.StrongFocus)
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
-    def show(self, title=None):
-        self.activateWindow()
+    def restore(self, app, title=None):
+        desktop = QApplication.desktop()
+        screensize = desktop.screenGeometry(self)
 
-        if title is not None:
-            self.setWindowTitle(title)
-
-        screensize = QApplication.desktop().screenGeometry(self)
         size = self.geometry()
         hpos = (screensize.width() - size.width()) // 2
         vpos = (screensize.height() - size.height()) // 2
         self.move(hpos, vpos)
-        return super(MainView, self).show()
+
+        if title is not None:
+            self.setWindowTitle(title)
+
+        self.activateWindow()
+
+        return self.showNormal()
 
 
 def default_colors(view):
@@ -647,7 +650,7 @@ class MenuApp(QObject):
         self.frontend.hide()
 
     def restore(self, title=None):
-        self.frontend.show(title=title)
+        self.frontend.restore(self.app, title=title)
 
     def exec_(self):
         return self.app.exec_()
