@@ -76,6 +76,9 @@ Plug 'vim-scripts/dbext.vim'
 " Autocompletion
 Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
 
+" Text object for function arguments
+Plug 'b4winckler/vim-angry'
+
 " Many handy text objects
 Plug 'wellle/targets.vim'
 
