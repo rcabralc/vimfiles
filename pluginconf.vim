@@ -97,8 +97,7 @@ let g:python_auto_complete_variables = 0
 
 " Ruby highlighting options
 let g:ruby_operators = 1
-let g:ruby_space_errors = 1
-let g:ruby_no_trail_space_error = 1 " As we already have support for this for all filetypes
+let g:ruby_no_expensive = 1
 let g:ruby_minlines = 200
 
 " Ruby filetype options.
