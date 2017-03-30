@@ -79,8 +79,6 @@ function! s:improve_highlights(p)
     call rcabralc#hl('GitGutterChange',        a:p.yellow, a:p.none, 'bold')
     call rcabralc#hl('GitGutterDelete',        a:p.red,    a:p.none, 'bold')
     call rcabralc#hl('GitGutterChangeDelete',  a:p.red,    a:p.none, 'bold')
-
-    call rcabralc#hl('SyntasticWarningSign', a:p.black, a:p.orange, 'bold')
 endfunction
 
 augroup Colors

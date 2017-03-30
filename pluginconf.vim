@@ -18,7 +18,7 @@ let g:lightline.active = {
     \ 'left': [ [ 'mode', 'paste' ],
     \           [ 'fugitive' ],
     \           [ 'readonly', 'filename', 'modified' ] ],
-    \ 'right': [ [ 'syntastic', 'lineinfo' ],
+    \ 'right': [ [ 'ale', 'lineinfo' ],
     \            [ 'percent' ],
     \            [ 'filetype' ] ]
 \ }
@@ -35,10 +35,10 @@ let g:lightline.component_function = {
     \ 'fugitive': 'LightLineFugitive',
 \ }
 let g:lightline.component_expand = {
-    \ 'syntastic': 'SyntasticStatuslineFlag',
+    \ 'ale': 'ALEGetStatusLine',
 \ }
 let g:lightline.component_type = {
-    \ 'syntastic': 'error',
+    \ 'ale': 'error',
 \ }
 let g:lightline.separator = { 'left': '⮀', 'right': '⮂' }
 let g:lightline.subseparator = { 'left': '⮁', 'right': '⮃' }
@@ -57,24 +57,29 @@ function! LightLineFugitive()
 endfunction
 
 
-" Syntastic
-" =========
+" ALE
+" ===
 
 set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%{ALEGetStatusLine()}
 set statusline+=%*
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_error_symbol = "\u2717"
-let g:syntastic_warning_symbol = "\u26A0"
+let g:ale_sign_error = "\u2717"
+let g:ale_sign_warning = "\u26A0"
+let g:ale_statusline_format = ['%d error(s)', '%d warning(s)', '']
+let g:ale_lint_on_save = 0
 
-let g:syntastic_javascript_checkers = ['jshint', 'jscs']
-let g:syntastic_python_checkers = ['flake8']
-let g:syntastic_ruby_checkers = ['rubocop']
-let g:syntastic_ruby_rubocop_args = '-D'
-let g:syntastic_eruby_ruby_quiet_messages =
-    \ {'regex': 'possibly useless use of \(a variable\|+\) in void context'}
+" let g:syntastic_always_populate_loc_list = 1
+" let g:syntastic_check_on_wq = 0
+" let g:syntastic_error_symbol = "\u2717"
+" let g:syntastic_warning_symbol = "\u26A0"
+"
+" let g:syntastic_javascript_checkers = ['jshint', 'jscs']
+" let g:syntastic_python_checkers = ['flake8']
+" let g:syntastic_ruby_checkers = ['rubocop']
+" let g:syntastic_ruby_rubocop_args = '-D'
+" let g:syntastic_eruby_ruby_quiet_messages =
+"     \ {'regex': 'possibly useless use of \(a variable\|+\) in void context'}
 
 
 " Filetypes
