@@ -16,16 +16,16 @@ nnoremap <A-l> :tabn<CR>
 noremap <S-l> :bn<CR>
 noremap <S-h> :bp<CR>
 
-nnoremap <C-h> <C-W>h
-nnoremap <C-j> <C-W>j
-nnoremap <C-k> <C-W>k
-nnoremap <C-l> <C-W>l
+nnoremap <A-C-h> <C-W>h
+nnoremap <A-C-j> <C-W>j
+nnoremap <A-C-k> <C-W>k
+nnoremap <A-C-l> <C-W>l
 
 if has('nvim')
-    tnoremap <C-h> <C-\><C-n><C-w>h
-    tnoremap <C-j> <C-\><C-n><C-w>j
-    tnoremap <C-k> <C-\><C-n><C-w>k
-    tnoremap <C-l> <C-\><C-n><C-w>l
+    tnoremap <A-C-h> <C-\><C-n><C-w>h
+    tnoremap <A-C-j> <C-\><C-n><C-w>j
+    tnoremap <A-C-k> <C-\><C-n><C-w>k
+    tnoremap <A-C-l> <C-\><C-n><C-w>l
 
     tnoremap <A-h> <C-\><C-n>:tabp<CR>
     tnoremap <A-l> <C-\><C-n>:tabn<CR>
@@ -108,6 +108,12 @@ nnoremap Q gqap
 "     let &isk = oldisk
 " endfunction
 
-nmap <Leader>s :set hlsearch!<CR>
 nmap <Leader>n :set relativenumber!<CR>
 nmap <Leader>c :set cursorcolumn!<CR>
+
+nmap <silent> <C-S-k> <Plug>(ale_previous_wrap)
+nmap <silent> <C-S-j> <Plug>(ale_next_wrap)
+
+nmap <Leader>h <Plug>GitGutterLineHighlightsToggle
+nmap <C-k> <Plug>GitGutterPrevHunk
+nmap <C-j> <Plug>GitGutterNextHunk

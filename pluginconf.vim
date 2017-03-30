@@ -108,16 +108,6 @@ let g:ruby_indent_block_style = 'do'
 let g:polyglot_disabled = ['ruby']
 
 
-" Git Gutter
-" ==========
-
-" vim-gitgutter: enable/disable line hightlighting
-nmap <Leader>h <Plug>GitGutterLineHighlightsToggle
-" vim-gitgutter: next/previous hunks
-nmap [c <Plug>GitGutterPrevHunk
-nmap ]c <Plug>GitGutterNextHunk
-
-
 " Rest console
 " ============
 
