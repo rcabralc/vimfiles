@@ -15,7 +15,7 @@ endif
 call plug#begin(vimdir . 'bundle')
 
 " Filetypes/linters
-Plug 'scrooloose/syntastic'
+Plug 'w0rp/ale'
 Plug 'sheerun/vim-polyglot'
 Plug 'vim-ruby/vim-ruby'
 
