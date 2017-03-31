@@ -550,13 +550,12 @@ class MainView(QWebView):
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
     def restore(self, app, title=None):
+        frameGeometry = self.frameGeometry()
         desktop = QApplication.desktop()
-        screensize = desktop.screenGeometry(self)
-
-        size = self.geometry()
-        hpos = (screensize.width() - size.width()) // 2
-        vpos = (screensize.height() - size.height()) // 2
-        self.move(hpos, vpos)
+        screen = desktop.screenNumber(desktop.cursor().pos())
+        centerPoint = desktop.screenGeometry(screen).center()
+        frameGeometry.moveCenter(centerPoint)
+        self.move(frameGeometry.topLeft())
 
         if title is not None:
             self.setWindowTitle(title)
