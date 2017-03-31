@@ -57,7 +57,7 @@ endif
 nmap <Leader>w 073l<A-j>
 
 " Search in current git tree.
-nmap <C-S> <A-8>:Ggrep -I  <bar> copen
+nmap K <A-8>:Ggrep -I  <bar> copen
 
 " Just highlight pattern under cursor.
 nmap <A-8> :set hlsearch<CR>*<S-n>
@@ -117,3 +117,7 @@ nmap <silent> <A-j> <Plug>(ale_next_wrap)
 nmap <Leader>h <Plug>GitGutterLineHighlightsToggle
 nmap <C-k> <Plug>GitGutterPrevHunk
 nmap <C-j> <Plug>GitGutterNextHunk
+nmap <C-s> <Plug>GitGutterStageHunk
+
+nmap <A-n> :cn<CR>
+nmap <A-p> :cp<CR>
