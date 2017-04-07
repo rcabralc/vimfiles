@@ -70,6 +70,9 @@ Plug 'haya14busa/incsearch.vim'
 Plug 'haya14busa/incsearch-fuzzy.vim'
 Plug 'haya14busa/vim-asterisk'
 
+" Table mode
+Plug 'dhruvasagar/vim-table-mode'
+
 " SQL from within VIM
 Plug 'vim-scripts/dbext.vim'
 
