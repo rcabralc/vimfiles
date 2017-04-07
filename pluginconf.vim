@@ -134,6 +134,10 @@ let g:incsearch#auto_nohlsearch = 1
 let g:asterisk#keeppos = 1
 
 
+" Deoplete
+" ========
+let g:deoplete#enable_at_startup = 1
+
 
 " Table mode
 " ==========
