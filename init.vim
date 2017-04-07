@@ -33,9 +33,6 @@ endfunction
 
 command! RegenerateCTagsForGitRepo call s:regenerate_ctags_for_git_repo()
 
-set listchars=tab:»»,trail:•
-set list
-
 augroup Text
     autocmd!
     autocmd BufNewFile,BufRead *.txt setfiletype human

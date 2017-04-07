@@ -2,6 +2,9 @@ set number
 set mouse=
 set autoindent
 set noshowmode
+set list
+set listchars=tab:»»,trail:•
+set tags+=.git/tags
 
 " Assume a capable terminal.
 if has('nvim')
