@@ -154,3 +154,9 @@ inoreabbrev <expr> <bar><bar>
 inoreabbrev <expr> __
           \ <SID>isAtStartOfLine('__') ?
           \ '<c-o>:silent! TableModeDisable<cr>' : '__'
+
+
+" GitGutter
+" =========
+
+let g:gitgutter_grep_command = 'grep'
