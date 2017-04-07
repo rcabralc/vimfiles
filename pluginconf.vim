@@ -130,22 +130,9 @@ let g:indentLine_setColors = 0
 " Incsearch and asterisk
 " ======================
 
-map /  <Plug>(incsearch-forward)
-map ?  <Plug>(incsearch-backward)
-map g/ <Plug>(incsearch-stay)
-
 let g:incsearch#auto_nohlsearch = 1
 let g:asterisk#keeppos = 1
-map n  <Plug>(incsearch-nohl-n)
-map N  <Plug>(incsearch-nohl-N)
-map *  <Plug>(incsearch-nohl)<Plug>(asterisk-z*)
-map #  <Plug>(incsearch-nohl)<Plug>(asterisk-z#)
-map g* <Plug>(incsearch-nohl)<Plug>(asterisk-gz*)
-map g# <Plug>(incsearch-nohl)<Plug>(asterisk-gz#)
 
-map z/ <Plug>(incsearch-fuzzy-/)
-map z? <Plug>(incsearch-fuzzy-?)
-map zg/ <Plug>(incsearch-fuzzy-stay)
 
 
 " Table mode
