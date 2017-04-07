@@ -58,7 +58,7 @@ augroup Prog
     autocmd FileType ruby,html,eruby,javascript,coffee,css,scss,sass set ts=2 sw=2 sts=2 indentkeys-=*<Return>
     autocmd FileType eruby,html,css,scss,sass set isk=@,48-57,_,192-255,-
     autocmd FileType python,vim set ts=4 sw=4 sts=4
-    autocmd FileType ruby set formatprg=rubocop\ --except\ Lint/Debugger\ -ao\ /dev/null\ -s\ -\ \|\ tail\ -n+2
+    autocmd FileType ruby setlocal formatprg=rubocop\ --except\ Lint/Debugger,Style/SymbolProc\ -ao\ /dev/null\ -s\ -\ \|\ tail\ -n+2
     autocmd BufWritePre *.rb if !exists('b:dont_format') || !b:dont_format | exe "normal! gggqG\<C-o>\<C-o>" | endif
 augroup END
 
