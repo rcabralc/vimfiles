@@ -53,14 +53,8 @@ if has('nvim')
     tmap <C-a><C-v> <C-\><C-n><C-a>v
 endif
 
-" Mappings for breaking lines at 72 chars
+" Mapping for breaking lines at 72 chars
 nmap <Leader>w 073l<A-j>
-
-" Search in current git tree.
-nmap K <A-8>:Ggrep -I  <bar> copen
-
-" Just highlight pattern under cursor.
-nmap <A-8> :set hlsearch<CR>*<S-n>
 
 " For Emacs-style editing on the command-line:
 " start of line
@@ -119,5 +113,30 @@ nmap <C-k> <Plug>GitGutterPrevHunk
 nmap <C-j> <Plug>GitGutterNextHunk
 nmap <C-s> <Plug>GitGutterStageHunk
 
-nmap <A-n> :cn<CR>
-nmap <A-p> :cp<CR>
+nmap Z :bw<CR>
+
+" Incsearch and asterisk
+" ======================
+
+" Walk though quickfix lines.
+map <A-n> :cn <bar> set hlsearch<CR>
+map <A-p> :cp <bar> set hlsearch<CR>
+
+" Search in current git tree. (* marks the word without jumping to next
+" match thanks to vim-asterisk.)
+nmap K *:Ggrep -I  <bar> copen
+
+map /  <Plug>(incsearch-forward)
+map ?  <Plug>(incsearch-backward)
+map g/ <Plug>(incsearch-stay)
+
+map n  <Plug>(incsearch-nohl-n)
+map N  <Plug>(incsearch-nohl-N)
+map *  <Plug>(incsearch-nohl)<Plug>(asterisk-z*)
+map #  <Plug>(incsearch-nohl)<Plug>(asterisk-z#)
+map g* <Plug>(incsearch-nohl)<Plug>(asterisk-gz*)
+map g# <Plug>(incsearch-nohl)<Plug>(asterisk-gz#)
+
+map z/ <Plug>(incsearch-fuzzy-/)
+map z? <Plug>(incsearch-fuzzy-?)
+map zg/ <Plug>(incsearch-fuzzy-stay)
