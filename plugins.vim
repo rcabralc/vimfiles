@@ -88,6 +88,9 @@ Plug 'wellle/targets.vim'
 " Easy swap of text objects
 Plug 'tommcdo/vim-exchange'
 
+" Easy selection expansing/contraction
+Plug 'terryma/vim-expand-region'
+
 call plug#end()
 
 if !was_installed
