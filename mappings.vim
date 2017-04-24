@@ -18,11 +18,6 @@ nnoremap <A-l> :tabn<CR>
 noremap <S-l> :bn<CR>
 noremap <S-h> :bp<CR>
 
-nnoremap <A-C-h> <C-W>h
-nnoremap <A-C-j> <C-W>j
-nnoremap <A-C-k> <C-W>k
-nnoremap <A-C-l> <C-W>l
-
 if has('nvim')
     tnoremap <A-C-h> <C-\><C-n><C-w>h
     tnoremap <A-C-j> <C-\><C-n><C-w>j
