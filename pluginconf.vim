@@ -161,3 +161,12 @@ inoreabbrev <expr> __
 " =========
 
 let g:gitgutter_grep_command = 'grep'
+
+
+" Expand region
+" =============
+
+let g:expand_region_text_objects_ruby = {
+      \ 'im' :0,
+      \ 'am' :0
+\ }
