@@ -91,6 +91,9 @@ Plug 'tommcdo/vim-exchange'
 " Easy selection expansing/contraction
 Plug 'terryma/vim-expand-region'
 
+" Make . work with surround (and other plugins)
+Plug 'tpope/vim-repeat'
+
 call plug#end()
 
 if !was_installed
