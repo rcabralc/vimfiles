@@ -85,6 +85,9 @@ Plug 'b4winckler/vim-angry'
 " Many handy text objects
 Plug 'wellle/targets.vim'
 
+" Easy swap of text objects
+Plug 'tommcdo/vim-exchange'
+
 call plug#end()
 
 if !was_installed
