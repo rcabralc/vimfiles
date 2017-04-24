@@ -99,9 +99,6 @@ nnoremap Q gqap
 "     let &isk = oldisk
 " endfunction
 
-nmap <Leader>n :set relativenumber!<CR>
-nmap <Leader>c :set cursorcolumn!<CR>
-
 nmap <silent> <A-k> <Plug>(ale_previous_wrap)
 nmap <silent> <A-j> <Plug>(ale_next_wrap)
 
