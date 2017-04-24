@@ -50,9 +50,6 @@ if has('nvim')
     tmap <C-a><C-v> <C-\><C-n><C-a>v
 endif
 
-" Mapping for breaking lines at 72 chars
-nmap <Leader>w 073l<A-j>
-
 " Fuzzy file opening
 map <Leader>f :call g:fuzzy.open('edit', expand('%:p:h'), 1, '')<CR>
 map <Leader>p :call g:fuzzy.open('read', expand('%:p:h'), 0, '')<CR>
