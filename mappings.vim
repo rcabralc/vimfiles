@@ -1,3 +1,5 @@
+let mapleader = "\<Space>"
+
 " This seems more logical
 nmap Y y$
 
