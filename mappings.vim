@@ -3,8 +3,6 @@ let mapleader = "\<Space>"
 " This seems more logical
 nmap Y y$
 
-nnoremap <Leader>k :BW<CR>
-nnoremap <Leader>K :bw!<CR>
 inoremap <C-a><C-a> <Esc>
 if has('nvim')
     tnoremap <C-a><C-a> <C-\><C-n>
@@ -84,10 +82,12 @@ nmap <C-k> <Plug>GitGutterPrevHunk
 nmap <C-j> <Plug>GitGutterNextHunk
 nmap <C-s> <Plug>GitGutterStageHunk
 
-nmap Z :bw<CR>
+nnoremap <Leader>k :BW<CR>
+nnoremap <Leader>K :bw!<CR>
+nnoremap <Leader>q :q<CR>
 nnoremap <Leader>w :w<CR>
 nmap <Leader>v V
-nmap <Leader><Leader> :
+map <Leader><Leader> :
 
 " Copy and paste to and from system clipboard
 vmap <Leader>y "+y
