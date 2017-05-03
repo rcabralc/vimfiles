@@ -94,7 +94,7 @@ Plug 'terryma/vim-expand-region'
 " Make . work with surround (and other plugins)
 Plug 'tpope/vim-repeat'
 
-" Make . work with surround (and other plugins)
+" Readline key bindings.
 Plug 'tpope/vim-rsi'
 
 call plug#end()
