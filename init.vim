@@ -57,8 +57,23 @@ augroup Prog
     autocmd FileType python,vim set ts=4 sw=4 sts=4
     autocmd FileType ruby setlocal formatprg=rubocop\ --except\ Lint/Debugger,Style/SymbolProc\ -ao\ /dev/null\ -s\ -\ \|\ tail\ -n+2
     autocmd FileType ruby setlocal tags+=.git/rbtags
-    autocmd BufWritePre *.rb if !exists('b:dont_format') || !b:dont_format | exe "normal! gggqG\<C-o>\<C-o>" | endif
+    autocmd BufWritePre *.rb call s:reformat_ruby_file()
 augroup END
+
+function! s:reformat_ruby_file()
+    if exists('b:dont_format') && b:dont_format
+        return
+    endif
+
+    if expand('%:t') == 'schema.rb'
+        return
+    endif
+
+    let current_line = line('.')
+
+    normal! gggqG
+    exe ':' . current_line
+endfunction
 
 
 " Highlighting optimizations
