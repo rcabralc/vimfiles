@@ -97,7 +97,7 @@ let g:python_auto_complete_variables = 0
 
 " Ruby highlighting options
 let g:ruby_operators = 1
-let g:ruby_no_expensive = 1
+" let g:ruby_no_expensive = 1
 let g:ruby_minlines = 200
 
 " Ruby filetype options.
