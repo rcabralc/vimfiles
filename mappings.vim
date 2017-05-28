@@ -3,11 +3,6 @@ let mapleader = "\<Space>"
 " This seems more logical
 nmap Y y$
 
-inoremap <C-a><C-a> <Esc>
-if has('nvim')
-    tnoremap <C-a><C-a> <C-\><C-n>
-endif
-
 " Navigation and splitting mappings
 
 nnoremap <A-h> :tabp<CR>
@@ -16,7 +11,20 @@ nnoremap <A-l> :tabn<CR>
 noremap <S-l> :bn<CR>
 noremap <S-h> :bp<CR>
 
+nmap <A-C-h> <C-w>h
+nmap <A-C-j> <C-w>j
+nmap <A-C-k> <C-w>k
+nmap <A-C-l> <C-w>l
+
+inoremap <A-C-h> <Esc><C-w>h
+inoremap <A-C-j> <Esc><C-w>j
+inoremap <A-C-k> <Esc><C-w>k
+inoremap <A-C-l> <Esc><C-w>l
+
 if has('nvim')
+    tnoremap <C-b><C-b> <C-b>
+    tnoremap <C-b><Esc> <C-\><C-n>
+
     tnoremap <A-C-h> <C-\><C-n><C-w>h
     tnoremap <A-C-j> <C-\><C-n><C-w>j
     tnoremap <A-C-k> <C-\><C-n><C-w>k
@@ -37,15 +45,14 @@ if has('nvim')
 
     nnoremap <Leader>t :call OpenTermInDir(expand('%:p:h'))<CR>
 
-    " This kinda mimics Tmux.
-    nnoremap <C-a>s :split<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
-    nnoremap <C-a><C-s> :split<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
-    nnoremap <C-a>v :vsplit<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
-    nnoremap <C-a><C-v> :vsplit<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
-    tmap <C-a>s <C-\><C-n><C-a>s
-    tmap <C-a><C-s> <C-\><C-n><C-a>s
-    tmap <C-a>v <C-\><C-n><C-a>v
-    tmap <C-a><C-v> <C-\><C-n><C-a>v
+    nnoremap <C-b>s :split<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
+    nnoremap <C-b><C-s> :split<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
+    nnoremap <C-b>v :vsplit<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
+    nnoremap <C-b><C-v> :vsplit<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
+    tmap <C-b>s <C-\><C-n><C-b>s
+    tmap <C-b><C-s> <C-\><C-n><C-b>s
+    tmap <C-b>v <C-\><C-n><C-b>v
+    tmap <C-b><C-v> <C-\><C-n><C-b>v
 endif
 
 " Fuzzy file opening
