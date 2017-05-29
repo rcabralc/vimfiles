@@ -106,7 +106,7 @@ let g:vrc_trigger = '<Leader>r'
 " dbext
 " =====
 
-let g:dbext_default_window_use_horiz = 0
+let g:dbext_default_window_use_horiz = 1
 let g:dbext_default_window_width = ''
 
 let g:dbext_default_profile_biva_dev = 'type=PGSQL:user=rafael.coutinho:dbname=Biva_development'
