@@ -16,6 +16,11 @@ nmap <A-C-j> <C-w>j
 nmap <A-C-k> <C-w>k
 nmap <A-C-l> <C-w>l
 
+imap <A-C-h> <Esc><C-w>h
+imap <A-C-j> <Esc><C-w>j
+imap <A-C-k> <Esc><C-w>k
+imap <A-C-l> <Esc><C-w>l
+
 inoremap <A-C-h> <Esc><C-w>h
 inoremap <A-C-j> <Esc><C-w>j
 inoremap <A-C-k> <Esc><C-w>k
