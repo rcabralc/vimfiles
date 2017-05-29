@@ -262,6 +262,7 @@ function! s:gather_dirs(root, maxdepth)
         \ '\) ' .
         \ '-prune -o -print \) ' .
         \ '2>/dev/null | ' .
+        \ 'sort -u | ' .
         \ 'sed "s/^\.\///" | sed "s/\$/\//"'
 endfunction
 
