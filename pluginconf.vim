@@ -88,6 +88,7 @@ let g:python_auto_complete_variables = 0
 let g:ruby_operators = 1
 " let g:ruby_no_expensive = 1
 let g:ruby_minlines = 200
+let g:ruby_spellcheck_strings = 1
 
 " Ruby filetype options.
 let g:ruby_indent_access_modifier_style = 'outdent'
