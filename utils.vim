@@ -198,7 +198,7 @@ function! utils.spawn_menu(entriescmd, params)
         let executable = 'python'
     endif
 
-    let menucmd = executable . ' -u ' . g:vimdir . '/python/menu.py --daemonize'
+    let menucmd = executable . ' -u ' . g:vimdir . 'python/menu.py --daemonize'
 
     if has_key(a:params, 'limit')
         let menucmd = menucmd . ' --limit ' . shellescape(a:params.limit)
