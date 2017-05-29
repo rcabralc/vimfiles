@@ -58,6 +58,8 @@ augroup Prog
     autocmd FileType ruby setlocal formatprg=rubocop\ --except\ Lint/Debugger,Style/SymbolProc\ -ao\ /dev/null\ -s\ -\ \|\ tail\ -n+2
     autocmd FileType ruby setlocal tags+=.git/rbtags
     autocmd BufWritePre *.rb call s:reformat_ruby_file()
+
+    autocmd BufEnter *.arb setfiletype ruby
 augroup END
 
 function! s:reformat_ruby_file()
