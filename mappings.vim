@@ -40,6 +40,7 @@ if has('nvim')
 
         set nospell
         edit term://fish
+        setlocal nonumber
         startinsert
     endfunction
 
