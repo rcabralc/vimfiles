@@ -416,6 +416,9 @@ class CompositeMatch(object):
         return partitions
 
     def _spans(self):
+        if not self._matches:
+            return
+
         streaks = functools.reduce(
             lambda acc, streaks: acc.merge(streaks),
             (Streaks(m.indices) for m in self._matches)
