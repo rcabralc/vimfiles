@@ -5,14 +5,15 @@ function! g:gitcommand.select_branch(root, ...)
     let title = has_key(options, 'title') ? options.title : 'Select Git branch'
 
     let branchescmd = 'git branch --list -a --no-color | ' .
-        \ "grep -v HEAD | grep -v '\*'"
+        \ "grep -v HEAD | grep -v '\*' | sed 's/^\\s\*//'"
     let entriescmd = g:utils.fish(branchescmd, { 'cwd': a:root, 'cmd': 1 })
 
     return g:utils.spawn_menu(entriescmd, {
         \ 'limit': 20,
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
-        \ 'title': title
+        \ 'title': title,
+        \ 'history_key': 'branch:'.a:root
     \ })
 endfunction
 
