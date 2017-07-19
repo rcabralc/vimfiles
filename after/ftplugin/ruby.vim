@@ -21,11 +21,4 @@ endfunction
 " Mappings
 " ========
 
-" Ruby-Debugger
-
-map <Leader>D :Rdebugger<Space>
-map <Leader>P :RdbCommand<Space>p<Space>
-map <Leader>L :RdbLog<CR>
-map <Leader>S :RdbStop<CR>
-
 nnoremap <Leader>B :call <SID>PromoteToBlock()<CR>
