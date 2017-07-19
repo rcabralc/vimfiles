@@ -77,12 +77,6 @@ set fillchars=vert:│,fold:-
 " Mark text width column.
 set colorcolumn=+1
 
-" Use indents of 2 spaces, and have them copied down lines.
-set shiftwidth=2
-set shiftround
-set expandtab
-set smarttab
-
 " Text width at 79 chars allows me to easily split windows vertically.
 set textwidth=79
 
@@ -92,3 +86,4 @@ set synmaxcol=200
 
 set cursorline
 set nofoldenable
+set shiftround
