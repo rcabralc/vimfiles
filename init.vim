@@ -43,8 +43,8 @@ augroup Text
     autocmd FileType mail,human,gitcommit setlocal tw=72
     autocmd FileType markdown,rst setlocal tw=78
 
-    autocmd FileType markdown,rst,human,mail,gitcommit setlocal ai et sw=2 ts=2 sts=2
-    autocmd FileType yaml setlocal et ts=2 sw=2 sts=2 tw=79
+    autocmd FileType markdown,rst,human,mail,gitcommit setlocal ai ts=2
+    autocmd FileType yaml setlocal ts=2 tw=79
 
     " Make text wrap.
     autocmd FileType qf setlocal wrap
@@ -52,10 +52,10 @@ augroup END
 
 augroup Prog
     autocmd!
-    autocmd FileType ruby,html,eruby,javascript,coffee,css,scss,sass set ts=2 sw=2 sts=2 indentkeys-=*<Return>
+    autocmd FileType ruby,html,eruby,javascript,coffee,css,scss,sass set ts=2 indentkeys-=*<Return>
     autocmd FileType eruby,html,css,scss,sass set isk=@,48-57,_,192-255,-
-    autocmd FileType python,vim set ts=4 sw=4 sts=4
     autocmd FileType ruby setlocal formatprg=rubocop\ --except\ Lint/Debugger,Style/SymbolProc\ -ao\ /dev/null\ -s\ -\ \|\ tail\ -n+2
+    autocmd FileType python,vim set ts=4
     autocmd FileType ruby setlocal tags+=.git/rbtags
     autocmd BufWritePre *.rb call s:reformat_ruby_file()
 

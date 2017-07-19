@@ -53,6 +53,9 @@ Plug 'tpope/vim-endwise'
 " Easily change delimiters
 Plug 'tpope/vim-surround'
 
+" Heuristically adjust shiftwidth and expandtab
+Plug 'tpope/vim-sleuth'
+
 " Keep layout when deleting/wiping buffers
 Plug 'qpkorr/vim-bufkill'
 
