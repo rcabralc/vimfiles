@@ -116,7 +116,7 @@ let g:dbext_default_profile_biva_prd = 'type=PGSQL:user=rafael.coutinho:host=biv
 " Indent line
 " ===========
 
-let g:indentLine_char = '│'
+let g:indentLine_char = '┆'
 let g:indentLine_setColors = 0
 
 
