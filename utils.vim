@@ -192,13 +192,7 @@ function! utils.regexescape(str)
 endfunction
 
 function! utils.spawn_menu(entriescmd, params)
-    if exists('g:python3_executable')
-        let executable = g:python3_executable
-    else
-        let executable = 'python'
-    endif
-
-    let menucmd = executable . ' -u ' . g:vimdir . 'python/menu.py --daemonize'
+    let menucmd = 'pickout --daemonize'
 
     if has_key(a:params, 'limit')
         let menucmd = menucmd . ' --limit ' . shellescape(a:params.limit)
