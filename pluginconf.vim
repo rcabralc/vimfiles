@@ -113,7 +113,7 @@ let g:dbext_default_window_width = ''
 " Indent line
 " ===========
 
-let g:indentLine_char = '│'
+let g:indentLine_char = '┆'
 let g:indentLine_setColors = 0
 
 
