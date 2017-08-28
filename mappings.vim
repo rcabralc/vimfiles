@@ -135,3 +135,6 @@ map g# <Plug>(incsearch-nohl)<Plug>(asterisk-gz#)
 map z/ <Plug>(incsearch-fuzzy-/)
 map z? <Plug>(incsearch-fuzzy-?)
 map zg/ <Plug>(incsearch-fuzzy-stay)
+
+map - <Plug>(expand_region_expand)
+map + <Plug>(expand_region_shrink)
