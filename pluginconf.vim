@@ -111,6 +111,7 @@ let g:vrc_show_command = 1
 
 let g:dbext_default_window_use_horiz = 1
 let g:dbext_default_window_width = ''
+let g:dbext_default_buffer_lines = '50%'
 
 
 " Indent line
