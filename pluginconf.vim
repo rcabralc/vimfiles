@@ -101,6 +101,9 @@ let g:polyglot_disabled = ['ruby']
 " ============
 
 let g:vrc_trigger = '<Leader>r'
+let g:vrc_set_default_mapping = 0
+let g:vrc_include_response_header = 1
+let g:vrc_show_command = 1
 
 
 " dbext
