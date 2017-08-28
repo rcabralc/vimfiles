@@ -66,7 +66,7 @@ map <Leader>f :call g:fuzzy.open('edit', expand('%:p:h'), 1, '')<CR>
 map <Leader>r :call g:fuzzy.open('read', expand('%:p:h'), 0, '')<CR>
 map <Leader>b :call g:fuzzy.reopen('e')<CR>
 map <Leader>o :call g:fuzzy.openold('e')<CR>
-map <Leader>d :call g:fuzzy.select_dir('e', $HOME, expand('%:p:h'), 5)<CR>
+map <Leader>d :call g:fuzzy.select_dir('e', $HOME, expand('%:p:h'), 1)<CR>
 map <Leader>g :call g:fuzzy.select_gem_dir('e', expand('%:p:h'))<CR>
 map <A-b> :call g:fuzzy.open_from_branch()<CR>
 map <A-c> :call g:gitcommand.checkout()<CR>
