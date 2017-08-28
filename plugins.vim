@@ -100,6 +100,9 @@ Plug 'tpope/vim-repeat'
 " Readline key bindings.
 Plug 'tpope/vim-rsi'
 
+" Multiple cursors
+Plug 'terryma/vim-multiple-cursors'
+
 call plug#end()
 
 if !was_installed
