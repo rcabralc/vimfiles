@@ -111,6 +111,7 @@ let g:vrc_show_command = 1
 
 let g:dbext_default_window_use_horiz = 1
 let g:dbext_default_window_width = ''
+let g:dbext_default_buffer_lines = '50%'
 
 let g:dbext_default_profile_biva_dev = 'type=PGSQL:user=rafael.coutinho:dbname=Biva_development'
 let g:dbext_default_profile_biva_prd = 'type=PGSQL:user=rafael.coutinho:host=biva-prd.cqn9p6dhfew8.us-east-1.rds.amazonaws.com:dbname=biva'
