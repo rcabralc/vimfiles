@@ -56,11 +56,11 @@ function! g:fuzzy.open(cmd, dirname, accept_input, info)
         return
     endif
 
-    if fname == '..'
+    if fname ==# '..'
         return g:fuzzy.select_dir(a:cmd, s:getparent(info.toplevel), dirname, 1)
     endif
 
-    if fname == '.'
+    if fname ==# '.'
         return g:fuzzy.select_dir(a:cmd, info.toplevel, info.toplevel, 1)
     endif
 
@@ -183,14 +183,21 @@ function! g:fuzzy.select_dir(cmd, root, dirname, depth)
         return
     endif
 
-    let choice = root . '/' . substitute(choice, '/$', '', '')
+    if choice ==# '../'
+        return g:fuzzy.select_dir(a:cmd, s:getparent(root), a:dirname, 1)
+    endif
 
-    return g:fuzzy.open(a:cmd, choice, 1, '')
+    if choice ==# './'
+        return g:fuzzy.open(a:cmd, root, 1, '')
+    endif
+
+    let choice = root . '/' . choice
+    return g:fuzzy.select_dir(a:cmd, choice, a:dirname, 1)
 endfunction
 
 function! g:fuzzy.select_gem_dir(cmd, root)
     let root = s:rubygems_path(a:root)
-    let entriescmd = s:gather_dirs(root, -1)
+    let entriescmd = s:gather_dirs(root, -1, { 'self': 0, 'parent': 0 })
 
     let choice = g:utils.spawn_menu(entriescmd, {
         \ 'limit': 20,
@@ -237,8 +244,30 @@ function! s:project_root_info(dirname)
     \ }
 endfunction
 
-function! s:gather_dirs(root, maxdepth)
+function! s:gather_dirs(root, maxdepth, ...)
     let root = substitute(resolve(a:root), '/$', '', '')
+
+    if a:0 != 0
+        let options = a:1
+        if !has_key(options, 'self')
+            let options.self = 1
+        endif
+        if !has_key(options, 'parent')
+            let options.parent = 1
+        endif
+    else
+        let options = { 'self': 1, 'parent': 1 }
+    endif
+
+    let firstentries = []
+
+    if options.parent
+        let firstentries = add(firstentries, '../')
+    endif
+
+    if options.self
+        let firstentries = add(firstentries, './')
+    endif
 
     let entriescmd = 'cd ' . shellescape(root) . '; and find -L . '
 
@@ -246,7 +275,7 @@ function! s:gather_dirs(root, maxdepth)
         let entriescmd = entriescmd . '-maxdepth ' . a:maxdepth . ' '
     endif
 
-    return entriescmd .
+    let finalcmd = entriescmd .
         \ '-type d \! -empty \( ' .
         \ '\( ' .
         \    '-path "./.wine" ' .
@@ -262,8 +291,16 @@ function! s:gather_dirs(root, maxdepth)
         \ '\) ' .
         \ '-prune -o -print \) ' .
         \ '2>/dev/null | ' .
+        \ 'sed "/^\.\$/d" |' .
         \ 'sort -u | ' .
         \ 'sed "s/^\.\///" | sed "s/\$/\//"'
+
+    if !empty(firstentries)
+        call map(firstentries, '"(echo \"" . v:val . "\" | psub)"')
+        let finalcmd = 'cat ' . join(firstentries, ' ') . ' (' . finalcmd . ' | psub)'
+    endif
+
+    return finalcmd
 endfunction
 
 function! s:rubygems_path(dirname)
