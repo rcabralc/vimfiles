@@ -28,7 +28,7 @@
 " should not cause anoying delays when launched.
 let g:fuzzy = {}
 
-function! g:fuzzy.open(cmd, dirname, accept_input, info)
+function! s:open(dirname, accept_input, info)
     " resolve() mangles fugitive:// paths.
     if match(a:dirname, '^fugitive:\/\/') == 0
         let dirname = a:dirname
@@ -42,29 +42,49 @@ function! g:fuzzy.open(cmd, dirname, accept_input, info)
         let info = a:info
     endif
 
-    let fname = g:utils.spawn_menu(info.filescmd, {
+    if g:utils.looks_like_gitroot(info.toplevel)
+        let title = 'Select file from Git repo at ' . info.toplevel
+    else
+        let title = 'Select from ' . info.toplevel
+    endif
+
+    let choice = g:utils.spawn_menu(info.filescmd, {
         \ 'limit': 20,
         \ 'input': info.initial,
         \ 'history_key': 'file:' . info.toplevel,
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
         \ 'accept_input': a:accept_input,
-        \ 'title': 'Select file from ' . info.toplevel
+        \ 'title': title
     \ })
 
-    if empty(fname)
+    if empty(choice)
         return
     endif
 
-    if fname ==# '..'
-        return g:fuzzy.select_dir(a:cmd, s:getparent(info.toplevel), dirname, 1)
+    if !empty(matchstr(choice, "\/$")) || choice ==# '..' || choice ==# '.'
+        return s:open(resolve(info.toplevel . '/' . choice), a:accept_input, a:info)
     endif
 
-    if fname ==# '.'
-        return g:fuzzy.select_dir(a:cmd, info.toplevel, info.toplevel, 1)
-    endif
+    return resolve(info.toplevel . '/' . choice)
+endfunction
 
-    execute a:cmd . " " .  g:utils.makepath(resolve(info.toplevel . '/' . fname))
+function! g:fuzzy.edit(dirname, ...)
+    let info = a:0 ? a:1 : ''
+    let choice = s:open(a:dirname, 1, info)
+    if empty(choice)
+        return
+    endif
+    execute 'edit ' . g:utils.makepath(choice)
+endfunction
+
+function! g:fuzzy.read(dirname, ...)
+    let info = a:0 ? a:1 : ''
+    let choice = s:open(a:dirname, 0, info)
+    if empty(choice)
+        return
+    endif
+    execute 'read ' . choice
 endfunction
 
 function! g:fuzzy.open_from_branch()
@@ -156,45 +176,6 @@ function! g:fuzzy.openold(cmd)
     execute a:cmd . " " .  fname
 endfunction
 
-function! g:fuzzy.select_dir(cmd, root, dirname, depth)
-    let root = substitute(resolve(a:root), '/$', '', '')
-    let entriescmd = s:gather_dirs(root, a:depth)
-
-    if empty(a:dirname)
-        let initial = ''
-    else
-        let initial = g:utils.relativepath(root, a:dirname)
-    endif
-
-    if !empty(initial)
-        let initial = initial + '/'
-    endif
-
-    let choice = g:utils.spawn_menu(entriescmd, {
-        \ 'limit': 20,
-        \ 'word_delimiters': '/',
-        \ 'completion_sep': '/',
-        \ 'title': 'Select directory from ' . root,
-        \ 'history_key': 'dir:' . root,
-        \ 'input': initial
-    \ })
-
-    if empty(choice)
-        return
-    endif
-
-    if choice ==# '../'
-        return g:fuzzy.select_dir(a:cmd, s:getparent(root), a:dirname, 1)
-    endif
-
-    if choice ==# './'
-        return g:fuzzy.open(a:cmd, root, 1, '')
-    endif
-
-    let choice = root . '/' . choice
-    return g:fuzzy.select_dir(a:cmd, choice, a:dirname, 1)
-endfunction
-
 function! g:fuzzy.select_gem_dir(cmd, root)
     let root = s:rubygems_path(a:root)
     let entriescmd = s:gather_dirs(root, -1, { 'self': 0, 'parent': 0 })
@@ -213,7 +194,7 @@ function! g:fuzzy.select_gem_dir(cmd, root)
 
     let choice = root . '/' . substitute(choice, '/$', '', '')
 
-    return g:fuzzy.open(a:cmd, choice, 1, {
+    return g:fuzzy.edit(choice, {
         \ 'initial': '',
         \ 'toplevel': choice,
         \ 'filescmd': g:utils.project_files_cmd(choice, {

@@ -27,7 +27,7 @@ function! utils.project_files_cmd(file, ...)
         let root = g:utils.project_root(a:file)
     endif
 
-    if s:looks_like_gitroot(root)
+    if g:utils.looks_like_gitroot(root)
         return g:utils.fish(
             \ 'git ls-files -co --exclude-standard | sort -u', {
             \ 'cwd': root,
@@ -36,20 +36,7 @@ function! utils.project_files_cmd(file, ...)
         \ )
     endif
 
-    if s:looks_like_gemroot(root)
-        let options.depth = -1
-    elseif !has_key(options, 'depth')
-        let options.depth = 3
-    endif
-
-    return g:utils.fish(
-        \ 'ag . -i --nocolor --nogroup --hidden '.
-        \ '--depth '. options.depth.
-        \ '--ignore .git '.
-        \ '--ignore .hg '.
-        \ '--ignore .DS_Store '.
-        \ '--ignore "*.swp" '.
-        \ '-g "" ', {
+    return g:utils.fish('ls -ap1 | sed "/^\.\/\$/d"', {
         \ 'error': '/dev/null',
         \ 'cwd': root,
         \ 'cmd': 1
@@ -103,7 +90,7 @@ function! s:looks_like_gemroot(dirname)
                 \ filereadable(a:dirname . '/README.rdoc')
 endfunction
 
-function! s:looks_like_gitroot(dirname)
+function! utils.looks_like_gitroot(dirname)
     return filereadable(a:dirname . '/.git/config') || filereadable(a:dirname . '/.git')
 endfunction
 
