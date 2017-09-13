@@ -110,6 +110,10 @@ nmap <Leader>P "+P
 vmap <Leader>p "+p
 vmap <Leader>P "+P
 
+" Put visually-selected text into another register (_) before pasting content
+" in visual mode.  This way text in default register (@) don't get replaced.
+vnoremap p "_dP
+
 " Incsearch and asterisk
 " ======================
 
