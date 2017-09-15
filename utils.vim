@@ -80,7 +80,7 @@ function! s:looks_like_gemroot(dirname)
 
     let tail = split(a:dirname, '/')[-1]
 
-    if match(tail, "-")
+    if match(tail, "-") >= 0
         let tail = join(split(tail, '-')[0:-2], '-')
     endif
 
