@@ -114,6 +114,10 @@ vmap <Leader>P "+P
 " in visual mode.  This way text in default register (@) don't get replaced.
 vnoremap p "_dP
 
+" Command line history
+cmap <C-P> <Up>
+cmap <C-N> <Down>
+
 " Incsearch and asterisk
 " ======================
 
