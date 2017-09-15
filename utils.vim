@@ -7,11 +7,28 @@ function! utils.gitroot(file)
         return substitute(split(a:file, '/\.git/')[0], '^fugitive:\/\/', '', '')
     endif
 
-    return g:utils.fish('git rev-parse --show-toplevel', {
+    let root = g:utils.fish('git rev-parse --show-toplevel', {
         \ 'cwd': fnamemodify(a:file, ':p:h'),
         \ 'error': '/dev/null',
         \ 'chomp': 1
     \ })
+
+    if empty(root)
+      return ''
+    endif
+
+    let file = g:utils.relativepath(root, a:file)
+
+    let is_not_tracked = g:utils.fish('git ls-files ' . file . ' --error-unmatch >/dev/null 2>/dev/null; echo $status', {
+        \ 'cwd': root,
+        \ 'chomp': 1
+    \ })
+
+    if is_not_tracked ==# '1'
+      return ''
+    end
+
+    return root
 endfunction
 
 function! utils.project_files_cmd(file, ...)
@@ -34,6 +51,14 @@ function! utils.project_files_cmd(file, ...)
             \ 'cmd': 1
             \ }
         \ )
+    elseif s:looks_like_gemroot(root)
+        return g:utils.fish(
+            \ 'ag . -i --nocolor --nogroup --hidden -g ""', {
+            \ 'error': '/dev/null',
+            \ 'cwd': root,
+            \ 'cmd': 1
+            \ }
+        \ )
     endif
 
     return g:utils.fish('ls -ap1 | sed "/^\.\/\$/d"', {
@@ -46,17 +71,31 @@ endfunction
 
 " Give the "project root" of the given file/dir (use a full path).
 function utils.project_root(file)
-    let gemroot = s:gemroot(a:file)
-    if !empty(gemroot)
-        return gemroot
-    endif
-
     let gitroot = g:utils.gitroot(a:file)
     if !empty(gitroot)
         return gitroot
     endif
 
+    let gemroot = s:gemroot(a:file)
+    if !empty(gemroot)
+        return gemroot
+    endif
+
     return fnamemodify(a:file, ':p:h')
+endfunction
+
+function! g:utils.rubygems_path(dirname)
+    let gemroot = s:gemroot(a:dirname)
+    if !empty(gemroot)
+        return fnamemodify(gemroot . '-as-if-not-dir', ':p:h')
+    endif
+    return g:utils.fish(
+        \ 'rbenv exec gem environment | ' .
+        \ 'grep -e "- INSTALLATION DIRECTORY" | cut -d : -f 2 | xargs', {
+        \ 'cwd': a:dirname,
+        \ 'chomp': 1
+        \ }
+    \) . '/gems'
 endfunction
 
 function! s:gemroot(file)
@@ -74,20 +113,7 @@ function! s:gemroot(file)
 endfunction
 
 function! s:looks_like_gemroot(dirname)
-    if match(a:dirname, 'lib\/ruby\/gems\/\d\.\d\.\d\/gems\/' . fnamemodify(a:dirname, ':t') . '$') >= 0
-        return 1
-    endif
-
-    let tail = split(a:dirname, '/')[-1]
-
-    if match(tail, "-") >= 0
-        let tail = join(split(tail, '-')[0:-2], '-')
-    endif
-
-    return filereadable(a:dirname . '/' . tail . '.gemspec') ||
-                \ filereadable(a:dirname . '/README') ||
-                \ filereadable(a:dirname . '/README.md') ||
-                \ filereadable(a:dirname . '/README.rdoc')
+    return match(a:dirname, 'lib\/ruby\/gems\/\d\.\d\.\d\/gems\/' . fnamemodify(a:dirname, ':t') . '$') >= 0
 endfunction
 
 function! utils.looks_like_gitroot(dirname)

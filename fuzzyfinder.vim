@@ -62,11 +62,13 @@ function! s:open(dirname, accept_input, info)
         return
     endif
 
-    if !empty(matchstr(choice, "\/$")) || choice ==# '..' || choice ==# '.'
-        return s:open(resolve(info.toplevel . '/' . choice), a:accept_input, a:info)
+    let resolved = resolve(info.toplevel . '/' . choice)
+
+    if isdirectory(resolved)
+        return s:open(resolved, a:accept_input, a:info)
     endif
 
-    return resolve(info.toplevel . '/' . choice)
+    return resolved
 endfunction
 
 function! g:fuzzy.edit(dirname, ...)
@@ -176,33 +178,6 @@ function! g:fuzzy.openold(cmd)
     execute a:cmd . " " .  fname
 endfunction
 
-function! g:fuzzy.select_gem_dir(cmd, root)
-    let root = s:rubygems_path(a:root)
-    let entriescmd = s:gather_dirs(root, -1, { 'self': 0, 'parent': 0 })
-
-    let choice = g:utils.spawn_menu(entriescmd, {
-        \ 'limit': 20,
-        \ 'word_delimiters': '/',
-        \ 'completion_sep': '/',
-        \ 'title': 'Select gem from ' . root,
-        \ 'history_key': 'gem:' . root
-    \ })
-
-    if empty(choice)
-        return
-    endif
-
-    let choice = root . '/' . substitute(choice, '/$', '', '')
-
-    return g:fuzzy.edit(choice, {
-        \ 'initial': '',
-        \ 'toplevel': choice,
-        \ 'filescmd': g:utils.project_files_cmd(choice, {
-            \ 'depth': -1
-        \ })
-    \ })
-endfunction
-
 function! s:project_root_info(dirname)
     let dirname = substitute(a:dirname, '\.git\/\/', '.git/', '')
     let toplevel = g:utils.project_root(dirname)
@@ -282,16 +257,6 @@ function! s:gather_dirs(root, maxdepth, ...)
     endif
 
     return finalcmd
-endfunction
-
-function! s:rubygems_path(dirname)
-    return g:utils.fish(
-        \ 'rbenv exec gem environment | ' .
-        \ 'grep -e "- INSTALLATION DIRECTORY" | cut -d : -f 2 | xargs', {
-        \ 'cwd': a:dirname,
-        \ 'chomp': 1
-        \ }
-    \)
 endfunction
 
 function! s:getparent(dirname)
