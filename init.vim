@@ -54,7 +54,6 @@ augroup END
 augroup Prog
     autocmd!
     autocmd FileType ruby,html,eruby,javascript,coffee,css,scss,sass set ts=2 indentkeys-=*<Return>
-    autocmd FileType eruby,html,css,scss,sass set isk=@,48-57,_,192-255,-
     autocmd FileType python,vim set ts=4
     autocmd FileType ruby setlocal tags+=.git/rbtags
     autocmd BufWritePre *.rb silent! call rubyformat.format()
