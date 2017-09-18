@@ -60,10 +60,6 @@ endfunction
 " ALE
 " ===
 
-set statusline+=%#warningmsg#
-set statusline+=%{ALEGetStatusLine()}
-set statusline+=%*
-
 let g:ale_sign_error = "\u2717"
 let g:ale_sign_warning = "\u26A0"
 let g:ale_statusline_format = ['%d error(s)', '%d warning(s)', '']

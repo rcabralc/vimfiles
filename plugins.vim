@@ -32,9 +32,6 @@ Plug 'tpope/vim-fugitive'
 " EditorConfig
 Plug 'editorconfig/editorconfig-vim'
 
-" Better status/tab line
-Plug 'itchyny/lightline.vim'
-
 " Show lines changed
 Plug 'airblade/vim-gitgutter'
 

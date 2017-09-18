@@ -80,6 +80,18 @@ function! s:improve_highlights(p)
     call rcabralc#hl('GitGutterChange',        a:p.yellow.actual, a:p.none, 'bold')
     call rcabralc#hl('GitGutterDelete',        a:p.red.actual,    a:p.none, 'bold')
     call rcabralc#hl('GitGutterChangeDelete',  a:p.red.actual,    a:p.none, 'bold')
+
+    call rcabralc#hl('TabLineSel', a:p.bg.actual, a:p.fg.actual)
+
+    call rcabralc#hl('InsertModeStatus',     a:p.bg.actual,     a:p.green.actual)
+    call rcabralc#hl('VisualModeStatus',     a:p.bg.actual,     a:p.purple.actual)
+    call rcabralc#hl('ReplaceModeStatus',    a:p.bg.actual,     a:p.orange.actual)
+    call rcabralc#hl('GitBranchStatus',      a:p.purple.actual, a:p.gray0.actual)
+    call rcabralc#hl('ModifiedStatus',       a:p.green.actual,  a:p.gray0.actual)
+    call rcabralc#hl('ReadonlyStatus',       a:p.red.actual,    a:p.gray0.actual)
+    call rcabralc#hl('WarningStatus',        a:p.bg.actual,     a:p.red.actual)
+    call rcabralc#hl('FiletypeStatus',       a:p.purple.actual, a:p.gray0.actual)
+    call rcabralc#hl('AdditionalInfoStatus', a:p.gray2.actual,  a:p.gray0.actual)
 endfunction
 
 augroup Colors
@@ -89,3 +101,61 @@ augroup END
 
 call utils.vimsource('pluginconf.vim')
 call utils.vimsource('site.vim')
+
+augroup WinActiveHighlight
+    autocmd!
+    autocmd WinEnter * setlocal statusline=%!StatusLine(1)
+    autocmd WinLeave * setlocal statusline=%!StatusLine(0)
+augroup END
+
+function! StatusLine(active)
+    let sections = [
+        \ { 'val': a:active && mode() ==# 'i' ? ' INS ' : '', 'hl': 'InsertModeStatus', 'pad': '' },
+        \ { 'val': a:active && mode() ==# 't' ? ' TER ' : '', 'hl': 'InsertModeStatus', 'pad': '' },
+        \ { 'val': a:active && mode() ==# 'v' ? ' VIS ' : '', 'hl': 'VisualModeStatus', 'pad': '' },
+        \ { 'val': a:active && mode() ==# 'V' ? ' LVI ' : '', 'hl': 'VisualModeStatus', 'pad': '' },
+        \ { 'val': a:active && mode() ==# 's' ? ' SEL ' : '', 'hl': 'VisualModeStatus', 'pad': '' },
+        \ { 'val': a:active && mode() ==# 'S' ? ' LSE ' : '', 'hl': 'VisualModeStatus', 'pad': '' },
+        \ { 'val': a:active && mode() ==# 'R' ? ' REP ' : '', 'hl': 'ReplaceModeStatus', 'pad': '' },
+        \ { 'expr': '%m', 'hl': 'ModifiedStatus' },
+        \ { 'expr': '%f' },
+        \ { 'expr': '%{fugitive#head(10)}', 'hl': 'GitBranchStatus', 'pad': '@' },
+        \ { 'expr': '%r', 'hl': 'ReadonlyStatus' },
+        \ { 'expr': '%{ALEGetStatusLine()}', 'hl': 'WarningStatus' },
+        \ { 'expr': '%l(%p%%)/%L:%c%V', 'hl': 'AdditionalInfoStatus' },
+        \ { 'expr': '%y', 'hl': 'FiletypeStatus' },
+        \ { 'expr': '%w' }
+    \ ]
+    let final_expr = ''
+    for item in sections
+        let expr = ''
+
+        if has_key(item, 'val')
+            if substitute(substitute(item.val, '^\s*', '', ''), '\s*$', '', '') != ''
+                let expr = expr . substitute(item.val, '%', '%%', '')
+            endif
+        else
+            let expr = item.expr
+        endif
+
+        if expr != ''
+            " Custom padding is highlighted.
+            let expr = (has_key(item, 'pad') ? item.pad : '') . expr
+
+            if has_key(item, 'hl')
+                if a:active
+                    let expr = '%#' . item.hl . '#' . expr . '%*'
+                else
+                    let expr = '%#StatusLineNC#' . expr . '%*'
+                endif
+            endif
+
+            " Default padding is not highlighted.
+            let final_expr = final_expr . (has_key(item, 'pad') ? '' : ' ') . expr
+        endif
+    endfor
+
+    return final_expr
+endfunction
+
+set statusline=%!StatusLine(1)
