@@ -37,8 +37,10 @@ set wildmode=longest,list:longest,list:full
 " Leave the cursor where it was.
 set nostartofline
 
-" Keep some lines around for scope.
+" Keep some lines and rows around for scope.
 set scrolloff=10
+set sidescroll=1
+set sidescrolloff=10
 
 set history=50
 
