@@ -44,6 +44,9 @@ set sidescrolloff=10
 
 set history=50
 
+" "Unlimited" scrollback for terminals
+set scrollback=-1
+
 " always show the status line.
 set laststatus=2
 
