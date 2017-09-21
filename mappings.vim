@@ -5,38 +5,35 @@ nmap Y y$
 
 " Navigation and splitting mappings
 
-nnoremap <A-h> :tabp<CR>
-nnoremap <A-l> :tabn<CR>
+nnoremap <A-C-h> :tabp<CR>
+nnoremap <A-C-l> :tabn<CR>
 
-noremap <S-l> :bn<CR>
-noremap <S-h> :bp<CR>
+noremap L :bn<CR>
+noremap H :bp<CR>
 
-nmap <A-C-h> <C-w>h
-nmap <A-C-j> <C-w>j
-nmap <A-C-k> <C-w>k
-nmap <A-C-l> <C-w>l
-
-imap <A-C-h> <Esc><C-w>h
-imap <A-C-j> <Esc><C-w>j
-imap <A-C-k> <Esc><C-w>k
-imap <A-C-l> <Esc><C-w>l
-
-inoremap <A-C-h> <Esc><C-w>h
-inoremap <A-C-j> <Esc><C-w>j
-inoremap <A-C-k> <Esc><C-w>k
-inoremap <A-C-l> <Esc><C-w>l
+nnoremap <A-h> <C-w>h
+nnoremap <A-j> <C-w>j
+nnoremap <A-k> <C-w>k
+nnoremap <A-l> <C-w>l
+inoremap <A-h> <Esc><C-w>h
+inoremap <A-j> <Esc><C-w>j
+inoremap <A-k> <Esc><C-w>k
+inoremap <A-l> <Esc><C-w>l
 
 if has('nvim')
     tnoremap <C-b><C-b> <C-b>
     tnoremap <C-b><Esc> <C-\><C-n>
 
-    tnoremap <A-C-h> <C-\><C-n><C-w>h
-    tnoremap <A-C-j> <C-\><C-n><C-w>j
-    tnoremap <A-C-k> <C-\><C-n><C-w>k
-    tnoremap <A-C-l> <C-\><C-n><C-w>l
+    tnoremap <A-h> <C-\><C-n><C-w>h
+    tnoremap <A-j> <C-\><C-n><C-w>j
+    tnoremap <A-k> <C-\><C-n><C-w>k
+    tnoremap <A-l> <C-\><C-n><C-w>l
 
-    tnoremap <A-h> <C-\><C-n>:tabp<CR>
-    tnoremap <A-l> <C-\><C-n>:tabn<CR>
+    tnoremap <A-C-h> <C-\><C-n>:tabp<CR>
+    tnoremap <A-C-l> <C-\><C-n>:tabn<CR>
+
+    tnoremap <C-r><C-r> <C-r>
+    tnoremap <expr> <C-r><Esc> '<C-\><C-N>"'.nr2char(getchar()).'pi'
 
     function! OpenTermInDir(dir)
         if a:dir !~ '^term://'
@@ -87,8 +84,8 @@ nnoremap Q gqap
 "     let &isk = oldisk
 " endfunction
 
-nmap <silent> <A-k> <Plug>(ale_previous_wrap)
-nmap <silent> <A-j> <Plug>(ale_next_wrap)
+nmap <silent> <A-C-k> <Plug>(ale_previous_wrap)
+nmap <silent> <A-C-j> <Plug>(ale_next_wrap)
 
 nmap <Leader>h <Plug>GitGutterLineHighlightsToggle
 nmap <C-k> <Plug>GitGutterPrevHunk
@@ -115,15 +112,15 @@ vmap <Leader>P "+P
 vnoremap p "_dP
 
 " Command line history
-cmap <C-P> <Up>
-cmap <C-N> <Down>
+cmap <C-p> <Up>
+cmap <C-n> <Down>
 
 " Incsearch and asterisk
 " ======================
 
 " Walk though quickfix lines.
-map <A-n> :cn <bar> set hlsearch<CR>
-map <A-p> :cp <bar> set hlsearch<CR>
+map <A-C-n> :cn <bar> set hlsearch<CR>
+map <A-C-p> :cp <bar> set hlsearch<CR>
 
 " Search in current git tree. (* marks the word without jumping to next
 " match thanks to vim-asterisk.)
