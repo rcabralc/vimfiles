@@ -1,5 +1,9 @@
 let mapleader = "\<Space>"
 
+map <C-c> <Esc>
+cmap <C-c> <Esc>
+imap <C-c> <Esc>
+
 " This seems more logical
 nmap Y y$
 
@@ -22,6 +26,7 @@ inoremap <A-l> <Esc><C-w>l
 
 if has('nvim')
     tnoremap <C-b><C-b> <C-b>
+    tnoremap <C-b><C-c> <C-\><C-n>
     tnoremap <C-b><Esc> <C-\><C-n>
 
     tnoremap <A-h> <C-\><C-n><C-w>h
@@ -72,6 +77,9 @@ map <A-c> :call g:gitcommand.checkout()<CR>
 " but I don't use that, and I can enter in Ex mode (in a way more like typing
 " ":") by using gQ.
 nnoremap Q gqap
+
+nmap <A-S-w> viw
+nmap <A-(> vi(
 
 " map <A-b> :call <SID>softmotion('b')<CR>
 " map <A-w> :call <SID>softmotion('w')<CR>
@@ -140,9 +148,3 @@ map g# <Plug>(incsearch-nohl)<Plug>(asterisk-gz#)
 map z/ <Plug>(incsearch-fuzzy-/)
 map z? <Plug>(incsearch-fuzzy-?)
 map zg/ <Plug>(incsearch-fuzzy-stay)
-
-" Expand region
-" =============
-
-map + <Plug>(expand_region_expand)
-map - <Plug>(expand_region_shrink)

@@ -88,9 +88,6 @@ Plug 'wellle/targets.vim'
 " Easy swap of text objects
 Plug 'tommcdo/vim-exchange'
 
-" Easy selection expansing/contraction
-Plug 'terryma/vim-expand-region'
-
 " Make . work with surround (and other plugins)
 Plug 'tpope/vim-repeat'
 

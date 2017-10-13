@@ -153,10 +153,7 @@ inoreabbrev <expr> __
 let g:gitgutter_grep_command = 'grep'
 
 
-" Expand region
-" =============
+" Multiple cursors
+" ================
 
-let g:expand_region_text_objects_ruby = {
-      \ 'im' :0,
-      \ 'am' :0
-\ }
+let g:multi_cursor_exit_from_visual_mode = 0
