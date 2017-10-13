@@ -117,9 +117,10 @@ function! StatusLine(active)
         \ { 'val': a:active && mode() ==# 's' ? ' SEL ' : '', 'hl': 'VisualModeStatus', 'pad': '' },
         \ { 'val': a:active && mode() ==# 'S' ? ' LSE ' : '', 'hl': 'VisualModeStatus', 'pad': '' },
         \ { 'val': a:active && mode() ==# 'R' ? ' REP ' : '', 'hl': 'ReplaceModeStatus', 'pad': '' },
-        \ { 'expr': '%m', 'hl': 'ModifiedStatus' },
-        \ { 'expr': '%f' },
-        \ { 'expr': '%{fugitive#head(10)}', 'hl': 'GitBranchStatus', 'pad': '@' },
+        \ { 'expr': '%m', 'hl': 'ModifiedStatus', 'enabled': mode() !=# 't' },
+        \ { 'val': mode() ==# 't' ? getbufvar('%', 'term_title').' ['.getbufvar('%', 'terminal_job_pid').'] ' : '' },
+        \ { 'expr': '%f', 'enabled': mode() !=# 't' },
+        \ { 'expr': '%{fugitive#head(10)}', 'hl': 'GitBranchStatus', 'pad': '@', 'enabled': mode() !=# 't' },
         \ { 'expr': '%r', 'hl': 'ReadonlyStatus' },
         \ { 'expr': '%{ALEGetStatusLine()}', 'hl': 'WarningStatus' },
         \ { 'expr': '%l(%p%%)/%L:%c%V', 'hl': 'AdditionalInfoStatus' },
@@ -128,6 +129,10 @@ function! StatusLine(active)
     \ ]
     let final_expr = ''
     for item in sections
+        if has_key(item, 'enabled') && !item.enabled
+            continue
+        endif
+
         let expr = ''
 
         if has_key(item, 'val')
