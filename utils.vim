@@ -241,10 +241,9 @@ endfunction
 
 " Some code borrowed from rust.vim.
 function! utils.format(formatprg, ...)
-    let intmpname = expand("%:p:h") . "/." . expand("%:p:t") . ".fmt.in"
     let outtmpname = expand("%:p")
-    call writefile(getline(1, '$'), intmpname)
-    let command = 'cat ' . shellescape(intmpname) . ' | ' . a:formatprg . ' > ' . shellescape(outtmpname)
+    call writefile(getline(1, '$'), outtmpname)
+    let command = a:formatprg . ' ' . shellescape(outtmpname)
 
     if a:0
         let dirname = a:1
@@ -256,24 +255,14 @@ function! utils.format(formatprg, ...)
         let command = 'cd ' . dirname . ' && ' . command
     endif
 
-    if exists("*systemlist")
-        let out = systemlist(command)
-    else
-        let out = split(system(command), '\r\?\n')
-    endif
+    call system(command)
 
-    if v:shell_error == 0
-        let curw = winsaveview()
-        " Remove undo point caused by BufWritePre
-        try | silent undojoin | catch | endtry
+    let curw = winsaveview()
+    " Remove undo point caused by BufWritePre
+    try | silent undojoin | catch | endtry
 
-        " Reload
-        silent edit!
+    " Reload
+    silent edit!
 
-        call winrestview(curw)
-    else
-        echoerr out
-    endif
-
-    call delete(intmpname)
+    call winrestview(curw)
 endfunction
