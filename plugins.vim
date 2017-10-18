@@ -97,6 +97,9 @@ Plug 'tpope/vim-rsi'
 " Multiple cursors
 Plug 'terryma/vim-multiple-cursors'
 
+" Change background of inactive windows
+Plug 'blueyed/vim-diminactive'
+
 call plug#end()
 
 if !was_installed

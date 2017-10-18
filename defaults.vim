@@ -77,7 +77,7 @@ set ignorecase
 set smartcase
 set incsearch
 
-set fillchars=vert:│,fold:-
+set fillchars=vert:\ ,fold:-
 
 " Mark text width column.
 set colorcolumn=+1

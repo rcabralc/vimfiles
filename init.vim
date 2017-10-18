@@ -76,22 +76,32 @@ function! s:improve_highlights(p)
 
     hi! link xmlEndTag xmlTag
 
-    call rcabralc#hl('GitGutterAdd',           a:p.green.actual,  a:p.none, 'bold')
-    call rcabralc#hl('GitGutterChange',        a:p.yellow.actual, a:p.none, 'bold')
-    call rcabralc#hl('GitGutterDelete',        a:p.red.actual,    a:p.none, 'bold')
-    call rcabralc#hl('GitGutterChangeDelete',  a:p.red.actual,    a:p.none, 'bold')
+    call rcabralc#hl('GitGutterAdd',           a:p.green.actual,  a:p.gray0.actual, 'bold')
+    call rcabralc#hl('GitGutterChange',        a:p.yellow.actual, a:p.gray0.actual, 'bold')
+    call rcabralc#hl('GitGutterDelete',        a:p.red.actual,    a:p.gray0.actual, 'bold')
+    call rcabralc#hl('GitGutterChangeDelete',  a:p.red.actual,    a:p.gray0.actual, 'bold')
 
     call rcabralc#hl('TabLineSel', a:p.bg.actual, a:p.fg.actual)
 
     call rcabralc#hl('InsertModeStatus',     a:p.bg.actual,     a:p.green.actual)
     call rcabralc#hl('VisualModeStatus',     a:p.bg.actual,     a:p.purple.actual)
     call rcabralc#hl('ReplaceModeStatus',    a:p.bg.actual,     a:p.orange.actual)
-    call rcabralc#hl('GitBranchStatus',      a:p.purple.actual, a:p.gray0.actual)
-    call rcabralc#hl('ModifiedStatus',       a:p.orange.actual, a:p.gray0.actual)
-    call rcabralc#hl('ReadonlyStatus',       a:p.red.actual,    a:p.gray0.actual)
+    call rcabralc#hl('GitBranchStatus',      a:p.purple.actual, a:p.bg.actual)
+    call rcabralc#hl('ModifiedStatus',       a:p.orange.actual, a:p.bg.actual)
+    call rcabralc#hl('ReadonlyStatus',       a:p.red.actual,    a:p.bg.actual)
     call rcabralc#hl('WarningStatus',        a:p.bg.actual,     a:p.red.actual)
-    call rcabralc#hl('FiletypeStatus',       a:p.purple.actual, a:p.gray0.actual)
-    call rcabralc#hl('AdditionalInfoStatus', a:p.gray2.actual,  a:p.gray0.actual)
+    call rcabralc#hl('FiletypeStatus',       a:p.purple.actual, a:p.bg.actual)
+    call rcabralc#hl('AdditionalInfoStatus', a:p.gray2.actual,  a:p.bg.actual)
+
+    " Highlighs intended to blend with vim-dimnactive
+    call rcabralc#hl('NonText', a:p.gray2.actual, a:p.gray0.actual)
+    call rcabralc#hl('StatusLine', a:p.fg.actual, a:p.bg.actual, 'bold')
+    call rcabralc#hl('StatusLineNC', a:p.gray3.actual, a:p.gray0.actual)
+    call rcabralc#hl('LineNr', a:p.gray3.actual, a:p.gray0.actual)
+    call rcabralc#hl('VertSplit', a:p.gray2.actual, a:p.gray0.actual)
+    call rcabralc#hl('FoldColumn', a:p.gray3.actual, a:p.gray0.actual)
+    call rcabralc#hl('SignColumn', a:p.orange.actual, a:p.gray0.actual)
+    call rcabralc#hl('CursorLineNr', a:p.orange.actual, a:p.gray0.actual)
 endfunction
 
 augroup Colors
