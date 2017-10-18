@@ -93,6 +93,8 @@ function! s:improve_highlights(p)
     call rcabralc#hl('FiletypeStatus',       a:p.purple.actual, a:p.bg.actual)
     call rcabralc#hl('AdditionalInfoStatus', a:p.gray2.actual,  a:p.bg.actual)
 
+    hi! link vimUserFunc Function
+
     " Highlighs intended to blend with vim-dimnactive
     call rcabralc#hl('NonText', a:p.gray2.actual, a:p.gray0.actual)
     call rcabralc#hl('StatusLine', a:p.fg.actual, a:p.bg.actual, 'bold')
