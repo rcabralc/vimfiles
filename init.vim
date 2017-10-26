@@ -97,8 +97,6 @@ function! s:improve_highlights(p)
 
     " Highlighs intended to blend with vim-dimnactive
     call rcabralc#hl('NonText', a:p.gray2.actual, a:p.gray0.actual)
-    call rcabralc#hl('StatusLine', a:p.fg.actual, a:p.bg.actual, 'bold')
-    call rcabralc#hl('StatusLineNC', a:p.gray3.actual, a:p.gray0.actual)
     call rcabralc#hl('LineNr', a:p.gray3.actual, a:p.gray0.actual)
     call rcabralc#hl('VertSplit', a:p.gray2.actual, a:p.gray0.actual)
     call rcabralc#hl('FoldColumn', a:p.gray3.actual, a:p.gray0.actual)
