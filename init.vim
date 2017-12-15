@@ -86,12 +86,12 @@ function! s:improve_highlights(p)
     call rcabralc#hl('InsertModeStatus',     a:p.bg.actual,     a:p.green.actual)
     call rcabralc#hl('VisualModeStatus',     a:p.bg.actual,     a:p.purple.actual)
     call rcabralc#hl('ReplaceModeStatus',    a:p.bg.actual,     a:p.orange.actual)
-    call rcabralc#hl('GitBranchStatus',      a:p.purple.actual, a:p.bg.actual)
-    call rcabralc#hl('ModifiedStatus',       a:p.orange.actual, a:p.bg.actual)
-    call rcabralc#hl('ReadonlyStatus',       a:p.red.actual,    a:p.bg.actual)
+    call rcabralc#hl('GitBranchStatus',      a:p.purple.actual, a:p.gray0.actual)
+    call rcabralc#hl('ModifiedStatus',       a:p.orange.actual, a:p.gray0.actual)
+    call rcabralc#hl('ReadonlyStatus',       a:p.red.actual,    a:p.gray0.actual)
     call rcabralc#hl('WarningStatus',        a:p.bg.actual,     a:p.red.actual)
-    call rcabralc#hl('FiletypeStatus',       a:p.purple.actual, a:p.bg.actual)
-    call rcabralc#hl('AdditionalInfoStatus', a:p.gray2.actual,  a:p.bg.actual)
+    call rcabralc#hl('FiletypeStatus',       a:p.purple.actual, a:p.gray0.actual)
+    call rcabralc#hl('AdditionalInfoStatus', a:p.gray2.actual,  a:p.gray0.actual)
 
     hi! link vimUserFunc Function
 
