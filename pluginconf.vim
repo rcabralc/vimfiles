@@ -64,6 +64,7 @@ let g:ale_sign_error = "\u2717"
 let g:ale_sign_warning = "\u26A0"
 let g:ale_statusline_format = ['%d error(s)', '%d warning(s)', '']
 let g:ale_lint_on_save = 0
+let g:ale_history_enabled = 0
 
 let g:ale_linters = { 'ruby': ['rubocop'] }
 
