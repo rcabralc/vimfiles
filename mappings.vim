@@ -70,8 +70,8 @@ map <Leader>r :call g:fuzzy.read(expand('%:p:h'))<CR>
 map <Leader>b :call g:fuzzy.reopen('e')<CR>
 map <Leader>o :call g:fuzzy.openold('e')<CR>
 map <Leader>g :call g:fuzzy.edit(g:utils.rubygems_path(expand('%:p:h')))<CR>
-map <A-b> :call g:fuzzy.open_from_branch()<CR>
-map <A-c> :call g:gitcommand.checkout()<CR>
+map <A-C-b> :call g:fuzzy.open_from_branch()<CR>
+map <A-C-c> :call g:gitcommand.checkout()<CR>
 
 " Make the Q key format the entire paragraph.  This makes the Ex mode go away,
 " but I don't use that, and I can enter in Ex mode (in a way more like typing
@@ -132,7 +132,8 @@ map <A-C-p> :cp <bar> set hlsearch<CR>
 
 " Search in current git tree. (* marks the word without jumping to next
 " match thanks to vim-asterisk.)
-nmap K *:Ggrep -I  <bar> copen
+nmap K *:Ggrep -I  <bar> copen<A-b><A-b><Space><C-b>
+nmap <A-s> :Ggrep -I <bar> copen<A-b><A-b><Space><C-b>
 
 map /  <Plug>(incsearch-forward)
 map ?  <Plug>(incsearch-backward)
