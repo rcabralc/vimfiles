@@ -129,6 +129,9 @@ let g:asterisk#keeppos = 1
 " ========
 let g:deoplete#enable_at_startup = 1
 
+inoremap <silent><expr> <C-n> deoplete#manual_complete()
+inoremap <silent><expr> <C-p> deoplete#manual_complete()
+
 
 " Table mode
 " ==========
@@ -158,3 +161,17 @@ let g:gitgutter_grep_command = 'grep'
 " ================
 
 let g:multi_cursor_exit_from_visual_mode = 0
+
+" Called once right before you start selecting multiple cursors
+function! Multiple_cursors_before()
+    if exists('g:deoplete#disable_auto_complete') 
+       let g:deoplete#disable_auto_complete = 1
+    endif
+endfunction
+
+" Called once only when the multiple selection is canceled (default <Esc>)
+function! Multiple_cursors_after()
+    if exists('g:deoplete#disable_auto_complete')
+       let g:deoplete#disable_auto_complete = 0
+    endif
+endfunction
