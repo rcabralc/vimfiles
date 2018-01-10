@@ -7,7 +7,7 @@ function! utils.gitroot(file)
         return substitute(split(a:file, '/\.git/')[0], '^fugitive:\/\/', '', '')
     endif
 
-    let root = g:utils.fish('git rev-parse --show-toplevel', {
+    let root = g:utils.fish('/usr/bin/git rev-parse --show-toplevel', {
         \ 'cwd': fnamemodify(a:file, ':p:h'),
         \ 'error': '/dev/null',
         \ 'chomp': 1
