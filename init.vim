@@ -91,7 +91,7 @@ function! s:improve_highlights(p)
     call rcabralc#hl('ReadonlyStatus',       a:p.red.actual,    a:p.gray0.actual)
     call rcabralc#hl('WarningStatus',        a:p.bg.actual,     a:p.red.actual)
     call rcabralc#hl('FiletypeStatus',       a:p.purple.actual, a:p.gray0.actual)
-    call rcabralc#hl('AdditionalInfoStatus', a:p.gray2.actual,  a:p.gray0.actual)
+    call rcabralc#hl('AdditionalInfoStatus', a:p.gray3.actual,  a:p.gray0.actual)
 
     hi! link vimUserFunc Function
 
