@@ -174,9 +174,7 @@ endfunction
 
 function! utils.relativepath(basepath, path)
     let basepath = substitute(resolve(a:basepath), '/$', '', '')
-    let basepath = substitute(basepath, '^/files/rcabralc', '/home/rcabralc', '')
     let path = substitute(resolve(a:path), '/$', '', '')
-    let path = substitute(path, '^/files/rcabralc', '/home/rcabralc', '')
     let rel = substitute(path, '^' . g:utils.regexescape(basepath), '', '')
     return substitute(rel, '^/', '', '')
 endfunction
