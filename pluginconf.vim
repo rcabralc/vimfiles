@@ -91,7 +91,7 @@ let g:ruby_spellcheck_strings = 1
 let g:ruby_indent_access_modifier_style = 'outdent'
 let g:ruby_indent_block_style = 'do'
 
-let g:polyglot_disabled = ['ruby']
+let g:polyglot_disabled = ['javascript', 'ruby']
 
 
 " Rest console

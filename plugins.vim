@@ -18,6 +18,8 @@ call plug#begin(vimdir . 'bundle')
 Plug 'w0rp/ale'
 Plug 'sheerun/vim-polyglot'
 Plug 'vim-ruby/vim-ruby'
+Plug 'othree/yajs.vim'
+Plug 'othree/es.next.syntax.vim'
 
 " Colorschemes/themes
 Plug 'morhetz/gruvbox'
@@ -94,11 +96,21 @@ Plug 'tpope/vim-repeat'
 " Readline key bindings.
 Plug 'tpope/vim-rsi'
 
+" Useful toggling mappings
+Plug 'tpope/vim-unimpaired'
+
+" Auto close pairs
+Plug 'jiangmiao/auto-pairs'
+
 " Multiple cursors
 Plug 'terryma/vim-multiple-cursors'
 
 " Change background of inactive windows
 Plug 'blueyed/vim-diminactive'
+
+" Ruby blocks text object
+Plug 'kana/vim-textobj-user'
+Plug 'nelstrom/vim-textobj-rubyblock'
 
 call plug#end()
 
