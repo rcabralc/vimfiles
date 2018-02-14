@@ -76,6 +76,8 @@ function! s:improve_highlights(p)
 
     hi! link xmlEndTag xmlTag
 
+    hi! link vimUserFunc Function
+
     call rcabralc#hl('GitGutterAdd',           a:p.green.actual,  a:p.gray0.actual, 'bold')
     call rcabralc#hl('GitGutterChange',        a:p.yellow.actual, a:p.gray0.actual, 'bold')
     call rcabralc#hl('GitGutterDelete',        a:p.red.actual,    a:p.gray0.actual, 'bold')
@@ -92,8 +94,6 @@ function! s:improve_highlights(p)
     call rcabralc#hl('WarningStatus',        a:p.bg.actual,     a:p.red.actual)
     call rcabralc#hl('FiletypeStatus',       a:p.purple.actual, a:p.gray0.actual)
     call rcabralc#hl('AdditionalInfoStatus', a:p.gray3.actual,  a:p.gray0.actual)
-
-    hi! link vimUserFunc Function
 
     " Highlighs intended to blend with vim-dimnactive
     call rcabralc#hl('NonText', a:p.gray2.actual, a:p.gray0.actual)
