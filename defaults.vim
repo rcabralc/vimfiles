@@ -90,3 +90,5 @@ set synmaxcol=200
 set cursorline
 set nofoldenable
 set shiftround
+
+set updatetime=100
