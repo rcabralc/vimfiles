@@ -236,31 +236,3 @@ function! utils.spawn_menu(entriescmd, params)
     let cmd = a:entriescmd . ' | ' . menucmd
     return g:utils.fish(cmd . ' 2>/tmp/debug.log', { 'chomp': 1 })
 endfunction
-
-" Some code borrowed from rust.vim.
-function! utils.format(formatprg, ...)
-    let outtmpname = expand("%:p")
-    call writefile(getline(1, '$'), outtmpname)
-    let command = a:formatprg . ' ' . shellescape(outtmpname)
-
-    if a:0
-        let dirname = a:1
-    else
-        let dirname = expand("%:p:h")
-    endif
-
-    if !empty(dirname)
-        let command = 'cd ' . dirname . ' && ' . command
-    endif
-
-    call system(command)
-
-    let curw = winsaveview()
-    " Remove undo point caused by BufWritePre
-    try | silent undojoin | catch | endtry
-
-    " Reload
-    silent edit!
-
-    call winrestview(curw)
-endfunction
