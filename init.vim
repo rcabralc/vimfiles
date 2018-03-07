@@ -10,7 +10,6 @@ call utils.vimsource('git.vim')
 call utils.vimsource('defaults.vim')
 call utils.vimsource('plugins.vim')
 call utils.vimsource('mappings.vim')
-call utils.vimsource('rubyformat.vim')
 
 syntax enable
 filetype plugin indent on
@@ -56,7 +55,6 @@ augroup Prog
     autocmd FileType ruby,html,eruby,javascript,coffee,css,scss,sass set ts=2 indentkeys-=*<Return>
     autocmd FileType python,vim set ts=4
     autocmd FileType ruby setlocal tags+=.git/rbtags
-    autocmd BufWritePre *.rb silent! call rubyformat.format()
     autocmd BufWritePost *_spec.rb set syntax=rspec
     autocmd BufEnter *.arb setfiletype ruby
 augroup END

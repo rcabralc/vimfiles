@@ -64,9 +64,15 @@ let g:ale_sign_error = "\u2717"
 let g:ale_sign_warning = "\u26A0"
 let g:ale_statusline_format = ['%d error(s)', '%d warning(s)', '']
 let g:ale_lint_on_save = 0
+let g:ale_fix_on_save = 1
 let g:ale_history_enabled = 0
-
 let g:ale_linters = { 'ruby': ['rubocop'] }
+let g:ale_fixers = { 'ruby': ['rubocop'], 'javascript': ['eslint'] }
+let g:ale_ruby_rubocop_options = '--except Lint/Debugger,Style/SymbolProc'
+let g:ale_pattern_options = {
+\   'db/schema\.rb$': { 'ale_enabled': 0 },
+\ }
+
 
 " Filetypes
 " =========
