@@ -149,12 +149,6 @@ inoreabbrev <expr> __
           \ '<c-o>:silent! TableModeDisable<cr>' : '__'
 
 
-" GitGutter
-" =========
-
-let g:gitgutter_grep_command = 'grep'
-
-
 " Multiple cursors
 " ================
 
