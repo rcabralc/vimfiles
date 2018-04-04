@@ -109,14 +109,6 @@ let g:vrc_include_response_header = 1
 let g:vrc_show_command = 1
 
 
-" dbext
-" =====
-
-let g:dbext_default_window_use_horiz = 1
-let g:dbext_default_window_width = ''
-let g:dbext_default_buffer_lines = '50%'
-
-
 " Indent line
 " ===========
 

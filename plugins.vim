@@ -76,7 +76,7 @@ Plug 'haya14busa/vim-asterisk'
 Plug 'dhruvasagar/vim-table-mode'
 
 " SQL from within VIM
-Plug 'vim-scripts/dbext.vim'
+Plug 'tpope/vim-dadbod'
 
 " Autocompletion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }

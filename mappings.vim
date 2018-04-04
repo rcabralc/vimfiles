@@ -157,3 +157,8 @@ map g# <Plug>(incsearch-nohl)<Plug>(asterisk-gz#)
 map z/ <Plug>(incsearch-fuzzy-/)
 map z? <Plug>(incsearch-fuzzy-?)
 map zg/ <Plug>(incsearch-fuzzy-stay)
+
+" dadbod
+" ======
+
+map <Leader>db vip:DB<Space>$PGJENGAPRD<CR>
