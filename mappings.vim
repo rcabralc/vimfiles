@@ -51,7 +51,7 @@ if has('nvim')
         startinsert
     endfunction
 
-    nnoremap <Leader>t :call OpenTermInDir(expand('%:p:h'))<CR>
+    nnoremap <Leader><CR> :call OpenTermInDir(expand('%:p:h'))<CR>
 
     nnoremap <C-b>s :split<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
     nnoremap <C-b><C-s> :split<CR>:call OpenTermInDir(expand('%:p:h'))<CR>
@@ -64,12 +64,21 @@ if has('nvim')
 endif
 
 " Fuzzy file opening
-map <Leader>f :call g:fuzzy.edit(expand('%:p:h'))<CR>
-map <Leader>F :call g:fuzzy.edit($HOME, '')<CR>
-map <Leader>r :call g:fuzzy.read(expand('%:p:h'))<CR>
-map <Leader>b :call g:fuzzy.reopen('e')<CR>
-map <Leader>o :call g:fuzzy.openold('e')<CR>
-map <Leader>g :call g:fuzzy.edit(g:utils.rubygems_path(expand('%:p:h')))<CR>
+map <Leader>ff :call g:fuzzy.open('edit', expand('%:p:h'))<CR>
+map <Leader>vf :call g:fuzzy.open('vsplit', expand('%:p:h'))<CR>
+map <Leader>sf :call g:fuzzy.open('split', expand('%:p:h'))<CR>
+map <Leader>tf :call g:fuzzy.open('tabedit', expand('%:p:h'))<CR>
+map <Leader>FF :call g:fuzzy.open('edit', $HOME)<CR>
+map <Leader>VF :call g:fuzzy.open('vsplit', $HOME)<CR>
+map <Leader>SF :call g:fuzzy.open('split', $HOME)<CR>
+map <Leader>TF :call g:fuzzy.open('tabedit', $HOME)<CR>
+map <Leader>rf :call g:fuzzy.read(expand('%:p:h'))<CR>
+map <Leader>bb :call g:fuzzy.reopen('edit')<CR>
+map <Leader>vb :call g:fuzzy.reopen('vsplit')<CR>
+map <Leader>sb :call g:fuzzy.reopen('split')<CR>
+map <Leader>tb :call g:fuzzy.reopen('tabedit')<CR>
+map <Leader>o :call g:fuzzy.openold('edit')<CR>
+map <Leader>g :call g:fuzzy.open('edit', g:utils.rubygems_path(expand('%:p:h')))<CR>
 map <A-C-b> :call g:fuzzy.open_from_branch()<CR>
 map <A-C-c> :call g:gitcommand.checkout()<CR>
 
@@ -104,7 +113,6 @@ nnoremap <Leader>k :BW<CR>
 nnoremap <Leader>K :bw!<CR>
 nnoremap <Leader>q :q<CR>
 nnoremap <Leader>w :w<CR>
-nmap <Leader>v V
 map <Leader><Leader> :
 
 " Copy and paste to and from system clipboard

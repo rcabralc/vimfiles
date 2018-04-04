@@ -28,7 +28,7 @@
 " should not cause anoying delays when launched.
 let g:fuzzy = {}
 
-function! s:open(dirname, accept_input, info)
+function! s:select(dirname, cmd, accept_input, info)
     " resolve() mangles fugitive:// paths.
     if match(a:dirname, '^fugitive:\/\/') == 0
         let dirname = a:dirname
@@ -43,12 +43,12 @@ function! s:open(dirname, accept_input, info)
     endif
 
     if g:utils.looks_like_gitroot(info.toplevel)
-        let title = 'Select file from Git repo at ' . info.toplevel
+        let title = ':'.a:cmd.' file from Git repo at ' . info.toplevel
     else
-        let title = 'Select from ' . info.toplevel
+        let title = ':'.a:cmd.' from ' . info.toplevel
     endif
 
-    let choice = g:utils.spawn_menu(info.filescmd, {
+    let choice = g:utils.menucmd({
         \ 'limit': 20,
         \ 'input': info.initial,
         \ 'history_key': 'file:' . info.toplevel,
@@ -56,7 +56,7 @@ function! s:open(dirname, accept_input, info)
         \ 'completion_sep': '/',
         \ 'accept_input': a:accept_input,
         \ 'title': title
-    \ })
+    \ }).pipe_from(info.filescmd).output()
 
     if empty(choice)
         return
@@ -65,24 +65,24 @@ function! s:open(dirname, accept_input, info)
     let resolved = resolve(info.toplevel . '/' . choice)
 
     if isdirectory(resolved)
-        return s:open(resolved, a:accept_input, a:info)
+        return s:select(resolved, a:cmd, a:accept_input, a:info)
     endif
 
     return resolved
 endfunction
 
-function! g:fuzzy.edit(dirname, ...)
+function! g:fuzzy.open(command, dirname, ...)
     let info = a:0 ? a:1 : ''
-    let choice = s:open(a:dirname, 1, info)
+    let choice = s:select(a:dirname, a:command, 1, info)
     if empty(choice)
         return
     endif
-    execute 'edit ' . g:utils.makepath(choice)
+    execute a:command . ' ' . g:utils.makepath(choice)
 endfunction
 
 function! g:fuzzy.read(dirname, ...)
     let info = a:0 ? a:1 : ''
-    let choice = s:open(a:dirname, 0, info)
+    let choice = s:select(a:dirname, 'read', 0, info)
     if empty(choice)
         return
     endif
@@ -106,13 +106,13 @@ function! g:fuzzy.open_from_branch()
         \ 'cwd': root,
         \ 'cmd': 1
     \ })
-    let fname = g:utils.spawn_menu(entriescmd, {
+    let fname = g:utils.menucmd({
         \ 'limit': 20,
         \ 'input': g:utils.relativepath(root, filename),
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
         \ 'title': 'Select file from Git branch ' . branch
-    \ })
+    \ }).pipe_from(entriescmd).output()
 
     if empty(fname)
         return
@@ -122,60 +122,43 @@ function! g:fuzzy.open_from_branch()
 endfunction
 
 function! g:fuzzy.reopen(cmd)
-    let tempfile = tempname()
-
-    execute "redir >" . tempfile
-    silent ls
-    redir END
-
-    let entriescmd = 'cat ' . tempfile .
+    let entriescmd = 'grep -v " a- " ' .
         \ ' | grep "."' .
         \ ' | sed "s/^.*\"\([^\"]*\)\".*\$/\\1/"'
 
-    let fname = g:utils.spawn_menu(entriescmd, {
+    let fname = g:utils.menucmd({
         \ 'limit': 100,
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
-        \ 'title': 'Select buffer'
-    \ })
-
-    call g:utils.fish('rm ' . tempfile)
+        \ 'title': ':'.a:cmd.' buffer'
+    \ }).pipe_from(entriescmd).input(execute('silent ls')).output()
 
     if empty(fname)
         return
     endif
 
-    execute a:cmd . " " .  fname
+    execute a:cmd . " " . fname
 endfunction
 
 function! g:fuzzy.openold(cmd)
-    let tempfile = tempname()
-
-    execute "redir >" . tempfile
-    silent oldfiles
-    redir END
-
-    let entriescmd = 'cat ' . tempfile .
-        \ ' | grep "."' .
+    let entriescmd = 'grep "."' .
         \ ' | grep -v "term://"' .
         \ ' | grep -v ".git/"' .
         \ ' | grep -v "/tmp/nvim"' .
         \ ' | cut -d":" -f2- | sed "s/^\s\+//"'
 
-    let fname = g:utils.spawn_menu(entriescmd, {
+    let fname = g:utils.menucmd({
         \ 'limit': 100,
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
-        \ 'title': 'Select old file'
-    \ })
-
-    call g:utils.fish('rm ' . tempfile)
+        \ 'title': ':'.a:cmd.' old file'
+    \ }).pipe_from(entriescmd).input(execute('silent oldfiles')).output()
 
     if empty(fname)
         return
     endif
 
-    execute a:cmd . " " .  fname
+    execute a:cmd . " " . fname
 endfunction
 
 function! s:project_root_info(dirname)

@@ -90,12 +90,11 @@ function! g:utils.rubygems_path(dirname)
         return fnamemodify(gemroot . '-as-if-not-dir', ':p:h')
     endif
     return g:utils.fish(
-        \ 'rbenv exec gem environment | ' .
-        \ 'grep -e "- INSTALLATION DIRECTORY" | cut -d : -f 2 | xargs', {
+        \ 'bundle env | grep "Gem Path" | xargs | cut -d" " -f3-', {
         \ 'cwd': a:dirname,
         \ 'chomp': 1
         \ }
-    \) . '/gems'
+    \)
 endfunction
 
 function! s:gemroot(file)
@@ -157,7 +156,11 @@ function! utils.fish(command, ...)
         let previous_shell = &shell
 
         set shell=/usr/bin/fish
-        let output = system(l:command)
+        if has_key(options, 'input')
+          let output = system(l:command, options.input)
+        else
+          let output = system(l:command)
+        endif
         let &shell = previous_shell
 
         if v:shell_error
@@ -202,7 +205,7 @@ function! utils.regexescape(str)
   return str
 endfunction
 
-function! utils.spawn_menu(entriescmd, params)
+function! utils.menucmd(params)
     let menucmd = 'pickout --daemonize'
 
     if has_key(a:params, 'limit')
@@ -233,6 +236,74 @@ function! utils.spawn_menu(entriescmd, params)
         let menucmd = menucmd . ' --input ' . shellescape(a:params.input)
     endif
 
-    let cmd = a:entriescmd . ' | ' . menucmd
-    return g:utils.fish(cmd . ' 2>/tmp/debug.log', { 'chomp': 1 })
+    return g:utils.fishline.wrap(menucmd).options({ 'chomp': 1, 'error': '/tmp/debug.log' })
+endfunction
+
+let utils.fishline = {}
+
+function! utils.fishline.wrap(ob)
+    if type(a:ob) ==# 1
+        return s:build_fishline(a:ob)
+    endif
+    return a:ob
+endfunction
+
+function! s:build_fishline(cmd, ...)
+    if a:0
+        let initial_values = a:1
+    else
+        let initial_values = {}
+    endif
+
+    let new_fishline = { '_cmd': a:cmd }
+
+    if has_key(initial_values, '_options')
+      let new_fishline._options = initial_values._options
+    else
+      let new_fishline._options = {}
+    endif
+
+    let new_fishline.pipe_to = function('s:fishline_pipe_to')
+    let new_fishline.pipe_from = function('s:fishline_pipe_from')
+    let new_fishline.options = function('s:fishline_options')
+    let new_fishline.input = function('s:fishline_input')
+    let new_fishline.output = function('s:fishline_output')
+
+    return new_fishline
+endfunction
+
+function! s:fishline_pipe_to(command) dict
+    let cmd = self._cmd
+    let othercmd = type(a:command) ==# 1 ? a:command : a:command._cmd
+    return s:build_fishline(cmd.' | '.othercmd, self)
+endfunction
+
+function! s:fishline_pipe_from(command) dict
+    let othercmd = self._cmd
+    let cmd = type(a:command) ==# 1 ? a:command : a:command._cmd
+    return s:build_fishline(cmd.' | '.othercmd, self)
+endfunction
+
+function! s:fishline_options(options) dict
+    let new_fishline = s:build_fishline(self._cmd, self)
+    if has_key(a:options, 'cwd')
+        let new_fishline._options.cwd = a:options.cwd
+    endif
+    if has_key(a:options, 'error')
+        let new_fishline._options.error = a:options.error
+    endif
+    if has_key(a:options, 'chomp')
+        let new_fishline._options.chomp = a:options.chomp
+    endif
+    return new_fishline
+endfunction
+
+function! s:fishline_input(input) dict
+    let new_fishline = s:build_fishline(self._cmd, self)
+    let new_fishline._options.input = a:input
+    return new_fishline
+endfunction
+
+function! s:fishline_output() dict
+    return g:utils.fish(self._cmd, self._options)
 endfunction

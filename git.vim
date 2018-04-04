@@ -8,13 +8,13 @@ function! g:gitcommand.select_branch(root, ...)
         \ "grep -v HEAD | grep -v '\*' | sed 's/^\\s\*//'"
     let entriescmd = g:utils.fish(branchescmd, { 'cwd': a:root, 'cmd': 1 })
 
-    return g:utils.spawn_menu(entriescmd, {
+    return g:utils.menucmd({
         \ 'limit': 20,
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
         \ 'title': title,
         \ 'history_key': 'branch:'.a:root
-    \ })
+    \ }).pipe_from(entriescmd).output()
 endfunction
 
 function! g:gitcommand.checkout()
