@@ -128,6 +128,7 @@ function! g:fuzzy.reopen(cmd)
 
     let fname = g:utils.menucmd({
         \ 'limit': 100,
+        \ 'input': bufname("%"),
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
         \ 'title': ':'.a:cmd.' buffer'
