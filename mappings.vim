@@ -90,25 +90,6 @@ nnoremap Q gqap
 nmap <A-S-w> viw
 nmap <A-(> vi(
 
-" map <A-b> :call <SID>softmotion('b')<CR>
-" map <A-w> :call <SID>softmotion('w')<CR>
-" map <A-e> :call <SID>softmotion('e')<CR>
-"
-" function! <SID>softmotion(motion)
-"     let oldisk = &isk
-"     let &isk = substitute(substitute(substitute(oldisk.',', '[-_],', '', 'g'), ',\+', ',', 'g'), ',$', '', '')
-"     execute "normal ".a:motion
-"     let &isk = oldisk
-" endfunction
-
-nmap <silent> <A-C-k> <Plug>(ale_previous_wrap)
-nmap <silent> <A-C-j> <Plug>(ale_next_wrap)
-
-nmap <Leader>h <Plug>GitGutterLineHighlightsToggle
-nmap <C-k> <Plug>GitGutterPrevHunk
-nmap <C-j> <Plug>GitGutterNextHunk
-nmap <C-s> <Plug>GitGutterStageHunk
-
 nnoremap <Leader>k :BW<CR>
 nnoremap <Leader>K :bw!<CR>
 nnoremap <Leader>q :q<CR>
@@ -130,6 +111,46 @@ vnoremap p "_dP
 " Command line history
 cmap <C-p> <Up>
 cmap <C-n> <Down>
+
+" map <A-b> :call <SID>softmotion('b')<CR>
+" map <A-w> :call <SID>softmotion('w')<CR>
+" map <A-e> :call <SID>softmotion('e')<CR>
+"
+" function! <SID>softmotion(motion)
+"     let oldisk = &isk
+"     let &isk = substitute(substitute(substitute(oldisk.',', '[-_],', '', 'g'), ',\+', ',', 'g'), ',$', '', '')
+"     execute "normal ".a:motion
+"     let &isk = oldisk
+" endfunction
+
+
+" ALE
+" ===
+
+nmap <silent> <A-C-k> <Plug>(ale_previous_wrap)
+nmap <silent> <A-C-j> <Plug>(ale_next_wrap)
+
+
+" Git
+" ===
+
+function! s:stage_hunk_and_reload_status()
+    :GitGutterStageHunk
+    silent call fugitive#reload_status()
+endfunction
+
+function! s:undo_hunk_and_reload_status()
+    :GitGutterUndoHunk
+    silent call fugitive#reload_status()
+endfunction
+
+nmap <Leader>h <Plug>GitGutterLineHighlightsToggle
+nmap <C-k> <Plug>GitGutterPrevHunk
+nmap <C-j> <Plug>GitGutterNextHunk
+nmap <C-s> :call <SID>stage_hunk_and_reload_status()<CR>
+nmap <Leader>hu :call <SID>undo_hunk_and_reload_status()<CR>
+nmap <Leader>G :Gst<CR>
+
 
 " Incsearch and asterisk
 " ======================
@@ -157,6 +178,7 @@ map g# <Plug>(incsearch-nohl)<Plug>(asterisk-gz#)
 map z/ <Plug>(incsearch-fuzzy-/)
 map z? <Plug>(incsearch-fuzzy-?)
 map zg/ <Plug>(incsearch-fuzzy-stay)
+
 
 " dadbod
 " ======
