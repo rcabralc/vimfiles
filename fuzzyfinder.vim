@@ -131,6 +131,7 @@ function! g:fuzzy.reopen(cmd)
         \ 'input': bufname("%"),
         \ 'word_delimiters': '/',
         \ 'completion_sep': '/',
+        \ 'accept_input': 1,
         \ 'title': ':'.a:cmd.' buffer'
     \ }).pipe_from(entriescmd).input(execute('silent ls')).output()
 
@@ -138,7 +139,7 @@ function! g:fuzzy.reopen(cmd)
         return
     endif
 
-    execute a:cmd . " " . fname
+    execute a:cmd . ' ' . g:utils.makepath(fname)
 endfunction
 
 function! g:fuzzy.openold(cmd)
