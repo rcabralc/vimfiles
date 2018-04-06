@@ -76,21 +76,24 @@ function! s:improve_highlights(p)
 
     hi! link vimUserFunc Function
 
-    call rcabralc#hl('GitGutterAdd',           a:p.green.actual,  a:p.gray0.actual, 'bold')
-    call rcabralc#hl('GitGutterChange',        a:p.yellow.actual, a:p.gray0.actual, 'bold')
-    call rcabralc#hl('GitGutterDelete',        a:p.red.actual,    a:p.gray0.actual, 'bold')
-    call rcabralc#hl('GitGutterChangeDelete',  a:p.red.actual,    a:p.gray0.actual, 'bold')
+    hi! link javascriptClassKeyword Define
+    hi! link javascriptObjectLabel Identifier
+
+    call rcabralc#hl('GitGutterAdd',           a:p.green0.actual,  a:p.gray0.actual, 'bold')
+    call rcabralc#hl('GitGutterChange',        a:p.yellow0.actual, a:p.gray0.actual, 'bold')
+    call rcabralc#hl('GitGutterDelete',        a:p.red0.actual,    a:p.gray0.actual, 'bold')
+    call rcabralc#hl('GitGutterChangeDelete',  a:p.red0.actual,    a:p.gray0.actual, 'bold')
 
     call rcabralc#hl('TabLineSel', a:p.bg.actual, a:p.fg.actual)
 
-    call rcabralc#hl('InsertModeStatus',     a:p.bg.actual,     a:p.green.actual)
-    call rcabralc#hl('VisualModeStatus',     a:p.bg.actual,     a:p.purple.actual)
-    call rcabralc#hl('ReplaceModeStatus',    a:p.bg.actual,     a:p.orange.actual)
-    call rcabralc#hl('GitBranchStatus',      a:p.purple.actual, a:p.gray0.actual)
-    call rcabralc#hl('ModifiedStatus',       a:p.orange.actual, a:p.gray0.actual)
-    call rcabralc#hl('ReadonlyStatus',       a:p.red.actual,    a:p.gray0.actual)
-    call rcabralc#hl('WarningStatus',        a:p.bg.actual,     a:p.red.actual)
-    call rcabralc#hl('FiletypeStatus',       a:p.purple.actual, a:p.gray0.actual)
+    call rcabralc#hl('InsertModeStatus',     a:p.bg.actual,     a:p.green0.actual)
+    call rcabralc#hl('VisualModeStatus',     a:p.bg.actual,     a:p.purple0.actual)
+    call rcabralc#hl('ReplaceModeStatus',    a:p.bg.actual,     a:p.orange0.actual)
+    call rcabralc#hl('GitBranchStatus',      a:p.purple0.actual, a:p.gray0.actual)
+    call rcabralc#hl('ModifiedStatus',       a:p.orange0.actual, a:p.gray0.actual)
+    call rcabralc#hl('ReadonlyStatus',       a:p.red0.actual,    a:p.gray0.actual)
+    call rcabralc#hl('WarningStatus',        a:p.bg.actual,     a:p.red0.actual)
+    call rcabralc#hl('FiletypeStatus',       a:p.purple0.actual, a:p.gray0.actual)
     call rcabralc#hl('AdditionalInfoStatus', a:p.gray3.actual,  a:p.gray0.actual)
 
     " Highlighs intended to blend with vim-dimnactive
@@ -98,8 +101,8 @@ function! s:improve_highlights(p)
     call rcabralc#hl('LineNr', a:p.gray3.actual, a:p.gray0.actual)
     call rcabralc#hl('VertSplit', a:p.gray2.actual, a:p.gray0.actual)
     call rcabralc#hl('FoldColumn', a:p.gray3.actual, a:p.gray0.actual)
-    call rcabralc#hl('SignColumn', a:p.orange.actual, a:p.gray0.actual)
-    call rcabralc#hl('CursorLineNr', a:p.orange.actual, a:p.gray0.actual)
+    call rcabralc#hl('SignColumn', a:p.orange0.actual, a:p.gray0.actual)
+    call rcabralc#hl('CursorLineNr', a:p.orange0.actual, a:p.gray0.actual)
 endfunction
 
 augroup Colors
@@ -111,7 +114,7 @@ augroup END
 call utils.vimsource('pluginconf.vim')
 call utils.vimsource('site.vim')
 
-augroup WinActiveHighlight
+augroup CustomStatusLine
     autocmd!
     autocmd WinEnter * setlocal statusline=%!StatusLine(1)
     autocmd WinLeave * setlocal statusline=%!StatusLine(0)
