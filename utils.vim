@@ -87,14 +87,14 @@ endfunction
 function! g:utils.rubygems_path(dirname)
     let gemroot = s:gemroot(a:dirname)
     if !empty(gemroot)
-        return fnamemodify(gemroot . '-as-if-not-dir', ':p:h')
+        return s:parent_dir(gemroot)
     endif
     return g:utils.fish(
-        \ 'bundle env | grep "Gem Path" | xargs | cut -d" " -f3-', {
+        \ 'rbenv exec bundle env | grep "Gem Path" | xargs | cut -d" " -f3- | cut -d: -f2', {
         \ 'cwd': a:dirname,
         \ 'chomp': 1
         \ }
-    \)
+    \).'/gems'
 endfunction
 
 function! s:gemroot(file)
@@ -105,10 +105,14 @@ function! s:gemroot(file)
             return dirname
         endif
 
-        let dirname = fnamemodify(dirname . '-as-if-not-dir', ':p:h')
+        let dirname = s:parent_dir(dirname)
     endwhile
 
     return ''
+endfunction
+
+function! s:parent_dir(dirname)
+    return fnamemodify(a:dirname . '-as-if-not-dir', ':p:h')
 endfunction
 
 function! s:looks_like_gemroot(dirname)
