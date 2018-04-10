@@ -72,7 +72,7 @@ map <Leader>FF :call g:fuzzy.open('edit', $HOME)<CR>
 map <Leader>VF :call g:fuzzy.open('vsplit', $HOME)<CR>
 map <Leader>SF :call g:fuzzy.open('split', $HOME)<CR>
 map <Leader>TF :call g:fuzzy.open('tabedit', $HOME)<CR>
-map <Leader>rf :call g:fuzzy.read(expand('%:p:h'))<CR>
+map <Leader>rf :call g:fuzzy.open('read', expand('%:p:h'))<CR>
 map <Leader>bb :call g:fuzzy.reopen('edit')<CR>
 map <Leader>vb :call g:fuzzy.reopen('vsplit')<CR>
 map <Leader>sb :call g:fuzzy.reopen('split')<CR>

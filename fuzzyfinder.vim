@@ -28,7 +28,9 @@
 " should not cause anoying delays when launched.
 let g:fuzzy = {}
 
-function! s:select(dirname, cmd, accept_input, info)
+function! s:select(dirname, cmd, accept_input, ...)
+    let initial_info = a:0 ? a:1 : ''
+
     " resolve() mangles fugitive:// paths.
     if match(a:dirname, '^fugitive:\/\/') == 0
         let dirname = a:dirname
@@ -36,10 +38,10 @@ function! s:select(dirname, cmd, accept_input, info)
         let dirname = resolve(a:dirname)
     endif
 
-    if empty(a:info)
+    if empty(initial_info)
         let info = s:project_root_info(dirname)
     else
-        let info = a:info
+        let info = initial_info
     endif
 
     if g:utils.looks_like_gitroot(info.toplevel)
@@ -65,28 +67,22 @@ function! s:select(dirname, cmd, accept_input, info)
     let resolved = resolve(info.toplevel . '/' . choice)
 
     if isdirectory(resolved)
-        return s:select(resolved, a:cmd, a:accept_input, a:info)
+        return s:select(resolved, a:cmd, a:accept_input, initial_info)
     endif
 
     return resolved
 endfunction
 
-function! g:fuzzy.open(command, dirname, ...)
-    let info = a:0 ? a:1 : ''
-    let choice = s:select(a:dirname, a:command, 1, info)
+function! g:fuzzy.open(command, dirname)
+    let accept_input = a:command !=# 'read'
+    let choice = s:select(a:dirname, a:command, accept_input)
     if empty(choice)
         return
     endif
-    execute a:command . ' ' . g:utils.makepath(choice)
-endfunction
-
-function! g:fuzzy.read(dirname, ...)
-    let info = a:0 ? a:1 : ''
-    let choice = s:select(a:dirname, 'read', 0, info)
-    if empty(choice)
-        return
+    if accept_input
+        let choice = g:utils.makepath(choice)
     endif
-    execute 'read ' . choice
+    execute a:command . ' ' . choice
 endfunction
 
 function! g:fuzzy.open_from_branch()
