@@ -120,6 +120,15 @@ augroup CustomStatusLine
     autocmd WinLeave * setlocal statusline=%!StatusLine(0)
 augroup END
 
+function! CustomALEStatus()
+    let problems = ale#statusline#Count(bufnr('%'))['total']
+    if problems > 0
+        return ' '.problems.'(!)'
+    else
+        return ''
+    endif
+endfunction
+
 function! StatusLine(active)
     let sections = [
         \ { 'val': a:active && mode() ==# 'i' ? ' INS ' : '', 'hl': 'InsertModeStatus', 'pad': '' },
@@ -134,7 +143,7 @@ function! StatusLine(active)
         \ { 'expr': '%f', 'enabled': mode() !=# 't' },
         \ { 'expr': '%{fugitive#head(10)}', 'hl': 'GitBranchStatus', 'pad': '@', 'enabled': mode() !=# 't' },
         \ { 'expr': '%r', 'hl': 'ReadonlyStatus' },
-        \ { 'expr': '%{ALEGetStatusLine()}', 'hl': 'WarningStatus' },
+        \ { 'expr': "%{CustomALEStatus()}", 'hl': 'WarningStatus' },
         \ { 'expr': '%l(%p%%)/%L:%c%V', 'hl': 'AdditionalInfoStatus' },
         \ { 'expr': '%y', 'hl': 'FiletypeStatus' },
         \ { 'expr': '%w' }
