@@ -87,8 +87,7 @@ map <A-C-c> :call g:gitcommand.checkout()<CR>
 " ":") by using gQ.
 nnoremap Q gqap
 
-nmap <A-S-w> viw
-nmap <A-(> vi(
+nmap <C-F> /
 
 nnoremap <Leader>k :BW<CR>
 nnoremap <Leader>K :bw!<CR>
