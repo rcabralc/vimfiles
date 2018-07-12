@@ -167,3 +167,10 @@ function! Multiple_cursors_after()
        let g:deoplete#disable_auto_complete = 0
     endif
 endfunction
+
+" Far
+" ===
+
+" Not sure why vimgrep doesn't work (this requires ag installed, no support for
+" multilne).
+let g:far#source = 'ag'

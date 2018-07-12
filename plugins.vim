@@ -112,6 +112,9 @@ Plug 'blueyed/vim-diminactive'
 Plug 'kana/vim-textobj-user'
 Plug 'nelstrom/vim-textobj-rubyblock'
 
+" Refactor
+Plug 'brooth/far.vim'
+
 call plug#end()
 
 if !was_installed
