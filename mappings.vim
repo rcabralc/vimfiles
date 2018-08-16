@@ -160,9 +160,9 @@ map <A-C-p> :cp <bar> set hlsearch<CR>
 
 " Search in current git tree. (* marks the word without jumping to next
 " match thanks to vim-asterisk.)
-nmap K *:F  .
-vmap K y:F " .
-nmap <A-s> :F  .<C-b><C-b>
+nmap K *:Ggrep "" <bar> copen<A-b><A-b><C-b><C-b>
+vmap K y:Ggrep """ <bar> copen<A-b><A-b><C-b><C-b>
+nmap <A-s> :Ggrep  <bar> copen<A-b><A-b><C-b>
 
 map /  <Plug>(incsearch-forward)
 map ?  <Plug>(incsearch-backward)

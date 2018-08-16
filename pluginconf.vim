@@ -124,8 +124,6 @@ function! Multiple_cursors_after()
     endif
 endfunction
 
-" Far
-" ===
 
 " Not sure why vimgrep doesn't work (this requires ag installed, no support for
 " multilne).
