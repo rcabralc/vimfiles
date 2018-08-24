@@ -23,10 +23,7 @@ Plug 'othree/es.next.syntax.vim'
 
 " Colorschemes/themes
 Plug 'morhetz/gruvbox'
-Plug 'rcabralc/monokai.vim'
-Plug '~/devel/vim/rcabralc-colorscheme.vim'
-Plug '~/devel/vim/monokai-airline.vim/'
-Plug '~/devel/vim/rcabralc-airline.vim/'
+Plug 'rcabralc/rcabralc-colorscheme.vim', { 'branch': 'new-colors' }
 
 " Git
 Plug 'tpope/vim-fugitive'
