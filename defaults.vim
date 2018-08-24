@@ -1,5 +1,4 @@
 set number
-set mouse=
 set autoindent
 set noshowmode
 set list
