@@ -4,6 +4,7 @@
 Session.vim
 bundle/
 autoload/plug*
+colors/undefined.vim
 python/history.json
 python/elect.so
 spell/

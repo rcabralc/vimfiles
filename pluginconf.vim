@@ -7,54 +7,10 @@ let g:EditorConfig_exclude_patterns = ['scp://.*']
 " ===========
 
 set background=dark
-let g:rcabralc= { 'use_default_term_colors': 1 }
-let g:monokai_colorscheme#use_default_term_colors = 1
-colorscheme rcabralc
-
-
-" let g:lightline = { }
-" let g:lightline.colorscheme = 'rcabralc'
-" let g:lightline.active = {
-"     \ 'left': [ [ 'mode', 'paste' ],
-"     \           [ 'fugitive' ],
-"     \           [ 'readonly', 'filename', 'modified' ] ],
-"     \ 'right': [ [ 'ale', 'lineinfo' ],
-"     \            [ 'percent' ],
-"     \            [ 'filetype' ] ]
-" \ }
-" let g:lightline.inactive = {
-"     \ 'left': [ [ 'filename' ] ],
-"     \ 'right': [ [ 'lineinfo', 'percent' ] ]
-" \ }
-" let g:lightline.tabline = {
-"     \ 'left': [ [ 'tabs' ] ],
-"     \ 'right': [ [ 'close' ] ]
-" \ }
-" let g:lightline.component_function = {
-"     \ 'readonly': 'LightLineReadonly',
-"     \ 'fugitive': 'LightLineFugitive',
-" \ }
-" let g:lightline.component_expand = {
-"     \ 'ale': 'ALEGetStatusLine',
-" \ }
-" let g:lightline.component_type = {
-"     \ 'ale': 'error',
-" \ }
-" let g:lightline.separator = { 'left': '⮀', 'right': '⮂' }
-" let g:lightline.subseparator = { 'left': '⮁', 'right': '⮃' }
-"
-" function! LightLineReadonly()
-"     return &readonly ? '!' : ''
-" endfunction
-"
-" function! LightLineFugitive()
-"     if !exists('*fugitive#head')
-"         return ''
-"     endif
-"
-"     let _ = fugitive#head()
-"     return strlen(_) ? _ : ''
-" endfunction
+try
+  colorscheme undefined
+catch /^Vim\%((\a\+)\)\=:E185/ " catch missing colorscheme
+endtry
 
 
 " ALE

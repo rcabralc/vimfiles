@@ -23,7 +23,6 @@ Plug 'othree/es.next.syntax.vim'
 
 " Colorschemes/themes
 Plug 'morhetz/gruvbox'
-Plug 'rcabralc/rcabralc-colorscheme.vim', { 'branch': 'new-colors' }
 
 " Git
 Plug 'tpope/vim-fugitive'

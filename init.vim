@@ -79,35 +79,35 @@ function! s:improve_highlights(p)
     hi! link javascriptClassKeyword Define
     hi! link javascriptObjectLabel Identifier
 
-    call rcabralc#hl('GitGutterAdd',           a:p.green0.actual,  a:p.gray0.actual, 'bold')
-    call rcabralc#hl('GitGutterChange',        a:p.yellow0.actual, a:p.gray0.actual, 'bold')
-    call rcabralc#hl('GitGutterDelete',        a:p.red0.actual,    a:p.gray0.actual, 'bold')
-    call rcabralc#hl('GitGutterChangeDelete',  a:p.red0.actual,    a:p.gray0.actual, 'bold')
+    exe "hi! GitGutterAdd guibg=".a:p.gray0." guifg="a:p.lime0." gui=bold"
+    exe "hi! GitGutterChange guibg=".a:p.gray0." guifg="a:p.yellow0." gui=bold"
+    exe "hi! GitGutterDelete guibg=".a:p.gray0." guifg="a:p.red0." gui=bold"
+    exe "hi! GitGutterChangeDelete guibg=".a:p.gray0." guifg="a:p.red0." gui=bold"
 
-    call rcabralc#hl('TabLineSel', a:p.bg.actual, a:p.fg.actual)
+    exe "hi! TabLineSel guibg=".a:p.fg." guifg="a:p.bg
 
-    call rcabralc#hl('InsertModeStatus',     a:p.bg.actual,     a:p.green0.actual)
-    call rcabralc#hl('VisualModeStatus',     a:p.bg.actual,     a:p.purple0.actual)
-    call rcabralc#hl('ReplaceModeStatus',    a:p.bg.actual,     a:p.orange0.actual)
-    call rcabralc#hl('GitBranchStatus',      a:p.purple0.actual, a:p.gray0.actual)
-    call rcabralc#hl('ModifiedStatus',       a:p.orange0.actual, a:p.gray0.actual)
-    call rcabralc#hl('ReadonlyStatus',       a:p.red0.actual,    a:p.gray0.actual)
-    call rcabralc#hl('WarningStatus',        a:p.bg.actual,     a:p.red0.actual)
-    call rcabralc#hl('FiletypeStatus',       a:p.purple0.actual, a:p.gray0.actual)
-    call rcabralc#hl('AdditionalInfoStatus', a:p.gray3.actual,  a:p.gray0.actual)
+    exe "hi! InsertModeStatus guibg=".a:p.lime0." guifg="a:p.bg
+    exe "hi! VisualModeStatus guibg=".a:p.purple0." guifg="a:p.bg
+    exe "hi! ReplaceModeStatus guibg=".a:p.orange0." guifg="a:p.bg
+    exe "hi! GitBranchStatus guibg=".a:p.gray0." guifg="a:p.purple0
+    exe "hi! ModifiedStatus guibg=".a:p.gray0." guifg="a:p.orange0
+    exe "hi! ReadonlyStatus guibg=".a:p.gray0." guifg="a:p.red0
+    exe "hi! WarningStatus guibg=".a:p.red0." guifg="a:p.bg
+    exe "hi! FiletypeStatus guibg=".a:p.gray0." guifg="a:p.purple0
+    exe "hi! AdditionalInfoStatus guibg=".a:p.gray0." guifg="a:p.gray3
 
     " Highlighs intended to blend with vim-dimnactive
-    call rcabralc#hl('NonText', a:p.gray2.actual, a:p.gray0.actual)
-    call rcabralc#hl('LineNr', a:p.gray3.actual, a:p.gray0.actual)
-    call rcabralc#hl('VertSplit', a:p.gray2.actual, a:p.gray0.actual)
-    call rcabralc#hl('FoldColumn', a:p.gray3.actual, a:p.gray0.actual)
-    call rcabralc#hl('SignColumn', a:p.orange0.actual, a:p.gray0.actual)
-    call rcabralc#hl('CursorLineNr', a:p.orange0.actual, a:p.gray0.actual)
+    exe "hi! NonText guibg=".a:p.gray0." guifg="a:p.gray2
+    exe "hi! LineNr guibg=".a:p.gray0." guifg="a:p.gray3
+    exe "hi! VertSplit guibg=".a:p.gray0." guifg="a:p.gray2
+    exe "hi! FoldColumn guibg=".a:p.gray0." guifg="a:p.gray3
+    exe "hi! SignColumn guibg=".a:p.gray0." guifg="a:p.orange0
+    exe "hi! CursorLineNr guibg=".a:p.gray0." guifg="a:p.orange0
 endfunction
 
 augroup Colors
     autocmd!
-    autocmd ColorScheme rcabralc call s:improve_highlights(g:rcabralc#palette)
+    autocmd ColorScheme undefined call s:improve_highlights(g:undefined#palette.current)
     autocmd ColorScheme * set guicursor=n-v-c:block-Cursor/lCursor-blinkon0,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor
 augroup END
 
