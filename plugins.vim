@@ -101,8 +101,10 @@ Plug 'jiangmiao/auto-pairs'
 " Multiple cursors
 Plug 'terryma/vim-multiple-cursors'
 
-" Change background of inactive windows
-Plug 'blueyed/vim-diminactive'
+if !has('nvim')
+    " Change background of inactive windows
+    Plug 'blueyed/vim-diminactive'
+endif
 
 " Ruby blocks text object
 Plug 'kana/vim-textobj-user'
