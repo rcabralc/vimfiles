@@ -96,13 +96,10 @@ function! s:improve_highlights(p)
     exe "hi! FiletypeStatus guibg=".a:p.gray0." guifg="a:p.purple0
     exe "hi! AdditionalInfoStatus guibg=".a:p.gray0." guifg="a:p.gray3
 
-    " Highlighs intended to blend with vim-dimnactive
-    exe "hi! NonText guibg=".a:p.gray0." guifg="a:p.gray2
-    exe "hi! LineNr guibg=".a:p.gray0." guifg="a:p.gray3
-    exe "hi! VertSplit guibg=".a:p.gray0." guifg="a:p.gray2
-    exe "hi! FoldColumn guibg=".a:p.gray0." guifg="a:p.gray3
-    exe "hi! SignColumn guibg=".a:p.gray0." guifg="a:p.orange0
-    exe "hi! CursorLineNr guibg=".a:p.gray0." guifg="a:p.orange0
+    " Highligh intended to blend with vim-dimnactive
+    if !has('nvim')
+        exe "hi! NonText guibg=".a:p.gray0." guifg="a:p.gray2
+    endif
 endfunction
 
 augroup Colors
