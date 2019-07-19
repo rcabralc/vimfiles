@@ -68,7 +68,7 @@ function! s:improve_highlights(p)
     hi! link cssFunctionName Function
     hi! link cssIdentifier Identifier
 
-    hi! link rubyPseudoVariable Special
+    hi! link rubyPseudoVariable Identifier
 
     hi! link erubyDelimiter Delimiter
 
@@ -79,26 +79,24 @@ function! s:improve_highlights(p)
     hi! link javascriptClassKeyword Define
     hi! link javascriptObjectLabel Identifier
 
-    exe "hi! GitGutterAdd guibg=".a:p.gray0." guifg="a:p.lime0." gui=bold"
-    exe "hi! GitGutterChange guibg=".a:p.gray0." guifg="a:p.yellow0." gui=bold"
-    exe "hi! GitGutterDelete guibg=".a:p.gray0." guifg="a:p.red0." gui=bold"
-    exe "hi! GitGutterChangeDelete guibg=".a:p.gray0." guifg="a:p.red0." gui=bold"
+    exe "hi! GitGutterAdd guibg=".a:p.term17." guifg="a:p.term10." gui=bold"
+    exe "hi! GitGutterChange guibg=".a:p.term17." guifg="a:p.term11." gui=bold"
+    exe "hi! GitGutterDelete guibg=".a:p.term17." guifg="a:p.term9." gui=bold"
+    exe "hi! GitGutterChangeDelete guibg=".a:p.term17." guifg="a:p.term9." gui=bold"
 
-    exe "hi! TabLineSel guibg=".a:p.fg." guifg="a:p.bg
-
-    exe "hi! InsertModeStatus guibg=".a:p.lime0." guifg="a:p.bg
-    exe "hi! VisualModeStatus guibg=".a:p.purple0." guifg="a:p.bg
-    exe "hi! ReplaceModeStatus guibg=".a:p.orange0." guifg="a:p.bg
-    exe "hi! GitBranchStatus guibg=".a:p.gray0." guifg="a:p.purple0
-    exe "hi! ModifiedStatus guibg=".a:p.gray0." guifg="a:p.orange0
-    exe "hi! ReadonlyStatus guibg=".a:p.gray0." guifg="a:p.red0
-    exe "hi! WarningStatus guibg=".a:p.red0." guifg="a:p.bg
-    exe "hi! FiletypeStatus guibg=".a:p.gray0." guifg="a:p.purple0
-    exe "hi! AdditionalInfoStatus guibg=".a:p.gray0." guifg="a:p.gray3
+    exe "hi! InsertModeStatus guibg=".a:p.term10." guifg="a:p.term0
+    exe "hi! VisualModeStatus guibg=".a:p.term12." guifg="a:p.term0
+    exe "hi! ReplaceModeStatus guibg=".a:p.term13." guifg="a:p.term0
+    exe "hi! GitBranchStatus guibg=".a:p.term17." guifg="a:p.term12
+    exe "hi! ModifiedStatus guibg=".a:p.term17." guifg="a:p.term13
+    exe "hi! ReadonlyStatus guibg=".a:p.term17." guifg="a:p.term9
+    exe "hi! WarningStatus guibg=".a:p.term9." guifg="a:p.term0
+    exe "hi! FiletypeStatus guibg=".a:p.term17." guifg="a:p.term12
+    exe "hi! AdditionalInfoStatus guibg=".a:p.term17." guifg="a:p.term19
 
     " Highligh intended to blend with vim-dimnactive
     if !has('nvim')
-        exe "hi! NonText guibg=".a:p.gray0." guifg="a:p.gray2
+        exe "hi! NonText guibg=".a:p.term17." guifg="a:p.term8
     endif
 endfunction
 
