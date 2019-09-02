@@ -91,3 +91,8 @@ set nofoldenable
 set shiftround
 
 set updatetime=100
+
+if has('nvim')
+    " See command (like substitution) effects incrementally, as they're typed.
+    set inccommand=nosplit
+endif
